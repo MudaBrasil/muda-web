@@ -34,7 +34,6 @@ a,
   }
 } */
 
-
 #app {
   width: 100vw;
   height:  100vh;
@@ -47,6 +46,7 @@ a,
   background-color: #F1F6F7;
   display: flex;
   justify-content: center;
+  align-items: center;
   z-index: 0;
 }
 
@@ -56,33 +56,6 @@ a,
   z-index: 100; 
 }
 
-/* .floating-menu-bar {
-  position: relative; 
-  height: 74px;
-  width: 354px;
-  border-radius: 60px;
-  background-color: white;
-  border: solid 1px #F1F1F2;
-  box-shadow: rgba(0, 0, 0, 0.4) 2px 4px 4px 0px;
-  opacity: 0.5;
-}
-
- .floating-menu-bar::before {
-  content: "";
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  background-color: white;
-  border: solid 1px #F1F1F2;
-  border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.4) 2px 4px 4px 0px;
-  left: 50%; 
-  top: 50%;
-  transform: translate(-50%, -50%); 
-} */
-
-
-/* Estilo para o elemento .floating-menu-bar */
 .floating-menu-bar {
   position: relative;
   height: 74px;
@@ -90,7 +63,7 @@ a,
   border-radius: 60px;
   background-color: white;
   border: solid 1px #F1F1F2;
-  z-index: 100; /* Coloca o elemento acima do círculo cinza */
+  z-index: 100;
 }
 
 .floating-menu-bar-shadow {
@@ -99,10 +72,9 @@ a,
   width: 354px;
   border-radius: 60px;
   box-shadow: rgba(0, 0, 0, 0.25) 2px 4px 4px 0px;
-  z-index: 98; /* Coloca o elemento acima do círculo cinza */
+  z-index: 98;
 }
 
-/* Estilo para o círculo branco por cima do .floating-menu-bar */
 .floating-menu-circle {
   position: absolute;
   width: 89px;
@@ -112,7 +84,7 @@ a,
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 101; /* Coloca o círculo branco acima do .floating-menu-bar */
+  z-index: 101;
 }
 
 .floating-menu-circle-shadow {
@@ -125,7 +97,7 @@ a,
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 99; /* Coloca o círculo atrás de tudo */
+  z-index: 99;
 }
 
 .floating-menu-circle-border {
@@ -138,4 +110,33 @@ a,
   transform: translate(-50%, -50%);
   border: solid 3px #E2E2E2;
   z-index: 102;
+}
+
+.floating-menu-options {
+  position: absolute;
+  z-index: 104;
+  height: 74px;
+  width: 354px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 7px;
+}
+
+.floating-menu-options-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.center-btn {
+  margin: 0px 14px;
+}
+
+.active {
+  background-color: #F1F1F2;
 }
