@@ -44,16 +44,15 @@ a,
   height:  100vh;
   position: relative;
   background-color: #F1F6F7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 0;
 }
 
 .floating-menu{
   position: absolute;
-  bottom: 30px;
+  bottom: 0px;
   z-index: 100; 
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .floating-menu-bar {
@@ -139,4 +138,9 @@ a,
 
 .active {
   background-color: #F1F1F2;
+}
+
+h1 {
+  color: #15BE77;
+  font-weight: bold;
 }

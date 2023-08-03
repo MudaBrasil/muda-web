@@ -17,14 +17,15 @@ export default defineConfig({
         enabled: true
       },
       manifest: {
-        theme_color: "#417505",
-        background_color: "#b8e986",
+        theme_color: "#15be77",
+        background_color: "#114C7C",
         display: "standalone",
         scope: "/",
+        lang: "pt",
         start_url: "/",
         name: "Muda",
         short_name: "Muda",
-        description: "Muda is your best growth app",
+        description: "Seu melhor jeito para aprender feliz!",
         icons: [
             {
                 src: "/logo-192x192.png",
@@ -44,8 +45,27 @@ export default defineConfig({
             {
                 src: "/logo.png",
                 sizes: "512x512",
-                type: "image/png"
+                type: "image/png",
+                purpose: "any"
+            },
+            {
+                src: "/logo-big.png",
+                sizes: "512x512",
+                type: "image/png",
+                purpose: "maskable"
             }
+        ],
+        dir: "auto",
+        categories: [
+          "education",
+          "fitness",
+          "food",
+          "games",
+          "health",
+          "music",
+          "productivity",
+          "social",
+          "utilities"
         ]
       }
     })

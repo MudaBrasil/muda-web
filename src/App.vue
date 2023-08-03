@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+
 </script>
 
 <template>
@@ -17,7 +18,27 @@ import HelloWorld from './components/HelloWorld.vue'
     </div>
   </header> -->
   <div class="main">
+    <div style="padding: 20px">
+      <h1>Parabéns Rennan</h1>
+      <a href="">Continue a nadar!</a>
+    </div>
+
     
+    <div style="padding: 20px">
+      <h1>Continuar o cronograma</h1>
+      <a href="">Criar de 30 em 30 min</a>
+    </div>
+    
+    
+    <div style="padding: 20px">
+      <h1>Construir pomodoro</h1>
+      <a href="">Criar botoes e customizar sons</a>
+    </div>
+    
+    <div style="padding: 20px">
+      <h1>Acorda groot</h1>
+      <a href="">Gravar audio motivacional para acordar bem</a>
+    </div>
     
     <div class="floating-menu">
       <div class="floating-menu-bar-shadow"></div>
