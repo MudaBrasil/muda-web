@@ -4,7 +4,7 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
+  <!-- <header>
     <img alt="Muda logo" class="logo" src="/logo.png" width="125" height="125" />
 
     <div class="wrapper">
@@ -15,21 +15,37 @@ import HelloWorld from './components/HelloWorld.vue'
         <RouterLink to="/about">Sobre</RouterLink>
       </nav>
     </div>
-  </header>
-
-  <RouterView />
+  </header> -->
+  <div class="main">
+    <div class="floating-menu">      
+      <div class="floating-menu-bar-shadow">
+      </div>
+      <div class="floating-menu-circle-shadow">
+      </div>
+      <div class="floating-menu-bar">
+        <div class="floating-menu-circle">
+        </div>
+        
+        <div class="floating-menu-circle-border">
+        </div>
+      </div>
+    </div>
+    <!-- <RouterView /> -->
+  </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 header {
   line-height: 1.5;
   max-height: 100vh;
 }
 
+
 .logo {
   display: block;
   margin: 0 auto 2rem;
 }
+
 
 nav {
   width: 100%;
