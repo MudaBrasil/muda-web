@@ -1,11 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue'
-import imgUrl from './tree_background.png'
+import imgTreeBackground from './assets/tree_background.png'
 
-const teste = ref('blue')
-// const image = ref(`url(${imgUrl})`)
 
 </script>
 
@@ -80,31 +77,54 @@ const teste = ref('blue')
       </div>
     </div>
   
-    <!-- <div class="bg-image" :style="{backgroundColor: 'blue'}"> -->
-    <div class="bg-image" :style="{backgroundImage: `url(${imgUrl})`}">
+    <div class="bg-image" :style="{backgroundImage: `url(${imgTreeBackground})`}">
     </div>
     
     <div class="context"> 
-      <div style="padding: 20px">
+      <div class="context-field">
         <h1>Parabéns Rennan</h1>
         <a href="">Continue a nadar!</a>
+        <br>
+        <img src="@/assets/logo.png" alt="Logo do Muda">
+        <br>
       </div>
   
       
-      <div style="padding: 20px">
+      <div class="context-field">
         <h1>Continuar o cronograma</h1>
         <a href="">Criar de 30 em 30 min</a>
+        <br>
+        <div>
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+        </div>
+        <br>
       </div>
       
       
-      <div style="padding: 20px">
+      <div class="context-field">
         <h1>Construir pomodoro</h1>
         <a href="">Criar botoes e customizar sons</a>
+        <br>
+        <div>
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+        </div>
+        <br>
       </div>
       
-      <div style="padding: 20px">
-        <h1>Acorda groot</h1>
+      <div class="context-field">
+        <h1>Acorda Mylow</h1>
         <a href="">Gravar audio motivacional para acordar bem</a>
+        <br>
+        <div>
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+          <img src="@/assets/logo.png" alt="Logo do Muda">
+        </div>
+        <br>
       </div>
     </div>
     
@@ -184,5 +204,19 @@ nav a:first-of-type {
 
 .context {
   margin-bottom: 140px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .context-field {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    img {
+      max-width: 100px;
+    }
+  }
 }
 </style>
