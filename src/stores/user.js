@@ -16,7 +16,7 @@ export const UserStore = defineStore('user', () => {
 
   auth && auth.onAuthStateChanged(fetch)
 
-  function resetState() {
+  function reset() {
     isLogged.value = false
     uid.value = ""
     email.value = ""
@@ -32,11 +32,12 @@ export const UserStore = defineStore('user', () => {
       displayName.value = user.displayName
       data.value = user
     } else {
-      resetState()
+      reset()
     }
   }
 
   async function register(user) {
+    // TODO: RETURN RESPONSE FOR ERROR HANDLING
     const response = await createUserWithEmailAndPassword(auth, user.email, user.password)
 
     if (response) {
@@ -44,7 +45,7 @@ export const UserStore = defineStore('user', () => {
 
       fetch(response.user)
     } else {
-      resetState()
+      reset()
       console.log("ERROR: User not registered")
       throw new Error('Unable to register user')
     }
@@ -62,14 +63,14 @@ export const UserStore = defineStore('user', () => {
       console.log("User logged: ", response.user)
     } else {
       console.log("ERROR: User not logged")
-      resetState()
+      reset()
       throw new Error('Unable to log in')
     }
   }
 
   async function logOut() {
     await signOut(auth)
-    resetState()
+    reset()
   }
 
   return {
@@ -83,4 +84,4 @@ export const UserStore = defineStore('user', () => {
     logOut,
     fetch
   }
-})
+}, { persist: true })
