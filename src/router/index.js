@@ -12,19 +12,16 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login
-    },
-    {
+    }, {
       path: '/register',
       name: 'Register',
       component: Register
-    },
-    {
+    }, {
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard,
       meta: { requiresAuth: true }
-    },
-    {
+    }, {
       path: '/',
       name: 'Home',
       component: Home,
@@ -43,6 +40,7 @@ const router = createRouter({
 
 router.beforeEach(to => {
   const userStore = UserStore()
+
   if (to.meta.requiresAuth && !userStore.isLogged) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }
