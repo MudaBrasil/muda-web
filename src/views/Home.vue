@@ -12,7 +12,7 @@ import imgTreeBackground from '@/assets/tree_background.png'
     <div class="context">
       <div class="context-field">
         <h1 style="font-size: 40px">MUDA</h1>
-        <a href="">Continue a nadar(mudar)!</a>
+        <a>Continue a nadar(mudar)!</a>
         <br />
         <img src="@/assets/logo.png" alt="Logo do Muda" />
         <br />
@@ -20,23 +20,27 @@ import imgTreeBackground from '@/assets/tree_background.png'
 
       <div class="context-field">
         <h1>Continuar o cronograma</h1>
-        <a href="">Criar de 30 em 30 min</a>
+        <a>Criar de 30 em 30 min</a>
         <br />
         <br />
       </div>
 
       <div class="context-field">
         <h1>Construir pomodoro</h1>
-        <a href="">Criar botoes e customizar sons</a>
+        <a>Criar botoes e customizar sons</a>
         <br />
         <br />
       </div>
 
       <div class="context-field">
         <h1>Acorda Mylow</h1>
-        <a href="">Gravar audio motivacional para acordar bem</a>
+        <a>Gravar audio motivacional para acordar bem</a>
         <br />
         <br />
+      </div>
+
+      <div class="card-header">
+        <router-link to="/dashboard">Ir para dashboard</router-link>
       </div>
     </div>
   </main>

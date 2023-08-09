@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { UserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const name = ref('')
 const email = ref('')
@@ -10,15 +10,23 @@ const error = ref(null)
 
 const userStore = UserStore()
 const router = useRouter()
+const route = useRoute()
 
 const Register = async () => {
+  error.value = null
+
   try {
     await userStore.register({
       email: email.value,
       password: password.value,
       name: name.value
     })
-    router.push('/')
+
+    if (route.query?.redirect) {
+      router.push(route.query.redirect)
+    } else {
+      router.push('/dashboard')
+    }
   } catch (err) {
     error.value = err.message
   }
@@ -26,13 +34,14 @@ const Register = async () => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container d-flex ai-center hv-100 px-50">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
           <div class="card-header">Register</div>
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
+            <br />
             <form action="#" @submit.prevent="Register">
               <div class="form-group row">
                 <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
@@ -66,7 +75,6 @@ const Register = async () => {
                   />
                 </div>
               </div>
-
               <div class="form-group row">
                 <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
 
@@ -81,6 +89,7 @@ const Register = async () => {
                   />
                 </div>
               </div>
+              <br />
 
               <div class="form-group row mb-0">
                 <div class="col-md-8 offset-md-4">
@@ -94,3 +103,9 @@ const Register = async () => {
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.alert-danger {
+  color: #721c24;
+}
+</style>

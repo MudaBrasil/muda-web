@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { UserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
@@ -9,14 +9,21 @@ const error = ref(null)
 
 const userStore = UserStore()
 const router = useRouter()
+const route = useRoute()
 
 const Login = async () => {
+  error.value = null
   try {
-    await userStore.logIn('logIn', {
+    await userStore.logIn({
       email: email.value,
       password: password.value
     })
-    router.push('/')
+
+    if (route.query?.redirect) {
+      router.push(route.query.redirect)
+    } else {
+      router.push('/dashboard')
+    }
   } catch (err) {
     error.value = err.message
   }
@@ -24,13 +31,14 @@ const Login = async () => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container d-flex ai-center hv-100 px-50">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
           <div class="card-header">Login</div>
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
+            <br />
             <form action="#" @submit.prevent="Login">
               <div class="form-group row">
                 <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
@@ -63,11 +71,18 @@ const Login = async () => {
                   />
                 </div>
               </div>
-
+              <br />
               <div class="form-group row mb-0">
                 <div class="col-md-8 offset-md-4">
                   <button type="submit" class="btn btn-primary">Login</button>
                 </div>
+              </div>
+              <br />
+              <br />
+              <br />
+              <div class="card-header">
+                Novo por aqui?
+                <router-link to="/register">Registre-se</router-link>
               </div>
             </form>
           </div>
@@ -76,3 +91,9 @@ const Login = async () => {
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.alert-danger {
+  color: #721c24;
+}
+</style>

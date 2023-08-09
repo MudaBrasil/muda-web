@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 
 import { register } from 'register-service-worker'
-console.log('MODE: ', import.meta.env.MODE)
-
 if (import.meta.env.MODE == 'production') {
   register(`registerSW.js`, {
     ready() {

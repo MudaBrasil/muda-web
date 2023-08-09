@@ -34,7 +34,7 @@
 <style scoped>
 .main {
   width: 100%;
-  height: 100%;
+  bottom: 0px;
   position: fixed;
   z-index: 0;
 }

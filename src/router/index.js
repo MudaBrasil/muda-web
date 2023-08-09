@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
-import DashBoard from '../views/DashBoard.vue'
+import Dashboard from '../views/Dashboard.vue'
 import Register from '../views/users/Register.vue'
-
+import { UserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,16 +19,16 @@ const router = createRouter({
       component: Register
     },
     {
-      path: '/',
-      name: 'DashBoard',
-      component: DashBoard
-      // meta: { requiresAuth: true }
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: Dashboard,
+      meta: { requiresAuth: true }
     },
     {
       path: '/',
       name: 'Home',
-      component: Home
-
+      component: Home,
+      meta: { requiresAuth: true }
     }
     // {
     //   path: '/about',
@@ -42,9 +42,10 @@ const router = createRouter({
 })
 
 router.beforeEach(to => {
-  const isAuthenticated = true
-  if (to.meta.requiresAuth && !isAuthenticated)
+  const userStore = UserStore()
+  if (to.meta.requiresAuth && !userStore.isLogged) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
 })
 
 // router.beforeResolve(async to => {
