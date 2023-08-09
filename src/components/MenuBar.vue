@@ -1,51 +1,48 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-  <div class="main" >
+  <div class="main">
     <div class="floating-menu">
       <div class="floating-menu-bar-shadow"></div>
       <div class="floating-menu-circle-shadow"></div>
       <div class="floating-menu-circle"></div>
       <div class="floating-menu-circle-border"></div>
-      
+
       <div class="floating-menu-options">
         <div class="floating-menu-options-btn active">
-          <img src="@/assets/icons/home.svg" alt="Icone de casa">
+          <img src="@/assets/icons/home.svg" alt="Icone de casa" />
         </div>
-        <div class="floating-menu-options-btn ">
-          <img src="@/assets/icons/student-book.svg" alt="Icone de livro de estudos">
+        <div class="floating-menu-options-btn">
+          <img src="@/assets/icons/student-book.svg" alt="Icone de livro de estudos" />
         </div>
         <div class="floating-menu-options-btn center-btn">
-          <img src="@/assets/icons/plus.svg" alt="Icone de adição">
+          <img src="@/assets/icons/plus.svg" alt="Icone de adição" />
         </div>
         <div class="floating-menu-options-btn">
-          <img src="@/assets/icons/social.svg" alt="Icone de socialização">
+          <img src="@/assets/icons/social.svg" alt="Icone de socialização" />
         </div>
         <div class="floating-menu-options-btn">
-          <img src="@/assets/icons/progress.svg" alt="Icone de progresso">
+          <img src="@/assets/icons/progress.svg" alt="Icone de progresso" />
         </div>
       </div>
-      <div class="floating-menu-bar">
-      </div>
+      <div class="floating-menu-bar"></div>
     </div>
   </div>
 </template>
 
+<!-- TODO: TESTAR box-shadow: 0 1px 3px 1px rgba(60,64,67,.15), 0 1px 2px 0 rgba(60,64,67,.3); -->
 <style scoped>
-
 .main {
   width: 100%;
-  height:  100%;
+  height: 100%;
   position: fixed;
   z-index: 0;
 }
 
-.floating-menu{
+.floating-menu {
   position: absolute;
   bottom: 0px;
-  z-index: 100; 
+  z-index: 100;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -56,7 +53,7 @@
   width: 324px;
   border-radius: 60px;
   background-color: white;
-  border: solid 1px #F1F1F2;
+  border: solid 1px #f1f1f2;
   z-index: 100;
 }
 
@@ -73,7 +70,7 @@
   position: absolute;
   width: 76px;
   height: 76px;
-  background-color: white; 
+  background-color: white;
   border-radius: 50%;
   left: 50%;
   top: 50%;
@@ -85,7 +82,7 @@
   position: absolute;
   width: 78px;
   height: 78px;
-  background-color: #F1F1F2;
+  background-color: #f1f1f2;
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.25) 2px 4px 4px 0px;
   left: 50%;
@@ -102,7 +99,7 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border: solid 2px #E2E2E2;
+  border: solid 2px #e2e2e2;
   z-index: 102;
 }
 
@@ -132,7 +129,7 @@
 }
 
 .active {
-  background-color: #F1F1F2;
+  background-color: #f1f1f2;
 }
 
 @media (min-width: 1024px) {

@@ -11,13 +11,19 @@ module.exports = {
   overrides: [
     {
       files: [
-        'cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx}'
+        'cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx,vue,json,html,md,svg,css,scss,yaml,yml}'
       ],
       'extends': [
         'plugin:cypress/recommended'
       ]
     }
   ],
+  rules: {
+    'comma-dangle': ["error", "never"],
+    'vue/multi-word-component-names': 0,
+    'semi': ["error", "never"],
+    'eol-last': ["error", "always"]
+  },
   parserOptions: {
     ecmaVersion: 'latest'
   }

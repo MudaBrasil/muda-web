@@ -30,3 +30,4 @@ coverage
 
 .cert
 .ssl
+.env
