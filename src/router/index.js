@@ -10,17 +10,24 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/logout',
+      name: 'logout'
+    },
+    {
       path: '/login',
       name: 'login',
-      component: Login
+      component: Login,
+      meta: { exceptAuth: true }
     }, {
       path: '/register',
       name: 'register',
-      component: Register
+      component: Register,
+      meta: { exceptAuth: true }
     }, {
       path: '/reset-password',
       name: 'reset-password',
-      component: ResetPassword
+      component: ResetPassword,
+      meta: { exceptAuth: true }
     }, {
       path: '/dashboard',
       name: 'dashboard',
@@ -46,8 +53,18 @@ const router = createRouter({
 router.beforeEach(to => {
   const userStore = UserStore()
 
+  if (to.name === 'logout') {
+    return userStore.logOut().then(() => {
+      return { path: '/login' }
+    })
+  }
+
   if (to.meta.requiresAuth && !userStore.isLogged) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.exceptAuth && userStore.isLogged) {
+    return { path: '/dashboard' }
   }
 })
 

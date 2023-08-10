@@ -11,7 +11,20 @@ const email = ref('')
 const password = ref('')
 const error = ref(null)
 
-const Login = () => {
+const GoogleLogin = () => {
+  error.value = null
+
+  userStore
+    .googleLogin()
+    .then(() => {
+      router.push(route.query.redirect || '/dashboard')
+    })
+    .catch((err) => {
+      error.value = err.message
+    })
+}
+
+const LogIn = () => {
   error.value = null
 
   userStore
@@ -37,7 +50,7 @@ const Login = () => {
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
             <br />
-            <form action="#" @submit.prevent="Login">
+            <form action="#" @submit.prevent="LogIn">
               <div class="form-group row">
                 <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
 
@@ -75,19 +88,24 @@ const Login = () => {
                   <button type="submit" class="btn btn-primary">Entrar</button>
                 </div>
               </div>
-              <br />
-              <br />
-              <br />
-              <div class="card-header">
-                Novo por aqui?
-                <router-link to="/register">Registre-se</router-link>
-              </div>
-
-              <div class="card-header">
-                Esqueceu a senha?
-                <router-link to="/reset-password">Recuperar</router-link>
-              </div>
             </form>
+            <div>
+              <div class="col-md-8 offset-md-4">
+                <button @click="GoogleLogin">Entrar com Google</button>
+              </div>
+            </div>
+            <br />
+            <br />
+            <br />
+            <div class="card-header">
+              Novo por aqui?
+              <router-link to="/register">Registre-se</router-link>
+            </div>
+
+            <div class="card-header">
+              Esqueceu a senha?
+              <router-link to="/reset-password">Recuperar</router-link>
+            </div>
           </div>
         </div>
       </div>

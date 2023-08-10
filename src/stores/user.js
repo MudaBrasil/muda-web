@@ -1,11 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { auth } from '@/firebaseConfig'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 
 export const UserStore = defineStore('user', () => {
   const uid = ref("")
-  const data = ref({})
   const email = ref("")
   const isLogged = ref(false)
   const displayName = ref("")
@@ -23,8 +22,32 @@ export const UserStore = defineStore('user', () => {
     { id: 6, code: 'auth/operation-not-allowed', message: "Operação não permitida" },
     { id: 7, code: 'auth/account-exists-with-different-credential', message: "Conta já existe com credenciais diferentes" },
     { id: 8, code: 'auth/invalid-credential', message: "Credenciais inválidas" },
-    { id: 9, code: 'auth/operation-not-allowed', message: "Operação não permitida" },
-    { id: 10, code: 'auth/invalid-argument', message: "Argumento inválido" }
+    { id: 9, code: 'auth/invalid-user-token', message: "Token de usuário inválido" },
+    { id: 10, code: 'auth/invalid-argument', message: "Argumento inválido" },
+    { id: 11, code: 'auth/popup-closed-by-user', message: "Popup fechada pelo usuário" },
+    { id: 12, code: 'auth/unauthorized-domain', message: "Domínio não autorizado" },
+    { id: 13, code: 'auth/operation-not-supported-in-this-environment', message: "Operação não suportada neste ambiente" },
+    { id: 14, code: 'auth/popup-blocked', message: "Popup bloqueada" },
+    { id: 15, code: 'auth/timeout', message: "Tempo limite excedido" },
+    { id: 16, code: 'auth/user-disabled', message: "Usuário desabilitado" },
+    { id: 17, code: 'auth/user-token-expired', message: "Token de usuário expirado" },
+    { id: 18, code: 'auth/web-storage-unsupported', message: "Armazenamento web não suportado" },
+    { id: 19, code: 'auth/invalid-verification-code', message: "Código de verificação inválido" },
+    { id: 20, code: 'auth/invalid-verification-id', message: "ID de verificação inválido" },
+    { id: 21, code: 'auth/captcha-check-failed', message: "Falha na verificação do captcha" },
+    { id: 22, code: 'auth/invalid-phone-number', message: "Número de telefone inválido" },
+    { id: 23, code: 'auth/missing-phone-number', message: "Número de telefone ausente" },
+    { id: 24, code: 'auth/quota-exceeded', message: "Cota excedida" },
+    { id: 25, code: 'auth/cancelled-popup-request', message: "Solicitação de popup cancelada" },
+    { id: 26, code: 'auth/missing-or-invalid-nonce', message: "Nonce ausente ou inválido" },
+    { id: 27, code: 'auth/time-limit-exceeded', message: "Limite de tempo excedido" },
+    { id: 28, code: 'auth/credential-already-in-use', message: "Credencial já em uso" },
+    { id: 29, code: 'auth/user-mismatch', message: "Usuário incompatível" },
+    { id: 30, code: 'auth/requires-recent-login', message: "Requer login recente" },
+    { id: 31, code: 'auth/invalid-oauth-provider', message: "Provedor OAuth inválido" },
+    { id: 32, code: 'auth/network-request-failed', message: "Falha na solicitação de rede" },
+    { id: 33, code: 'auth/provider-already-linked', message: "Provedor já vinculado" },
+    { id: 34, code: 'auth/no-such-provider', message: "Nenhum provedor" }
   ])
 
   auth && auth.onAuthStateChanged(fetch)
@@ -38,7 +61,6 @@ export const UserStore = defineStore('user', () => {
 
   function reset() {
     uid.value = ""
-    data.value = {}
     email.value = ""
     isLogged.value = false
     displayName.value = ""
@@ -47,7 +69,6 @@ export const UserStore = defineStore('user', () => {
   function fetch(user) {
     if (user) {
       uid.value = user.uid
-      data.value = user
       email.value = user.email
       isLogged.value = true
       displayName.value = user.displayName
@@ -80,16 +101,25 @@ export const UserStore = defineStore('user', () => {
     })
   }
 
-
   function resetPassword(email) {
     return sendPasswordResetEmail(auth, email).catch(error => {
       throw new Error(getError(error).message)
     })
   }
 
+  function googleLogin() {
+    const provider = new GoogleAuthProvider()
+    return signInWithPopup(auth, provider).then(response => {
+
+      fetch(response.user)
+    }).catch(error => {
+      reset()
+      throw new Error(getError(error).message)
+    })
+  }
+
   return {
     uid,
-    data,
     email,
     isLogged,
     displayName,
@@ -97,6 +127,7 @@ export const UserStore = defineStore('user', () => {
     logIn,
     logOut,
     register,
-    resetPassword
+    resetPassword,
+    googleLogin
   }
 }, { persist: true })
