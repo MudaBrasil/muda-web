@@ -17,7 +17,9 @@ import { RouterView } from 'vue-router'
   </header> -->
 
   <!-- <div> -->
-  <RouterView />
+  <Transition name="slide-fade">
+    <RouterView />
+  </Transition>
   <!-- </div> -->
 </template>
 

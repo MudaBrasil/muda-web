@@ -5,72 +5,77 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, up
 
 export const UserStore = defineStore('user', () => {
   const uid = ref("")
+  const data = ref({})
   const email = ref("")
   const isLogged = ref(false)
   const displayName = ref("")
-  // const firstName = ref("")
-  // const middleName = ref("")
-  // const lastName = ref("")
-  // const fullName = computed(() => `${firstName.value} ${middleName.value} ${lastName.value}`)
-  const data = ref({})
+
+  // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
+  // TODO: Talvez criar um store para os erros
+
+  const errors = ref([
+    { id: 0, code: 'unknown', message: "Erro desconhecido" },
+    { id: 1, code: 'auth/wrong-password', message: "Usuário ou senha inválidos" },
+    { id: 2, code: 'auth/invalid-email', message: "Usuário ou senha inválidos" },
+    { id: 3, code: 'auth/user-not-found', message: "Usuário ou senha inválidos" },
+    { id: 4, code: 'auth/email-already-in-use', message: "Email de usuário já cadastrado" },
+    { id: 5, code: 'auth/weak-password', message: "A combinação da senha pode estar frágil" },
+    { id: 6, code: 'auth/operation-not-allowed', message: "Operação não permitida" },
+    { id: 7, code: 'auth/account-exists-with-different-credential', message: "Conta já existe com credenciais diferentes" },
+    { id: 8, code: 'auth/invalid-credential', message: "Credenciais inválidas" },
+    { id: 9, code: 'auth/operation-not-allowed', message: "Operação não permitida" },
+    { id: 10, code: 'auth/invalid-argument', message: "Argumento inválido" }
+  ])
 
   auth && auth.onAuthStateChanged(fetch)
 
   function reset() {
-    isLogged.value = false
     uid.value = ""
-    email.value = ""
-    displayName.value = ""
     data.value = {}
+    email.value = ""
+    isLogged.value = false
+    displayName.value = ""
   }
 
   function fetch(user) {
+    console.log('fetch', user)
     if (user) {
-      isLogged.value = true
       uid.value = user.uid
-      email.value = user.email
-      displayName.value = user.displayName
       data.value = user
-    } else {
-      reset()
-    }
-  }
-
-  async function register(user) {
-    // TODO: RETURN RESPONSE FOR ERROR HANDLING
-    const response = await createUserWithEmailAndPassword(auth, user.email, user.password)
-
-    if (response) {
-      await updateProfile(response.user, { displayName: user.name })
-
-      fetch(response.user)
-    } else {
-      reset()
-      console.log("ERROR: User not registered")
-      throw new Error('Unable to register user')
-    }
-  }
-
-  async function logIn(user) {
-    const response = await signInWithEmailAndPassword(auth, user.email, user.password)
-
-    if (response) {
+      email.value = user.email
       isLogged.value = true
-      data.value = response.user
-      uid.value = response.user.uid
-      email.value = response.user.email
-      displayName.value = response.user.displayName
-      console.log("User logged: ", response.user)
+      displayName.value = user.displayName
     } else {
-      console.log("ERROR: User not logged")
       reset()
-      throw new Error('Unable to log in')
     }
   }
 
-  async function logOut() {
-    await signOut(auth)
-    reset()
+  function getError(error) {
+    const code = error.code || errors.value[0].code
+    const message = error.message || errors.value[0].message
+
+    return errors.value.find(e => e.code === code) || { id: 0, code, message }
+  }
+
+  function register(user) {
+    return createUserWithEmailAndPassword(auth, user.email, user.password).then(async () => {
+      await updateProfile(auth.currentUser, { displayName: user.name })
+      fetch(auth.currentUser)
+    }).catch(error => {
+      reset()
+      throw new Error(getError(error).message)
+    })
+  }
+
+  function logIn(user) {
+    return signInWithEmailAndPassword(auth, user.email, user.password).catch(error => {
+      reset()
+      throw new Error(getError(error).message)
+    })
+  }
+
+  function logOut() {
+    return signOut(auth).finally(() => reset())
   }
 
   return {

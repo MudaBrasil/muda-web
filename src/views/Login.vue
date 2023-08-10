@@ -3,30 +3,28 @@ import { ref } from 'vue'
 import { UserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
 
-const email = ref('')
-const password = ref('')
-const error = ref(null)
-
 const userStore = UserStore()
 const router = useRouter()
 const route = useRoute()
 
-const Login = async () => {
+const email = ref('')
+const password = ref('')
+const error = ref(null)
+
+const Login = () => {
   error.value = null
-  try {
-    await userStore.logIn({
+
+  userStore
+    .logIn({
       email: email.value,
       password: password.value
     })
-
-    if (route.query?.redirect) {
-      router.push(route.query.redirect)
-    } else {
-      router.push('/dashboard')
-    }
-  } catch (err) {
-    error.value = err.message
-  }
+    .then(() => {
+      router.push(route.query.redirect || '/dashboard')
+    })
+    .catch((err) => {
+      error.value = err.message
+    })
 }
 </script>
 

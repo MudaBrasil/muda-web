@@ -12,24 +12,22 @@ const userStore = UserStore()
 const router = useRouter()
 const route = useRoute()
 
-const Register = async () => {
+const Register = () => {
   error.value = null
 
-  try {
-    await userStore.register({
+  userStore
+    .register({
       email: email.value,
       password: password.value,
       name: name.value
     })
-
-    if (route.query?.redirect) {
-      router.push(route.query.redirect)
-    } else {
-      router.push('/dashboard')
-    }
-  } catch (err) {
-    error.value = err.message
-  }
+    .then(() => {
+      // TODO: Criar redirect automático la no router
+      router.push(route.query.redirect || '/dashboard')
+    })
+    .catch((err) => {
+      error.value = err.message
+    })
 }
 </script>
 
