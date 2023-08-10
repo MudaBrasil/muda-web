@@ -38,7 +38,6 @@ export const UserStore = defineStore('user', () => {
   }
 
   function fetch(user) {
-    console.log('fetch', user)
     if (user) {
       uid.value = user.uid
       data.value = user
@@ -58,9 +57,10 @@ export const UserStore = defineStore('user', () => {
   }
 
   function register(user) {
-    return createUserWithEmailAndPassword(auth, user.email, user.password).then(async () => {
-      await updateProfile(auth.currentUser, { displayName: user.name })
-      fetch(auth.currentUser)
+    return createUserWithEmailAndPassword(auth, user.email, user.password).then(() => {
+      updateProfile(auth.currentUser, { displayName: user.name }).then(() => {
+        fetch(auth.currentUser)
+      })
     }).catch(error => {
       reset()
       throw new Error(getError(error).message)
@@ -75,7 +75,9 @@ export const UserStore = defineStore('user', () => {
   }
 
   function logOut() {
-    return signOut(auth).finally(() => reset())
+    return signOut(auth).finally(() => {
+      reset()
+    })
   }
 
   return {

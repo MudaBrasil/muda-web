@@ -30,7 +30,6 @@
   </div>
 </template>
 
-<!-- TODO: TESTAR box-shadow: 0 1px 3px 1px rgba(60,64,67,.15), 0 1px 2px 0 rgba(60,64,67,.3); -->
 <style scoped>
 .main {
   width: 100%;
@@ -62,7 +61,7 @@
   height: 64px;
   width: 324px;
   border-radius: 60px;
-  box-shadow: rgba(0, 0, 0, 0.25) 2px 4px 4px 0px;
+  box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15), 2px 4px 4px 0px rgba(0, 0, 0, 0.2);
   z-index: 98;
 }
 
@@ -84,7 +83,8 @@
   height: 78px;
   background-color: #f1f1f2;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.25) 2px 4px 4px 0px;
+  /* box-shadow: ; */
+  box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15), 2px 4px 4px 0px rgba(0, 0, 0, 0.2);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
