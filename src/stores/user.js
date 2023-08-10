@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { auth } from '@/firebaseConfig'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail } from 'firebase/auth'
 
 export const UserStore = defineStore('user', () => {
   const uid = ref("")
@@ -29,6 +29,13 @@ export const UserStore = defineStore('user', () => {
 
   auth && auth.onAuthStateChanged(fetch)
 
+  function getError(error) {
+    const code = error.code || errors.value[0].code
+    const message = error.message || errors.value[0].message
+
+    return errors.value.find(e => e.code === code) || { id: 0, code, message }
+  }
+
   function reset() {
     uid.value = ""
     data.value = {}
@@ -49,24 +56,6 @@ export const UserStore = defineStore('user', () => {
     }
   }
 
-  function getError(error) {
-    const code = error.code || errors.value[0].code
-    const message = error.message || errors.value[0].message
-
-    return errors.value.find(e => e.code === code) || { id: 0, code, message }
-  }
-
-  function register(user) {
-    return createUserWithEmailAndPassword(auth, user.email, user.password).then(() => {
-      updateProfile(auth.currentUser, { displayName: user.name }).then(() => {
-        fetch(auth.currentUser)
-      })
-    }).catch(error => {
-      reset()
-      throw new Error(getError(error).message)
-    })
-  }
-
   function logIn(user) {
     return signInWithEmailAndPassword(auth, user.email, user.password).catch(error => {
       reset()
@@ -80,15 +69,34 @@ export const UserStore = defineStore('user', () => {
     })
   }
 
+  function register(user) {
+    return createUserWithEmailAndPassword(auth, user.email, user.password).then(() => {
+      updateProfile(auth.currentUser, { displayName: user.name }).then(() => {
+        fetch(auth.currentUser)
+      })
+    }).catch(error => {
+      reset()
+      throw new Error(getError(error).message)
+    })
+  }
+
+
+  function resetPassword(email) {
+    return sendPasswordResetEmail(auth, email).catch(error => {
+      throw new Error(getError(error).message)
+    })
+  }
+
   return {
     uid,
     data,
     email,
     isLogged,
     displayName,
-    register,
+    fetch,
     logIn,
     logOut,
-    fetch
+    register,
+    resetPassword
   }
 }, { persist: true })

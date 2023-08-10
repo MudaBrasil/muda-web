@@ -36,7 +36,7 @@ const Register = () => {
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
-          <div class="card-header">Register</div>
+          <div class="card-header">Cadastro</div>
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
             <br />
@@ -74,7 +74,7 @@ const Register = () => {
                 </div>
               </div>
               <div class="form-group row">
-                <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
+                <label for="password" class="col-md-4 col-form-label text-md-right">Senha</label>
 
                 <div class="col-md-6">
                   <input
@@ -91,8 +91,20 @@ const Register = () => {
 
               <div class="form-group row mb-0">
                 <div class="col-md-8 offset-md-4">
-                  <button type="submit" class="btn btn-primary">Register</button>
+                  <button type="submit" class="btn btn-primary">Cadastrar</button>
                 </div>
+              </div>
+              <br />
+              <br />
+              <br />
+              <div class="card-header">
+                Ja possui uma conta?
+                <router-link to="/login">Entrar</router-link>
+              </div>
+
+              <div class="card-header">
+                Esqueceu a senha?
+                <router-link to="/reset-password">Recuperar</router-link>
               </div>
             </form>
           </div>

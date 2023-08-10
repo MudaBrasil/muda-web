@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Register from '../views/users/Register.vue'
+import ResetPassword from '../views/users/ResetPassword.vue'
 import { UserStore } from '@/stores/user'
 
 const router = createRouter({
@@ -14,16 +15,20 @@ const router = createRouter({
       component: Login
     }, {
       path: '/register',
-      name: 'Register',
+      name: 'register',
       component: Register
     }, {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPassword
+    }, {
       path: '/dashboard',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: Dashboard,
       meta: { requiresAuth: true }
     }, {
       path: '/',
-      name: 'Home',
+      name: 'home',
       component: Home,
       meta: { requiresAuth: true }
     }

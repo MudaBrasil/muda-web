@@ -33,7 +33,7 @@ const Login = () => {
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
-          <div class="card-header">Login</div>
+          <div class="card-header">Acessar o Muda</div>
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
             <br />
@@ -72,7 +72,7 @@ const Login = () => {
               <br />
               <div class="form-group row mb-0">
                 <div class="col-md-8 offset-md-4">
-                  <button type="submit" class="btn btn-primary">Login</button>
+                  <button type="submit" class="btn btn-primary">Entrar</button>
                 </div>
               </div>
               <br />
@@ -81,6 +81,11 @@ const Login = () => {
               <div class="card-header">
                 Novo por aqui?
                 <router-link to="/register">Registre-se</router-link>
+              </div>
+
+              <div class="card-header">
+                Esqueceu a senha?
+                <router-link to="/reset-password">Recuperar</router-link>
               </div>
             </form>
           </div>
