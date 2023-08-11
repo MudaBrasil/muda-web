@@ -10,19 +10,19 @@
 
       <div class="floating-menu-options">
         <div class="floating-menu-options-btn active">
-          <img src="@/assets/icons/home.svg" alt="Icone de casa" />
+          <img src="@/assets/icons/home.svg" alt="Ícone de casa" />
         </div>
         <div class="floating-menu-options-btn">
-          <img src="@/assets/icons/student-book.svg" alt="Icone de livro de estudos" />
+          <img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
         </div>
         <div class="floating-menu-options-btn center-btn">
-          <img src="@/assets/icons/plus.svg" alt="Icone de adição" />
+          <img src="@/assets/icons/plus.svg" alt="Ícone de adição" />
         </div>
         <div class="floating-menu-options-btn">
-          <img src="@/assets/icons/social.svg" alt="Icone de socialização" />
+          <img src="@/assets/icons/social.svg" alt="Ícone de socialização" />
         </div>
         <div class="floating-menu-options-btn">
-          <img src="@/assets/icons/progress.svg" alt="Icone de progresso" />
+          <img src="@/assets/icons/progress.svg" alt="Ícone de progresso" />
         </div>
       </div>
       <div class="floating-menu-bar"></div>

@@ -9,6 +9,9 @@ export const UserStore = defineStore('user', () => {
   const isLogged = ref(false)
   const displayName = ref("")
 
+  auth?.onAuthStateChanged(fetch)
+
+
   // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
   // TODO: Talvez criar um store para os erros
 
@@ -50,7 +53,6 @@ export const UserStore = defineStore('user', () => {
     { id: 34, code: 'auth/no-such-provider', message: "Nenhum provedor" }
   ])
 
-  auth && auth.onAuthStateChanged(fetch)
 
   function getError(error) {
     const code = error.code || errors.value[0].code
