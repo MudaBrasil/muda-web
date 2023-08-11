@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Main from '../views/Main.vue'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
@@ -29,15 +30,23 @@ const router = createRouter({
       component: ResetPassword,
       meta: { exceptAuth: true }
     }, {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: Dashboard,
-      meta: { requiresAuth: true }
-    }, {
       path: '/',
-      name: 'home',
-      component: Home,
-      meta: { requiresAuth: true }
+      name: 'main',
+      component: Main,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '/',
+          name: 'home',
+          component: Home
+        }, {
+          path: '/dashboard',
+          name: 'dashboard',
+          component: Dashboard,
+          meta: { requiresAuth: true }
+        }
+
+      ]
     }
     // {
     //   path: '/about',

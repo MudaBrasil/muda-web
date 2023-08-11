@@ -3,26 +3,7 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <!-- <header>
-    <img alt="Muda logo" class="logo" src="/logo.png" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="Muda" />
-
-      <nav>
-        <RouterLink to="/">Início</RouterLink>
-        <RouterLink to="/about">Sobre</RouterLink>
-      </nav>
-    </div>
-  </header> -->
-
-  <!-- <div> -->
-  <RouterView v-slot="{ Component }">
-    <Transition name="slide-fade">
-      <component :is="Component" />
-    </Transition>
-  </RouterView>
-  <!-- </div> -->
+  <RouterView></RouterView>
 </template>
 
 <style scoped lang="scss">

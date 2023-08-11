@@ -1,12 +1,9 @@
 <script setup>
-import MenuBar from '@/components/MenuBar.vue'
 import imgTreeBackground from '@/assets/tree_background.png'
 </script>
 
 <template>
   <main>
-    <MenuBar />
-
     <div class="bg-image" :style="{ backgroundImage: `url(${imgTreeBackground})` }"></div>
 
     <div class="context">
