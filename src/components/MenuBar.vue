@@ -132,6 +132,6 @@
   background-color: #f1f1f2;
 }
 
-@media (min-width: 1024px) {
-}
+/* @media (min-width: 1024px) {
+} */
 </style>
