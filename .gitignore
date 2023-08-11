@@ -32,5 +32,5 @@ coverage
 .cert
 .ssl
 .env
-packgage-lock.json
+package-lock.json
 yarn.lock

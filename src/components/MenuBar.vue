@@ -5,7 +5,7 @@ const store = useMenuFlexStore()
 </script>
 
 <template>
-  <div class="main">
+  <div class="menu-background" :class="['menu-background', { 'h-100': store.active }]">
     <MenuFlex />
     <div class="floating-menu">
       <div class="floating-menu-bar-shadow"></div>
@@ -36,9 +36,8 @@ const store = useMenuFlexStore()
 </template>
 
 <style scoped>
-.main {
+.menu-background {
   width: 100%;
-  height: 100%;
   bottom: 0px;
   position: fixed;
   z-index: 0;
