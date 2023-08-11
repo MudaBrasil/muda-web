@@ -1,7 +1,12 @@
-<script setup></script>
+<script setup>
+import MenuFlex from '@/components/MenuFlex.vue'
+import { useMenuFlexStore } from '@/stores/menuFlex'
+const store = useMenuFlexStore()
+</script>
 
 <template>
   <div class="main">
+    <MenuFlex />
     <div class="floating-menu">
       <div class="floating-menu-bar-shadow"></div>
       <div class="floating-menu-circle-shadow"></div>
@@ -15,7 +20,7 @@
         <div class="floating-menu-options-btn">
           <img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
         </div>
-        <div class="floating-menu-options-btn center-btn">
+        <div class="floating-menu-options-btn center-btn" @click="store.active = true">
           <img src="@/assets/icons/plus.svg" alt="Ícone de adição" />
         </div>
         <div class="floating-menu-options-btn">
@@ -33,6 +38,7 @@
 <style scoped>
 .main {
   width: 100%;
+  height: 100%;
   bottom: 0px;
   position: fixed;
   z-index: 0;
