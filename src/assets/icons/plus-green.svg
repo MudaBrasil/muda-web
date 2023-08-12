@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+<!-- <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
   <path d="M29.9023 29.8984L10.1034 10.0994L29.9023 29.8984Z" fill="#5C5C5C"/>
   <path d="M29.9023 29.8984L10.1034 10.0994" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M29.9023 10.1016L10.1034 29.9006L29.9023 10.1016Z" fill="#5C5C5C"/>
   <path d="M29.9023 10.1016L10.1034 29.9006" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> -->
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
+  <path d="M16 2V30" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M2 16H30" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

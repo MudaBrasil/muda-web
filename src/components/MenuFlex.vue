@@ -5,26 +5,41 @@ const store = useMenuFlexStore()
 
 <template>
   <div class="background">
-    <div class="splash" :style="`--scale:${store.active ? 1 : 0}`" />
-    <div class="menu-flex" v-if="store.active">
+    <div class="menu-flex" :class="[{ active: store.active }]">
       <div class="content"></div>
-      <div class="floating-menu" :style="`--scale:${store.active ? 1 : 0}`">
-        <div class="floating-menu-circle-border d-flex jc-center ai-center">
+      <div class="floating-menu-flex" :style="`--scale:${store.active ? 1 : 0}`">
+        <div class="floating-menu-flex-circle-border d-flex jc-center ai-center">
           <img
             src="@/assets/icons/plus-green.svg"
             alt="Ícone de adição"
             @click="store.active = false"
+            :class="['img-close-menu', { active: store.active }]"
           />
         </div>
       </div>
     </div>
+    <div class="splash" :style="`--scale:${store.active ? 1 : 0}`" />
   </div>
 </template>
 
 <style lang="scss">
 .menu-flex {
+  // height: 0%;
+  // width: 0
+  // display: none;
+  opacity: 90%;
+  position: relative;
+  transform: scale(0);
+  z-index: 200;
   height: 100%;
-  width: 100%;
+  transition-delay: 0.3s;
+  will-change: opacity;
+
+  &.active {
+    transition: opacity 1s ease-in;
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .content {
@@ -64,7 +79,9 @@ const store = useMenuFlexStore()
 
     transform: scale(var(--scale));
     transform-origin: 50% 50%;
-    transition: transform 0.3s cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transition: transform 0.3s;
+    // transition: transform 0.3s ;
+    // transition-delay: 1250ms;
 
     // will-change tells the browser we plan to
     // animate this property in the near future
@@ -73,21 +90,21 @@ const store = useMenuFlexStore()
 }
 
 // Corrigir transição da opacidade
-.floating-menu {
+.floating-menu-flex {
   position: absolute;
   bottom: 64px;
   z-index: 100;
   left: 50%;
   transform: translate(-50%, -50%);
-  opacity: var(--scale);
+  // opacity: var(--scale);
 
-  -webkit-transition: opacity 1s ease-in-out;
-  -moz-transition: opacity 1s ease-in-out;
-  -ms-transition: opacity 1s ease-in-out;
-  -o-transition: opacity 1s ease-in-out;
-  transition: opacity 1s ease-in-out;
+  // -webkit-transition: opacity 1s ease-in-out;
+  // -moz-transition: opacity 1s ease-in-out;
+  // -ms-transition: opacity 1s ease-in-out;
+  // -o-transition: opacity 1s ease-in-out;
+  // transition: opacity 1s ease-in-out;
 
-  .floating-menu-circle-border {
+  .floating-menu-flex-circle-border {
     position: absolute;
     border-radius: 50%;
     width: 58px;
@@ -95,6 +112,21 @@ const store = useMenuFlexStore()
     transform: translate(-50%, -50%);
     border: solid 3px rgba(255, 255, 255, 0.2);
     z-index: 102;
+  }
+
+  .img-close-menu {
+    transform: rotate(0deg);
+    opacity: 0;
+    will-change: transform;
+    transition: transform 0.5s, opacity 0.2s 0.2s;
+    // transition-delay: 1000ms;
+    // transition-delay: 1000ms;
+
+    &.active {
+      opacity: 1;
+      transform: rotate(135deg);
+      transition: transform 0.2s;
+    }
   }
 }
 </style>
