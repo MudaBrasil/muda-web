@@ -8,11 +8,13 @@ const store = useMenuFlexStore()
     <div class="menu-flex" :class="[{ active: store.active }]">
       <div class="content"></div>
       <div class="floating-menu-flex" :style="`--scale:${store.active ? 1 : 0}`">
-        <div class="floating-menu-flex-circle-border d-flex jc-center ai-center cursor-pointer">
+        <div
+          class="floating-menu-flex-circle-border d-flex jc-center ai-center cursor-pointer"
+          @click="store.active = false"
+        >
           <img
             src="@/assets/icons/plus-green.svg"
             alt="Ícone de adição"
-            @click="store.active = false"
             :class="['img-close-menu', { active: store.active }]"
           />
         </div>
@@ -91,13 +93,6 @@ const store = useMenuFlexStore()
   z-index: 100;
   left: 50%;
   transform: translate(-50%, -50%);
-  // opacity: var(--scale);
-
-  // -webkit-transition: opacity 1s ease-in-out;
-  // -moz-transition: opacity 1s ease-in-out;
-  // -ms-transition: opacity 1s ease-in-out;
-  // -o-transition: opacity 1s ease-in-out;
-  // transition: opacity 1s ease-in-out;
 
   .floating-menu-flex-circle-border {
     position: absolute;
