@@ -8,7 +8,7 @@ const store = useMenuFlexStore()
     <div class="menu-flex" :class="[{ active: store.active }]">
       <div class="content"></div>
       <div class="floating-menu-flex" :style="`--scale:${store.active ? 1 : 0}`">
-        <div class="floating-menu-flex-circle-border d-flex jc-center ai-center">
+        <div class="floating-menu-flex-circle-border d-flex jc-center ai-center cursor-pointer">
           <img
             src="@/assets/icons/plus-green.svg"
             alt="Ícone de adição"
@@ -24,9 +24,6 @@ const store = useMenuFlexStore()
 
 <style lang="scss">
 .menu-flex {
-  // height: 0%;
-  // width: 0
-  // display: none;
   opacity: 90%;
   position: relative;
   transform: scale(0);
@@ -36,7 +33,7 @@ const store = useMenuFlexStore()
   will-change: opacity;
 
   &.active {
-    transition: opacity 1s ease-in;
+    transition: opacity 1s;
     transform: scale(1);
     opacity: 1;
   }
@@ -66,26 +63,24 @@ const store = useMenuFlexStore()
     display: block;
     position: absolute;
     border-radius: 50%;
-    backdrop-filter: blur(2px) saturate(100%);
-    -webkit-backdrop-filter: blur(2px) saturate(100%);
-    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.7);
 
-    // screen diameter can be 142vmax at most,
-    // circle needs to be twice that size to cover it
-    width: 284vmax;
-    height: 284vmax;
-    top: -142vmax;
-    left: -142vmax;
+    width: 210vmax;
+    height: 210vmax;
+    top: -105vmax;
+    left: -105vmax;
 
-    transform: scale(var(--scale));
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    backface-visibility: hidden;
+
+    transform: scale3d(var(--scale), var(--scale), 1);
     transform-origin: 50% 50%;
-    transition: transform 0.3s;
-    // transition: transform 0.3s ;
-    // transition-delay: 1250ms;
-
-    // will-change tells the browser we plan to
-    // animate this property in the near future
     will-change: transform;
+    transition: transform 0.2s ease-out;
   }
 }
 
@@ -118,9 +113,7 @@ const store = useMenuFlexStore()
     transform: rotate(0deg);
     opacity: 0;
     will-change: transform;
-    transition: transform 0.5s, opacity 0.2s 0.2s;
-    // transition-delay: 1000ms;
-    // transition-delay: 1000ms;
+    transition: transform 0.5s, opacity 0.1s 0.2s;
 
     &.active {
       opacity: 1;

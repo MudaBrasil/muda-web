@@ -20,7 +20,11 @@ const store = useMenuFlexStore()
         <div class="floating-menu-options-btn">
           <img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
         </div>
-        <div class="floating-menu-options-btn center-btn" @click="store.active = true">
+        <div
+          class="floating-menu-options-btn center-btn"
+          @click="store.active = true"
+          :class="['img-close-menu', { active: store.active }]"
+        >
           <img src="@/assets/icons/plus.svg" alt="Ícone de adição" />
         </div>
         <div class="floating-menu-options-btn">
@@ -35,7 +39,7 @@ const store = useMenuFlexStore()
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .menu-background {
   width: 100%;
   bottom: 0px;
@@ -104,7 +108,7 @@ const store = useMenuFlexStore()
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border: solid 2px #e2e2e2;
+  border: solid 3px #e2e2e2;
   z-index: 102;
 }
 
@@ -127,14 +131,25 @@ const store = useMenuFlexStore()
   height: 52px;
   border-radius: 50%;
   cursor: pointer;
+
+  &.active {
+    background-color: #f1f1f2;
+  }
 }
 
 .center-btn {
   margin: 0px 12px;
 }
 
-.active {
-  background-color: #f1f1f2;
+.img-close-menu {
+  transform: rotate(0deg);
+  will-change: transform;
+  transition: transform 0.5s;
+
+  &.active {
+    transform: rotate(135deg);
+    transition: transform 0.2s;
+  }
 }
 
 /* @media (min-width: 1024px) {
