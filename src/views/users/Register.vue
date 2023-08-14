@@ -29,6 +29,19 @@ const Register = () => {
       error.value = err.message
     })
 }
+
+const GoogleLogin = () => {
+  error.value = null
+
+  userStore
+    .googleLogin()
+    .then(() => {
+      router.push(route.query.redirect || '/dashboard')
+    })
+    .catch((err) => {
+      error.value = err.message
+    })
+}
 </script>
 
 <template>
@@ -40,7 +53,7 @@ const Register = () => {
           <div class="card-body">
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
             <br />
-            <form action="#" @submit.prevent="Register">
+            <form action="#" @submit.prevent="">
               <div class="form-group row">
                 <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
 
@@ -91,7 +104,12 @@ const Register = () => {
 
               <div class="form-group row mb-0">
                 <div class="col-md-8 offset-md-4">
-                  <button type="submit" class="btn btn-primary">Cadastrar</button>
+                  <button type="button" class="btn btn-primary" @click="Register">Cadastrar</button>
+                </div>
+                <div class="col-md-8 offset-md-4">
+                  <button type="button" class="btn btn-primary" @click="GoogleLogin">
+                    Cadastrar com Google
+                  </button>
                 </div>
               </div>
               <br />
