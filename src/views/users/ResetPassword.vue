@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
-// import { useRouter, useRoute } from 'vue-router'
+import { NButton, NInput, NCard, NSpace } from 'naive-ui'
 
 const email = ref('')
 const error = ref(null)
@@ -24,10 +24,54 @@ const ResetPassword = () => {
       error.value = err.message
     })
 }
+watch(error, (newVal) => {
+  if (newVal) {
+    setTimeout(() => {
+      error.value = null
+    }, 5000)
+  }
+})
 </script>
 
 <template>
-  <div class="container d-flex ai-center hv-100 px-50">
+  <n-space
+    justify="center"
+    align="center"
+    class="hv-100"
+    style="background-color: rgb(241, 248, 241)"
+  >
+    <n-card title="Recuperação de senha">
+      <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
+        {{ error }}
+      </n-tag>
+      <n-space>
+        <n-input
+          id="email"
+          type="text"
+          class="form-control"
+          name="email"
+          placeholder="E-mail"
+          required
+          autofocus
+          v-model="email"
+        />
+        <n-button type="primary" @click="ResetPassword">Enviar</n-button>
+      </n-space>
+      <template #footer>
+        <div>
+          Ja possui uma conta?
+          <router-link to="/login">Entrar</router-link>
+        </div>
+
+        <div>
+          Novo por aqui?
+          <router-link to="/register">Registre-se</router-link>
+        </div>
+      </template>
+    </n-card>
+  </n-space>
+
+  <!--   <div class="container d-flex ai-center hv-100 px-50">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
@@ -74,7 +118,7 @@ const ResetPassword = () => {
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped lang="scss">
