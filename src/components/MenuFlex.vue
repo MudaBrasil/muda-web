@@ -196,7 +196,7 @@ const store = useMenuFlexStore()
         opacity: 1;
         padding: 30px 30px;
         transform: scale3d(1, 1, 1);
-        transition: transform 0.2s 0.1s;
+        transition: transform 0.1s 0.05s;
       }
 
       .floating-menu-flex {
