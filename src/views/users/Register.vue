@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
-import { NButton, NInput, NCard, NSpace, NIcon } from 'naive-ui'
+import { NButton, NInput, NCard, NSpace, NIcon, NTag } from 'naive-ui'
 
 const name = ref('')
 const email = ref('')
@@ -57,44 +57,33 @@ watch(error, (newVal) => {
     justify="center"
     align="center"
     class="hv-100"
-    style="background-color: rgb(233, 241, 233)"
+    vertical
+    style="background-color: rgb(22 80 121)"
   >
-    <n-card title="Cadastro" hoverable>
-      <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
-        {{ error }}
-      </n-tag>
-      <n-input
-        id="name"
-        type="text"
-        class="form-control"
-        placeholder="Nome"
-        name="name"
-        required
-        autofocus
-        v-model="name"
-      />
-      <n-input
-        id="email"
-        type="text"
-        class="form-control"
-        placeholder="E-mail"
-        name="email"
-        value
-        required
-        autofocus
-        v-model="email"
-      />
-      <n-input
-        id="password"
-        type="password"
-        placeholder="Senha"
-        class="form-control"
-        name="password"
-        required
-        v-model="password"
-      />
-      <template #footer>
-        <n-space class="ml-5">
+    <img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
+    <n-space justify="center" align="center">
+      <n-card title="Cadastro" hoverable style="width: 300px">
+        <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
+          {{ error }}
+        </n-tag>
+        <n-input id="name" type="text" placeholder="Nome" name="name" required v-model="name" />
+        <n-input
+          id="email"
+          type="text"
+          placeholder="E-mail"
+          name="email"
+          required
+          v-model:value="email"
+        />
+        <n-input
+          id="password"
+          type="password"
+          placeholder="Senha"
+          name="password"
+          required
+          v-model:value="password"
+        />
+        <template #footer>
           <div>
             Ja possui uma conta?
             <router-link to="/login">Entrar</router-link>
@@ -103,30 +92,30 @@ watch(error, (newVal) => {
             Esqueceu a senha?
             <router-link to="/reset-password">Recuperar</router-link>
           </div>
-        </n-space>
-      </template>
-      <template #action>
-        <n-space>
-          <n-button type="primary" @click="Register"> Cadastrar </n-button>
-          <n-button type="info" @click="GoogleLogin">
-            <template #icon>
-              <n-icon>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  viewBox="0 0 488 512"
-                >
-                  <path
-                    d="M488 261.8C488 403.3 391.1 504 248 504C110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6c98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </n-icon>
-            </template>
-          </n-button>
-        </n-space>
-      </template>
-    </n-card>
+        </template>
+        <template #action>
+          <n-space>
+            <n-button type="primary" @click="Register"> Cadastrar </n-button>
+            <n-button type="info" @click="GoogleLogin">
+              <template #icon>
+                <n-icon>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    viewBox="0 0 488 512"
+                  >
+                    <path
+                      d="M488 261.8C488 403.3 391.1 504 248 504C110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6c98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                </n-icon>
+              </template>
+            </n-button>
+          </n-space>
+        </template>
+      </n-card>
+    </n-space>
   </n-space>
 </template>
 

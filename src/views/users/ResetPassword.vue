@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
-import { NButton, NInput, NCard, NSpace } from 'naive-ui'
+import { NButton, NInput, NCard, NSpace, NTag } from 'naive-ui'
 
 const email = ref('')
 const error = ref(null)
@@ -12,7 +12,6 @@ const userStore = UserStore()
 
 const ResetPassword = () => {
   error.value = null
-
   userStore
     .resetPassword(email.value)
     .then(() => {
@@ -38,37 +37,48 @@ watch(error, (newVal) => {
     justify="center"
     align="center"
     class="hv-100"
-    style="background-color: rgb(241, 248, 241)"
+    vertical
+    style="background-color: rgb(22 80 121)"
   >
-    <n-card title="Recuperação de senha">
-      <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
-        {{ error }}
-      </n-tag>
-      <n-space>
-        <n-input
-          id="email"
-          type="text"
-          class="form-control"
-          name="email"
-          placeholder="E-mail"
-          required
-          autofocus
-          v-model="email"
-        />
-        <n-button type="primary" @click="ResetPassword">Enviar</n-button>
-      </n-space>
-      <template #footer>
-        <div>
-          Ja possui uma conta?
-          <router-link to="/login">Entrar</router-link>
-        </div>
+    <img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
+    <n-space justify="center" align="center">
+      <n-card title="Recuperação de senha" style="width: 300px">
+        <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
+          {{ error }}
+        </n-tag>
+        <n-space>
+          <div>Informe o email de cadastro</div>
+          <n-input
+            id="email"
+            type="text"
+            class="form-control"
+            name="email"
+            placeholder="E-mail"
+            required
+            autofocus
+            v-model:value="email"
+          />
+        </n-space>
+        <br />
+        <br />
+        <template #footer>
+          <div>
+            Ja possui uma conta?
+            <router-link to="/login">Entrar</router-link>
+          </div>
+          <div>
+            Novo por aqui?
+            <router-link to="/register">Registre-se</router-link>
+          </div>
+        </template>
 
-        <div>
-          Novo por aqui?
-          <router-link to="/register">Registre-se</router-link>
-        </div>
-      </template>
-    </n-card>
+        <template #action>
+          <n-space>
+            <n-button type="primary" @click="ResetPassword">Enviar</n-button>
+          </n-space>
+        </template>
+      </n-card>
+    </n-space>
   </n-space>
 </template>
 

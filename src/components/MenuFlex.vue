@@ -115,7 +115,7 @@ const store = useMenuFlexStore()
       transform: scale3d(0, 0, 1);
       padding: 0px;
       opacity: 0;
-      overflow: scroll;
+      overflow-y: scroll;
       flex: 1;
       will-change: transform, padding, opacity;
       transition: transform 0.2s 0s;
