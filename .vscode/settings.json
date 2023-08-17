@@ -1,5 +1,14 @@
 {
   "cSpell.language": "en,pt,pt-BR",
   "AutoPreview.serverURL": "localhost:8080",
-  "cSpell.words": ["ionicons", "persistedstate", "pinia", "rushstack", "vetur", "vfonts", "vicons"]
+  "cSpell.words": [
+    "ionicons",
+    "Millis",
+    "persistedstate",
+    "pinia",
+    "rushstack",
+    "vetur",
+    "vfonts",
+    "vicons"
+  ]
 }

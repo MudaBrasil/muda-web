@@ -2,10 +2,10 @@
 import imgTreeBackground from '@/assets/tree_background.png'
 import { UserStore } from '@/stores/user'
 import { useRouter, RouterLink } from 'vue-router'
+import { NAvatar } from 'naive-ui'
 
 const userStore = UserStore()
 const router = useRouter()
-
 const signOut = async () => {
   await userStore.logOut()
   router.push('/login')
@@ -21,27 +21,28 @@ const signOut = async () => {
         <h1 style="font-size: 40px">MUDA</h1>
         <a href="">Continue a nadar(mudar)!</a>
         <br />
-        <img src="@/assets/logo.png" alt="Logo do Muda" />
+        <n-avatar round :size="100" :src="userStore.user.photoURL"></n-avatar>
         <br />
         <br />
         <div>
-          UID: <strong>{{ userStore.uid }}</strong>
+          UID: <strong>{{ userStore.user.uid }}</strong>
         </div>
         <div>
-          isLogged: <strong>{{ userStore.isLogged }}</strong>
+          isLogged: <strong>{{ userStore.user.isLogged }}</strong>
         </div>
         <div>
-          displayName: <strong>{{ userStore.displayName }}</strong>
+          displayName: <strong>{{ userStore.user.displayName }}</strong>
         </div>
         <div>
-          email: <strong>{{ userStore.email }}</strong>
+          email: <strong>{{ userStore.user.email }}</strong>
         </div>
         <br />
+
         <br />
         <br />
         <div>
-          <div class="" v-if="userStore.isLogged">
-            <div class="card-header">Welcome, {{ userStore.displayName }}</div>
+          <div class="" v-if="userStore.user.isLogged">
+            <div class="card-header">Welcome, {{ userStore.user.displayName }}</div>
 
             <br />
 
