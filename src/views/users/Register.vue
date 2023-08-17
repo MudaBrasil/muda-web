@@ -35,7 +35,7 @@ const GoogleLogin = () => {
   error.value = null
 
   userStore
-    .googleLogin(true)
+    .googleLogin()
     .then(() => {
       router.push(route.query.redirect || '/dashboard')
     })
