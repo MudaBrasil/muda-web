@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Muda</string>
+    <string name="title_activity_main">Muda</string>
+    <string name="package_name">com.muda.webapp</string>
+    <string name="custom_url_scheme">com.muda.webapp</string>
+</resources>
