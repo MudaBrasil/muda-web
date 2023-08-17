@@ -16,7 +16,7 @@ import { Timestamp } from 'firebase/firestore'
 export const UserStore = defineStore(
   'user',
   () => {
-    const userModel = {
+    const userModel = () => ({
       uid: '',
       email: '',
       isLogged: false,
@@ -25,12 +25,12 @@ export const UserStore = defineStore(
       photoURL: '',
       createdAt: '',
       lastLogin: ''
-    }
+    })
 
-    const user = ref(userModel)
+    const user = ref(userModel())
 
     function reset() {
-      user.value = userModel
+      user.value = userModel()
     }
 
     auth?.onAuthStateChanged(fetch)
@@ -117,9 +117,8 @@ export const UserStore = defineStore(
     }
 
     function logOut() {
-      return signOut(auth).finally(() => {
-        reset()
-      })
+      reset()
+      return signOut(auth)
     }
 
     function register(newUser) {
