@@ -16,15 +16,23 @@ import { Timestamp } from 'firebase/firestore'
 export const UserStore = defineStore(
   'user',
   () => {
-    const user = ref({
+    const userModel = {
       uid: '',
       email: '',
       isLogged: false,
       displayName: '',
       phoneNumber: '',
       photoURL: '',
-      createdAt: ''
-    })
+      createdAt: '',
+      lastLogin: ''
+    }
+
+    const user = ref(userModel)
+
+    function reset() {
+      user.value = userModel
+    }
+
     auth?.onAuthStateChanged(fetch)
 
     // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
@@ -83,25 +91,19 @@ export const UserStore = defineStore(
       return errors.value.find((e) => e.code === code) || { id: 0, code, message }
     }
 
-    function reset() {
-      user.value.uid = ''
-      user.value.email = ''
-      user.value.isLogged = false
-      user.value.displayName = ''
-      user.value.phoneNumber = ''
-      user.value.photoURL = ''
-      user.value.createdAt = ''
-    }
-
     function fetch(newUser) {
+      console.log(newUser)
       if (newUser) {
-        user.value.uid = newUser.uid
-        user.value.email = newUser.email
-        user.value.isLogged = true
-        user.value.displayName = newUser.displayName
-        user.value.phoneNumber = newUser.phoneNumber
-        user.value.photoURL = newUser.photoURL
-        user.value.createdAt = new Date(parseInt(newUser.metadata.createdAt))
+        user.value = {
+          uid: newUser.uid,
+          email: newUser.email,
+          isLogged: true,
+          displayName: newUser.displayName,
+          phoneNumber: newUser.phoneNumber,
+          photoURL: newUser.photoURL,
+          createdAt: new Date(parseInt(newUser.metadata.createdAt)),
+          lastLogin: new Date(parseInt(newUser.metadata.lastLoginAt))
+        }
         saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
       } else {
         reset()
