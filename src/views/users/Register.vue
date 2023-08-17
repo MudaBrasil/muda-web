@@ -35,7 +35,7 @@ const GoogleLogin = () => {
   error.value = null
 
   userStore
-    .googleLogin()
+    .googleLogin(true)
     .then(() => {
       router.push(route.query.redirect || '/dashboard')
     })
@@ -66,13 +66,22 @@ watch(error, (newVal) => {
         <n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
           {{ error }}
         </n-tag>
-        <n-input id="name" type="text" placeholder="Nome" name="name" required v-model="name" />
+        <n-input
+          id="name"
+          type="text"
+          placeholder="Nome"
+          name="name"
+          required
+          class="mb-10"
+          v-model:value="name"
+        />
         <n-input
           id="email"
           type="text"
           placeholder="E-mail"
           name="email"
           required
+          class="mb-10"
           v-model:value="email"
         />
         <n-input

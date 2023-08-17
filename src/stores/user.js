@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { auth } from '@/firebaseConfig'
+import { saveUser } from '../firestore/users'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,15 +11,20 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth'
+import { Timestamp } from 'firebase/firestore'
 
 export const UserStore = defineStore(
   'user',
   () => {
-    const uid = ref('')
-    const email = ref('')
-    const isLogged = ref(false)
-    const displayName = ref('')
-
+    const user = ref({
+      uid: '',
+      email: '',
+      isLogged: false,
+      displayName: '',
+      phoneNumber: '',
+      photoURL: '',
+      createdAt: ''
+    })
     auth?.onAuthStateChanged(fetch)
 
     // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
@@ -78,18 +84,24 @@ export const UserStore = defineStore(
     }
 
     function reset() {
-      uid.value = ''
-      email.value = ''
-      isLogged.value = false
-      displayName.value = ''
+      user.value.uid = ''
+      user.value.email = ''
+      user.value.isLogged = false
+      user.value.displayName = ''
+      user.value.phoneNumber = ''
+      user.value.photoURL = ''
+      user.value.createdAt = ''
     }
 
-    function fetch(user) {
-      if (user) {
-        uid.value = user.uid
-        email.value = user.email
-        isLogged.value = true
-        displayName.value = user.displayName
+    function fetch(newUser) {
+      if (newUser) {
+        user.value.uid = newUser.uid
+        user.value.email = newUser.email
+        user.value.isLogged = true
+        user.value.displayName = newUser.displayName
+        user.value.phoneNumber = newUser.phoneNumber
+        user.value.photoURL = newUser.photoURL
+        user.value.createdAt = new Date(parseInt(newUser.metadata.createdAt))
       } else {
         reset()
       }
@@ -108,11 +120,12 @@ export const UserStore = defineStore(
       })
     }
 
-    function register(user) {
-      return createUserWithEmailAndPassword(auth, user.email, user.password)
+    function register(newUser) {
+      return createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
         .then(() => {
-          updateProfile(auth.currentUser, { displayName: user.name }).then(() => {
+          updateProfile(auth.currentUser, { displayName: newUser.name }).then(() => {
             fetch(auth.currentUser)
+            saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
           })
         })
         .catch((error) => {
@@ -127,11 +140,14 @@ export const UserStore = defineStore(
       })
     }
 
-    function googleLogin() {
+    function googleLogin(register = false) {
       const provider = new GoogleAuthProvider()
       return signInWithPopup(auth, provider)
         .then((response) => {
           fetch(response.user)
+          if (register) {
+            saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
+          }
         })
         .catch((error) => {
           reset()
@@ -140,10 +156,7 @@ export const UserStore = defineStore(
     }
 
     return {
-      uid,
-      email,
-      isLogged,
-      displayName,
+      user,
       fetch,
       logIn,
       logOut,

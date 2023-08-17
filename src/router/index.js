@@ -19,17 +19,20 @@ const router = createRouter({
       name: 'login',
       component: Login,
       meta: { exceptAuth: true }
-    }, {
+    },
+    {
       path: '/register',
       name: 'register',
       component: Register,
       meta: { exceptAuth: true }
-    }, {
+    },
+    {
       path: '/reset-password',
       name: 'reset-password',
       component: ResetPassword,
       meta: { exceptAuth: true }
-    }, {
+    },
+    {
       path: '/',
       name: 'main',
       component: Main,
@@ -39,13 +42,13 @@ const router = createRouter({
           path: '/',
           name: 'home',
           component: Home
-        }, {
+        },
+        {
           path: '/dashboard',
           name: 'dashboard',
           component: Dashboard,
           meta: { requiresAuth: true }
         }
-
       ]
     }
     // {
@@ -59,7 +62,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach(to => {
+router.beforeEach((to) => {
   const userStore = UserStore()
 
   if (to.name === 'logout') {
@@ -67,12 +70,11 @@ router.beforeEach(to => {
       return { path: '/login' }
     })
   }
-
-  if (to.meta.requiresAuth && !userStore.isLogged) {
+  if (to.meta.requiresAuth && !userStore.user.isLogged) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 
-  if (to.meta.exceptAuth && userStore.isLogged) {
+  if (to.meta.exceptAuth && userStore.user.isLogged) {
     return { path: '/dashboard' }
   }
 })

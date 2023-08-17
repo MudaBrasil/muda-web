@@ -60,7 +60,6 @@ watch(error, (newVal) => {
           />
         </n-space>
         <br />
-        <br />
         <template #footer>
           <div>
             Ja possui uma conta?
