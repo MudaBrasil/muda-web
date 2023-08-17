@@ -102,6 +102,7 @@ export const UserStore = defineStore(
         user.value.phoneNumber = newUser.phoneNumber
         user.value.photoURL = newUser.photoURL
         user.value.createdAt = new Date(parseInt(newUser.metadata.createdAt))
+        saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
       } else {
         reset()
       }
@@ -125,7 +126,6 @@ export const UserStore = defineStore(
         .then(() => {
           updateProfile(auth.currentUser, { displayName: newUser.name }).then(() => {
             fetch(auth.currentUser)
-            saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
           })
         })
         .catch((error) => {
@@ -140,14 +140,11 @@ export const UserStore = defineStore(
       })
     }
 
-    function googleLogin(register = false) {
+    function googleLogin() {
       const provider = new GoogleAuthProvider()
       return signInWithPopup(auth, provider)
         .then((response) => {
           fetch(response.user)
-          if (register) {
-            saveUser({ ...user.value, createdAt: Timestamp.fromMillis(user.value.createdAt) })
-          }
         })
         .catch((error) => {
           reset()
