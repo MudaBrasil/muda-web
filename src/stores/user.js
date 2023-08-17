@@ -92,7 +92,6 @@ export const UserStore = defineStore(
     }
 
     function fetch(newUser) {
-      console.log(newUser)
       if (newUser) {
         user.value = {
           uid: newUser.uid,
