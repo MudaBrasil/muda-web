@@ -1,5 +1,10 @@
 <script setup>
 import { RouterView } from 'vue-router'
+
+console.log(
+  '%c' + 'Bem vindo ao MUDA!',
+  'color: #15BE77; -webkit-text-stroke: 3px black; font-size: 60px; font-weight: bold;'
+)
 </script>
 
 <template>

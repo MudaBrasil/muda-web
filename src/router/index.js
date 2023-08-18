@@ -50,7 +50,18 @@ const router = createRouter({
           meta: { requiresAuth: true }
         }
       ]
+    },
+    {
+      path: '/rennan',
+      name: 'rennan',
+      component: () => import('../views/Rennan.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFound.vue')
     }
+
     // {
     //   path: '/about',
     //   name: 'about',
