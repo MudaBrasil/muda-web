@@ -68,6 +68,9 @@ const signOut = async () => {
 </template>
 
 <style scoped lang="scss">
+.n-avatar {
+  position: initial;
+}
 .context {
   padding-bottom: 140px;
   display: flex;

@@ -12,6 +12,8 @@ const email = ref('')
 const password = ref('')
 const error = ref(null)
 
+// TODO: ADD TELEFONE LOGIN https://firebase.google.com/docs/auth/web/phone-auth?hl=pt-br
+
 const GoogleLogin = () => {
   error.value = null
 
