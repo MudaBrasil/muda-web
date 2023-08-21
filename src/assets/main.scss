@@ -26,7 +26,7 @@ h1 {
   font-weight: bold;
 }
 
-.hv-100 {
+.h-100vh {
   height: 100vh;
 }
 
@@ -43,6 +43,46 @@ h1 {
 
   &.ai-center {
     align-items: center;
+  }
+
+  &.fd-column {
+    flex-direction: column;
+  }
+
+  &.fd-row {
+    flex-direction: row;
+  }
+
+  &.fw-wrap {
+    flex-wrap: wrap;
+  }
+
+  &.fw-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  &.fw-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  &.fw-nowrap-reverse {
+    flex-wrap: nowrap-reverse;
+  }
+
+  &.jc-start {
+    justify-content: flex-start;
+  }
+
+  &.jc-end {
+    justify-content: flex-end;
+  }
+
+  &.jc-between {
+    justify-content: space-between;
+  }
+
+  &.jc-around {
+    justify-content: space-around;
   }
 }
 
@@ -91,22 +131,22 @@ h1 {
     margin-right: #{$i}px;
   }
 
-  .px-#{$i} {
+  .ph-#{$i} {
     padding-left: #{$i}px;
     padding-right: #{$i}px;
   }
 
-  .py-#{$i} {
+  .pv-#{$i} {
     padding-top: #{$i}px;
     padding-bottom: #{$i}px;
   }
 
-  .mx-#{$i} {
+  .mh-#{$i} {
     margin-left: #{$i}px;
     margin-right: #{$i}px;
   }
 
-  .my-#{$i} {
+  .mv-#{$i} {
     margin-top: #{$i}px;
     margin-bottom: #{$i}px;
   }

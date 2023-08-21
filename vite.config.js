@@ -17,55 +17,55 @@ export default defineConfig({
         enabled: true
       },
       manifest: {
-        theme_color: "#15be77",
-        background_color: "#114C7C",
-        display: "standalone",
-        scope: "/",
-        lang: "pt",
-        start_url: "/",
-        name: "Muda",
-        short_name: "Muda",
-        description: "Seu melhor jeito para aprender feliz!",
+        theme_color: '#114c7c',
+        background_color: '#114c7c', //  114C7C 1B5477
+        display: 'standalone',
+        scope: '/',
+        lang: 'pt',
+        start_url: '/',
+        name: 'Muda',
+        short_name: 'Muda',
+        description: 'Seu melhor jeito para aprender feliz!',
         icons: [
           {
-            src: "/logo-192x192.png",
-            sizes: "192x192",
-            type: "image/png"
+            src: '/logo-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
           },
           {
-            src: "/logo-256x256.png",
-            sizes: "256x256",
-            type: "image/png"
+            src: '/logo-256x256.png',
+            sizes: '256x256',
+            type: 'image/png'
           },
           {
-            src: "/logo-384x384.png",
-            sizes: "384x384",
-            type: "image/png"
+            src: '/logo-384x384.png',
+            sizes: '384x384',
+            type: 'image/png'
           },
           {
-            src: "/logo.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any"
+            src: '/logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any'
           },
           {
-            src: "/logo-big.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable"
+            src: '/logo-bg.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ],
-        dir: "auto",
+        dir: 'auto',
         categories: [
-          "education",
-          "fitness",
-          "food",
-          "games",
-          "health",
-          "music",
-          "productivity",
-          "social",
-          "utilities"
+          'education',
+          'fitness',
+          'food',
+          'games',
+          'health',
+          'music',
+          'productivity',
+          'social',
+          'utilities'
         ]
       }
     })

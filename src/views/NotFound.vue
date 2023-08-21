@@ -6,7 +6,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <n-space justify="center" align="center" class="hv-100" vertical>
+  <n-space justify="center" align="center" class="h-100vh" vertical>
     <n-result
       status="404"
       title="Página não encontrada"
