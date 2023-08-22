@@ -33,7 +33,7 @@ coverage
 .ssl
 .env
 package-lock.json
-*.lock
+yarn.lock
 
 # Sentry Auth Token
 .env.sentry-build-plugin
