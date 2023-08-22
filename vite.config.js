@@ -11,9 +11,6 @@ export default ({ mode }) => {
   const p = { env: { ...process.env, ...loadEnv(mode, process.cwd()) } }
 
   return defineConfig({
-    build: {
-      sourcemap: true
-    },
     plugins: [
       vue(),
       VitePWA({

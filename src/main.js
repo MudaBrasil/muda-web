@@ -31,6 +31,8 @@ app.use(pinia)
 app.use(router)
 Sentry.init({
   app,
+  enabled: import.meta.env.MODE === 'production',
+  environment: import.meta.env.MODE,
   dsn: 'https://e56e2192fb1ed5c1156526bf674cc6f4@o4505745942708224.ingest.sentry.io/4505745945460736',
   integrations: [
     new Sentry.BrowserTracing({
