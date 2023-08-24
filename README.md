@@ -1,6 +1,8 @@
-# muda-web
+<p align="center">
+  <a href="https://muda.education/" target="blank"><img src="https://muda.education/assets/logo-bcdb3960.png" width="200" alt="Muda Logo" /></a>
+</p>
 
-This template should help get you started developing with Vue 3 in Vite.
+<p align="center">A progressive application to change the human education <a href="http://muda.education" target="_blank">Muda</a>.</p>
 
 ## Recommended IDE Setup
 
