@@ -25,11 +25,17 @@ export default ({ mode }) => {
           theme_color: '#114c7c',
           background_color: '#114c7c', //  114C7C 1B5477
           display: 'standalone',
+          display_override: ['window-controls-overlay', 'standalone'],
           scope: '/',
           lang: 'pt',
+          id: '/',
+          launch_handler: {
+            client_mode: 'auto'
+          },
           start_url: '/',
           name: 'Muda',
           short_name: 'Muda',
+          orientation: 'portrait-primary',
           description: 'Seu melhor jeito para aprender feliz!',
           icons: [
             {
@@ -71,6 +77,27 @@ export default ({ mode }) => {
             'productivity',
             'social',
             'utilities'
+          ],
+          screenshots: [
+            {
+              src: '/screen-1.png',
+              sizes: '485x711',
+              type: 'image/png',
+              platform: 'wide'
+            },
+
+            {
+              src: '/screen-2.png',
+              sizes: '476x678',
+              type: 'image/png',
+              platform: 'wide'
+            },
+            {
+              src: '/screen-3.png',
+              sizes: '468x703',
+              type: 'image/png',
+              platform: 'wide'
+            }
           ]
         }
       }),
