@@ -1,11 +1,5 @@
 {
   "projects": {
-    "default": "muda-edu"
-  },
-  "targets": {},
-  "etags": {
-    "muda-edu": {
-      "extensionInstances": {}
-    }
+    "default": "muda-education"
   }
 }

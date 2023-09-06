@@ -38,7 +38,7 @@ watch(error, (newVal) => {
     align="center"
     class="h-100vh"
     vertical
-    style="background-color: rgb(22 80 121)"
+    style="background-color: #114c7c"
   >
     <img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
     <n-space justify="center" align="center">

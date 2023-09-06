@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { chunkSplitPlugin } from 'vite-plugin-chunk-split'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -37,6 +38,16 @@ export default ({ mode }) => {
           short_name: 'Muda',
           orientation: 'portrait-primary',
           description: 'Seu melhor jeito para aprender feliz!',
+          shortcuts: [
+            {
+              name: 'Login',
+              url: '/login'
+            },
+            {
+              name: 'Home',
+              url: '/'
+            }
+          ],
           icons: [
             {
               src: '/logo-192x192.png',
@@ -98,6 +109,13 @@ export default ({ mode }) => {
               type: 'image/png',
               platform: 'wide'
             }
+          ],
+          related_applications: [
+            {
+              platform: 'play',
+              url: 'https://play.google.com/store/apps/details?id=com.duolingo&hl=pt_BR&gl=US',
+              id: 'com.duolingo'
+            }
           ]
         }
       }),
@@ -105,7 +123,8 @@ export default ({ mode }) => {
         org: p.env.VITE_SENTRY_ORG,
         project: p.env.VITE_SENTRY_PROJECT,
         authToken: p.env.VITE_SENTRY_AUTH_TOKEN
-      })
+      }),
+      chunkSplitPlugin()
     ],
     resolve: {
       alias: {
@@ -115,6 +134,18 @@ export default ({ mode }) => {
     server: {
       host: true,
       port: 8080
+    },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            }
+          }
+        }
+      }
     }
   })
 }
