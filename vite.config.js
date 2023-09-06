@@ -4,7 +4,6 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
-import { chunkSplitPlugin } from 'vite-plugin-chunk-split'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -123,8 +122,7 @@ export default ({ mode }) => {
         org: p.env.VITE_SENTRY_ORG,
         project: p.env.VITE_SENTRY_PROJECT,
         authToken: p.env.VITE_SENTRY_AUTH_TOKEN
-      }),
-      chunkSplitPlugin()
+      })
     ],
     resolve: {
       alias: {
