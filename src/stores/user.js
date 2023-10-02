@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { auth } from '@/firebaseConfig'
-import { saveUser } from '../firestore/users'
+import { saveUser } from '../services/firestore/users'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -30,7 +30,7 @@ export const UserStore = defineStore(
       lastLogin: ''
     })
     const user = ref(userModel())
-    const reset = () => user.value = userModel()
+    const reset = () => (user.value = userModel())
 
     // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
     // TODO: Talvez criar um store para os erros

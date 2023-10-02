@@ -49,23 +49,28 @@ export default ({ mode }) => {
           ],
           icons: [
             {
-              src: '/logo-192x192.png',
+              src: '/logo.png',
               sizes: '192x192',
               type: 'image/png'
             },
             {
-              src: '/logo-256x256.png',
+              src: '/logo.png',
               sizes: '256x256',
               type: 'image/png'
             },
             {
-              src: '/logo-384x384.png',
+              src: '/logo.png',
               sizes: '384x384',
               type: 'image/png'
             },
             {
               src: '/logo.png',
               sizes: '512x512',
+              type: 'image/png'
+            },
+            {
+              src: '/logo.png',
+              sizes: '1024x1024',
               type: 'image/png',
               purpose: 'any'
             },
