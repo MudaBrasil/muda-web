@@ -15,5 +15,4 @@
 		"vicons"
 	],
 	"vue3snippets.enable-compile-vue-file-on-did-save-code": false,
-	"prettier.prettierPath": "node_modules/prettier",
 }

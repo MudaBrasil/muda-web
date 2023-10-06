@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
@@ -20,7 +20,8 @@ const GoogleLogin = () => {
 	userStore
 		.googleLogin()
 		.then(() => {
-			router.push(route.query.redirect || '/dashboard')
+			const redirectPath: any = route.query.redirect || '/dashboard'
+			router.push(redirectPath)
 		})
 		.catch((err) => {
 			error.value = err.message
@@ -36,7 +37,8 @@ const LogIn = () => {
 			password: password.value
 		})
 		.then(() => {
-			router.push(route.query.redirect || '/dashboard')
+			const redirectPath: any = route.query.redirect || '/dashboard'
+			router.push(redirectPath)
 		})
 		.catch((err) => {
 			error.value = err.message
@@ -53,7 +55,13 @@ watch(error, (newVal) => {
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="h-100vh" vertical style="background-color: #114c7c">
+	<n-space
+		justify="center"
+		align="center"
+		class="h-100vh"
+		vertical
+		style="background-color: #114c7c"
+	>
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Acessar o Muda" style="width: 300px">
@@ -61,11 +69,23 @@ watch(error, (newVal) => {
 					{{ error }}
 				</n-tag>
 				<n-space vertical>
-					<n-input id="email" type="text" class="form-control" name="email" placeholder="E-mail"
-						v-model:value="email" />
+					<n-input
+						id="email"
+						type="text"
+						class="form-control"
+						name="email"
+						placeholder="E-mail"
+						v-model:value="email"
+					/>
 
-					<n-input id="password" type="password" class="form-control" name="password"
-						placeholder="Senha" v-model:value="password" />
+					<n-input
+						id="password"
+						type="password"
+						class="form-control"
+						name="password"
+						placeholder="Senha"
+						v-model:value="password"
+					/>
 				</n-space>
 				<br />
 				<template #footer>
@@ -85,11 +105,15 @@ watch(error, (newVal) => {
 						<n-button type="info" @click="GoogleLogin">
 							<template #icon>
 								<n-icon>
-									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-										viewBox="0 0 488 512">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										xmlns:xlink="http://www.w3.org/1999/xlink"
+										viewBox="0 0 488 512"
+									>
 										<path
 											d="M488 261.8C488 403.3 391.1 504 248 504C110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6c98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-											fill="currentColor"></path>
+											fill="currentColor"
+										></path>
 									</svg>
 								</n-icon>
 							</template>

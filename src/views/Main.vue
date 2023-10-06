@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useMenuFlexStore } from '@/stores/menuFlex'
@@ -11,7 +11,8 @@ const menuFlexStore = useMenuFlexStore()
 watch(
 	() => menuFlexStore.active,
 	(menuFlexEnabled) => {
-		document.querySelector('body').style.overflowY = menuFlexEnabled ? 'hidden' : 'auto'
+		const body: any = document.querySelector('body')
+		body.style.overflowY = menuFlexEnabled ? 'hidden' : 'auto'
 	}
 )
 </script>
