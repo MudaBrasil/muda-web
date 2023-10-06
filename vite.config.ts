@@ -1,16 +1,23 @@
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vitest/config'
+import { fileURLToPath, URL } from 'node:url'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
-// https://vitejs.dev/config/
+/**
+ * https://vitejs.dev/config/
+ * @type {import('vite').UserConfig}
+ */
+
 export default ({ mode }) => {
   // eslint-disable-next-line no-undef
   const p = { env: { ...process.env, ...loadEnv(mode, process.cwd()) } }
 
   return defineConfig({
+    test: {
+      globals: true
+    },
     plugins: [
       vue(),
       VitePWA({
@@ -81,7 +88,7 @@ export default ({ mode }) => {
               purpose: 'maskable'
             }
           ],
-          dir: 'auto',
+          dir: 'ltr',
           categories: [
             'education',
             'fitness',
@@ -127,16 +134,17 @@ export default ({ mode }) => {
         org: p.env.VITE_SENTRY_ORG,
         project: p.env.VITE_SENTRY_PROJECT,
         authToken: p.env.VITE_SENTRY_AUTH_TOKEN
-      })
+			})
     ],
     resolve: {
+			extensions: ['.ts', '.js', '.vue'],
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       }
     },
     server: {
       host: true,
-      port: 8080
+      port: 8081
     },
     build: {
       chunkSizeWarningLimit: 1200,

@@ -1,17 +1,19 @@
 {
-  "cSpell.language": "en,pt,pt-BR",
-  "AutoPreview.serverURL": "localhost:8080",
-  "cSpell.words": [
-    "duolingo",
-    "github",
-    "ionicons",
-    "Millis",
-    "persistedstate",
-    "pinia",
-    "rennan",
-    "rushstack",
-    "vetur",
-    "vfonts",
-    "vicons"
-  ]
+	"cSpell.language": "en,pt,pt-BR",
+	"AutoPreview.serverURL": "localhost:8080",
+	"cSpell.words": [
+		"duolingo",
+		"github",
+		"ionicons",
+		"Millis",
+		"persistedstate",
+		"pinia",
+		"rennan",
+		"rushstack",
+		"vetur",
+		"vfonts",
+		"vicons"
+	],
+	"vue3snippets.enable-compile-vue-file-on-did-save-code": false,
+	"prettier.prettierPath": "node_modules/prettier",
 }

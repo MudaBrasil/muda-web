@@ -9,22 +9,22 @@ const menuFlexStore = useMenuFlexStore()
 // TODO: Criar mecanismo para validar toda vez que acessar a pagina o usuário esta logado
 
 watch(
-  () => menuFlexStore.active,
-  (menuFlexEnabled) => {
-    document.querySelector('body').style.overflowY = menuFlexEnabled ? 'hidden' : 'auto'
-  }
+	() => menuFlexStore.active,
+	(menuFlexEnabled) => {
+		document.querySelector('body').style.overflowY = menuFlexEnabled ? 'hidden' : 'auto'
+	}
 )
 </script>
 
 <template>
-  <div>
-    <!-- TODO: Componente MENU BAR -->
-    <MenuBar />
+	<div>
+		<!-- TODO: Componente MENU BAR -->
+		<MenuBar />
 
-    <RouterView v-slot="{ Component }">
-      <Transition name="slide-fade">
-        <component :is="Component" />
-      </Transition>
-    </RouterView>
-  </div>
+		<RouterView v-slot="{ Component }">
+			<Transition name="slide-fade">
+				<component :is="Component" />
+			</Transition>
+		</RouterView>
+	</div>
 </template>

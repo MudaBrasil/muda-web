@@ -8,32 +8,19 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-.DS_Store
 dist
 dist-ssr
-dev-dist
-coverage
 *.local
-
-/cypress/videos/
-/cypress/screenshots/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-!.vscode/settings.json
 .idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-.cert
-.ssl
 .env
-package-lock.json
-yarn.lock
-
-# Sentry Auth Token
-.env.sentry-build-plugin
+dev-dist/

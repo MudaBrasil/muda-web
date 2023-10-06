@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import imgTreeBackground from '@/assets/tree_background.png'
 import { UserStore } from '@/stores/user'
 import { useRouter, RouterLink } from 'vue-router'

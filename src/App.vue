@@ -1,15 +1,41 @@
-<script setup>
+<script setup lang="ts">
 import { RouterView } from 'vue-router'
 
 console.log(
-  '%c' + 'Bem vindo ao MUDA!',
-  'color: #15BE77; -webkit-text-stroke: 3px black; font-size: 60px; font-weight: bold;'
+	'%c' + 'Bem vindo ao MUDA!',
+	'color: #15BE77; -webkit-text-stroke: 3px black; font-size: 60px; font-weight: bold;'
 )
 </script>
 
 <template>
-  <RouterView></RouterView>
+	<!-- <div>
+		<a href="https://vitejs.dev" target="_blank">
+			<img src="/logo.png" class="logo" alt="Vite logo" />
+		</a>
+		<a href="https://vuejs.org/" target="_blank">
+			<img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
+		</a>
+	</div> -->
+	<RouterView></RouterView>
 </template>
+
+
+<style scoped lang="scss">
+.logo {
+	height: 6em;
+	padding: 1.5em;
+	will-change: filter;
+	transition: filter 300ms;
+}
+
+.logo:hover {
+	filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.vue:hover {
+	filter: drop-shadow(0 0 2em #42b883aa);
+}
+</style>
 
 <style scoped lang="scss">
 // header {

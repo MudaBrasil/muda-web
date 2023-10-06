@@ -1,1 +1,0 @@
-{"version":"0.0.0","name":"muda-web","dependencies":{"firebase":{"version":"10.1.0"},"pinia-plugin-persistedstate":{"version":"3.2.0"},"pinia":{"version":"2.1.4"},"register-service-worker":{"version":"1.7.2"},"vue-router":{"version":"4.2.4"},"vue":{"version":"3.3.4"}}}
