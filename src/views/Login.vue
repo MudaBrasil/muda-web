@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
 import { NButton, NInput, NCard, NSpace, NIcon, NTag } from 'naive-ui'
+import Loading from '@/components/Loading.vue'
 
 const userStore = UserStore()
 const router = useRouter()
@@ -11,17 +12,21 @@ const route = useRoute()
 const email = ref('')
 const password = ref('')
 const error = ref(null)
+const showLoading = ref(false)
 
+// TODO: Criar esquema de convite para novos usuários. Gerar link para compartilhar com amigos. Ver quem mais esta usando o Muda e quem mais recomendou
 // TODO: ADD TELEFONE LOGIN https://firebase.google.com/docs/auth/web/phone-auth?hl=pt-br
 
 const GoogleLogin = () => {
 	error.value = null
+	showLoading.value = true
 
 	userStore
 		.googleLogin()
 		.then(() => {
-			const redirectPath: any = route.query.redirect || '/dashboard'
+			const redirectPath: any = route.query.redirect || '/'
 			router.push(redirectPath)
+			showLoading.value = false
 		})
 		.catch((err) => {
 			error.value = err.message
@@ -31,25 +36,27 @@ const GoogleLogin = () => {
 const LogIn = () => {
 	error.value = null
 
-	userStore
-		.logIn({
-			email: email.value,
-			password: password.value
-		})
-		.then(() => {
-			const redirectPath: any = route.query.redirect || '/dashboard'
-			router.push(redirectPath)
-		})
-		.catch((err) => {
-			error.value = err.message
-		})
+	// TODO: show a message that the register and login email is suspended, only google login is available
+
+	// userStore
+	// 	.logIn({
+	// 		email: email.value,
+	// 		password: password.value
+	// 	})
+	// 	.then(() => {
+	// 		const redirectPath: any = route.query.redirect || '/dashboard'
+	// 		router.push(redirectPath)
+	// 	})
+	// 	.catch((err) => {
+	// 		error.value = err.message
+	// 	})
 }
 
 watch(error, (newVal) => {
 	if (newVal) {
 		setTimeout(() => {
 			error.value = null
-		}, 5000)
+		}, 10000)
 	}
 })
 </script>
@@ -118,9 +125,11 @@ watch(error, (newVal) => {
 								</n-icon>
 							</template>
 						</n-button>
+						<!-- <NButton @click="notify('info')"> Info </NButton> -->
 					</n-space>
 				</template>
 			</n-card>
+			<Loading :show="showLoading" :overlay="true" />
 		</n-space>
 	</n-space>
 </template>

@@ -7,8 +7,7 @@ import { NAvatar } from 'naive-ui'
 const userStore = UserStore()
 const router = useRouter()
 const signOut = async () => {
-	await userStore.logOut()
-	router.push('/login')
+	router.push('/logout')
 }
 </script>
 
@@ -20,6 +19,8 @@ const signOut = async () => {
 			<div class="context-field">
 				<h1 style="font-size: 40px">MUDA</h1>
 				<a href="">Continue a nadar(mudar)!</a>
+				<h2>O Muda vai virar todo esse jogo, o Muda é pra tudo, o Muda é pra todos!</h2>
+
 				<br />
 				<n-avatar round :size="100" :src="userStore.user.photoURL"></n-avatar>
 				<br />

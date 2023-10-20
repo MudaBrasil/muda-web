@@ -3,10 +3,27 @@ import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useMenuFlexStore } from '@/stores/menuFlex'
 import MenuBar from '@/components/MenuBar.vue'
+import { UserStore } from '@/stores/user'
+import { NotificationStore } from '@/stores/notification'
+
+const userStore = UserStore()
+const notificationStore = NotificationStore()
+
+watch(
+	() => userStore.user.isLogged,
+	(isLogged) => {
+		if (!isLogged) {
+			notificationStore.notify.info({
+				content: 'Voce foi deslogado!',
+				meta: 'Para continuar acesse a tela de login',
+				duration: 5000,
+				keepAliveOnHover: true
+			})
+		}
+	}
+)
 
 const menuFlexStore = useMenuFlexStore()
-
-// TODO: Criar mecanismo para validar toda vez que acessar a pagina o usuário esta logado
 
 watch(
 	() => menuFlexStore.active,

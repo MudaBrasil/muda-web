@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getAnalytics } from 'firebase/analytics'
+// import { getAnalytics } from 'firebase/analytics'
 import {
 	getFirestore,
 	doc,
@@ -19,12 +19,13 @@ const firebaseConfig = {
 	storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
 	messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
-	measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+	measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+	serviceAccountId: import.meta.env.VITE_FIREBASE_SERVICE_ACCOUNT_ID
 }
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig)
-const analytics = getAnalytics(firebaseApp)
+// const analytics = getAnalytics(firebaseApp)
 const auth = getAuth(firebaseApp)
 const db = getFirestore(firebaseApp)
 
@@ -46,4 +47,4 @@ const docRef = {
 	user: (uid: string) => typedRef<User>(User, 'users', uid)
 }
 
-export { firebaseApp, auth, analytics, db, docRef }
+export { firebaseApp, auth, db, docRef } // analytics

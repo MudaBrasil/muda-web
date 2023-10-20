@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { NNotificationProvider } from 'naive-ui'
+// import { UserStore } from '@/stores/user'
+
+// const userStore = UserStore()
 
 console.log(
 	'%c' + 'Bem vindo ao MUDA!',
@@ -8,17 +12,10 @@ console.log(
 </script>
 
 <template>
-	<!-- <div>
-		<a href="https://vitejs.dev" target="_blank">
-			<img src="/logo.png" class="logo" alt="Vite logo" />
-		</a>
-		<a href="https://vuejs.org/" target="_blank">
-			<img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-		</a>
-	</div> -->
-	<RouterView></RouterView>
+	<NNotificationProvider>
+		<RouterView></RouterView>
+	</NNotificationProvider>
 </template>
-
 
 <style scoped lang="scss">
 .logo {

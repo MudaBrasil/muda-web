@@ -8,9 +8,33 @@ import imgTreeBackground from '@/assets/tree_background.png'
 
 		<div class="context">
 			<div class="context-field">
-				<h1 style="font-size: 40px">MUDA</h1>
+				<h1 style="font-size: 40px">MUDA - CORRER AMANHA DE MANHA</h1>
 				<a>Continue a nadar(mudar)!</a>
+				<h2>O Muda vai virar todo esse jogo, o Muda é pra tudo, o Muda é pra todos!</h2>
 				<br />
+
+				<p>
+					Criar scroll de cards horizontais com as tarefas pendentes para aquele dia Em baixo uma
+					lista de tarefas que a pessoa tem para fazer (tem uma aba com as tarefas que ela ja
+					realizou)
+				</p>
+				<br />
+
+				<p>
+					Quando a pessoa for se concentrar em uma tarefa mais longa ou que exiga mais, ela pode
+					entra no modo super foco, onde aparece uma tela ou com mensagens motivacionais ou
+					lembretes importantes da tarefa, nessa tela o ideal é ficar full screen e mostrar um
+					pomodoro ou um cronometro de tempo, nesse modo a ideia é ser indistraivel
+				</p>
+				<br />
+				<p>
+					Caso a pessoa tenha dificuldade de se manter focada ou tem essa parte cognitiva atrofiada,
+					ela pode usar um recurso que pergunta de 2 em 2 min se ela ainda esta na tarefa, e se ela
+					nao tiver ele vai perguntando coisas pra tentar ajudar ela a voltar o foco, com o passar
+					do tempo pode ser que o tempo de intervalo aumente.
+				</p>
+				<br />
+
 				<img src="@/assets/logo.png" alt="Logo do Muda" />
 				<br />
 			</div>

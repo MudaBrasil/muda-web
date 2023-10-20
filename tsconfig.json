@@ -20,6 +20,7 @@
 		"jsx": "preserve",
 		/* Linting */
 		"strict": true,
+		"strictNullChecks": false,
 		"noImplicitAny": false,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
@@ -34,7 +35,8 @@
 			],
 		},
 		"types": [
-			"vite/client"
+			"vite/client",
+			"naive-ui/volar"
 		],
 		"plugins": [
 			{

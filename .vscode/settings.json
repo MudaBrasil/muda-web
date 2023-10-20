@@ -2,6 +2,7 @@
 	"cSpell.language": "en,pt,pt-BR",
 	"AutoPreview.serverURL": "localhost:8080",
 	"cSpell.words": [
+		"CCPA",
 		"duolingo",
 		"github",
 		"ionicons",
@@ -15,4 +16,7 @@
 		"vicons"
 	],
 	"vue3snippets.enable-compile-vue-file-on-did-save-code": false,
+	"cSpell.ignoreWords": [
+		"Tsecret"
+	],
 }
