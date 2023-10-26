@@ -1,8 +1,8 @@
 import vue from '@vitejs/plugin-vue'
-// import { loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+// import { loadEnv } from 'vite'
 // import { sentryVitePlugin } from '@sentry/vite-plugin' TODO: Enable Sentry (actually has a console error)
 
 /**
@@ -15,9 +15,6 @@ export default ({ mode }) => {
 	// const p = { env: { ...process.env, ...loadEnv(mode, process.cwd()) } }
 
 	return defineConfig({
-		test: {
-			globals: true
-		},
 		plugins: [
 			vue(),
 			VitePWA({

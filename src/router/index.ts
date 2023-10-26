@@ -8,86 +8,87 @@ import ResetPassword from '../views/users/ResetPassword.vue'
 import { UserStore } from '@/stores/user'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/logout',
-      name: 'logout'
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login,
-      meta: { exceptAuth: true }
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: Register,
-      meta: { exceptAuth: true }
-    },
-    {
-      path: '/reset-password',
-      name: 'reset-password',
-      component: ResetPassword,
-      meta: { exceptAuth: true }
-    },
-    {
-      path: '/',
-      name: 'main',
-      component: Main,
-      meta: { requiresAuth: true },
-      children: [
-        {
-          path: '/',
-          name: 'home',
-          component: Home
-        },
-        {
-          path: '/dashboard',
-          name: 'dashboard',
-          component: Dashboard,
-          meta: { requiresAuth: true }
-        }
-      ]
-    },
-    {
-      path: '/rennan',
-      name: 'rennan',
-      component: () => import('../views/Rennan.vue')
-    },
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('../views/NotFound.vue')
-    }
+	history: createWebHistory(import.meta.env.BASE_URL),
+	routes: [
+		{
+			path: '/logout',
+			name: 'logout',
+			redirect: '/login'
+		},
+		{
+			path: '/login',
+			name: 'login',
+			component: Login,
+			meta: { exceptAuth: true }
+		},
+		{
+			path: '/register',
+			name: 'register',
+			component: Register,
+			meta: { exceptAuth: true }
+		},
+		{
+			path: '/reset-password',
+			name: 'reset-password',
+			component: ResetPassword,
+			meta: { exceptAuth: true }
+		},
+		{
+			path: '/',
+			name: 'main',
+			component: Main,
+			meta: { requiresAuth: true },
+			children: [
+				{
+					path: '/',
+					name: 'home',
+					component: Home
+				},
+				{
+					path: '/dashboard',
+					name: 'dashboard',
+					component: Dashboard,
+					meta: { requiresAuth: true }
+				}
+			]
+		},
+		{
+			path: '/rennan',
+			name: 'rennan',
+			component: () => import('../views/Rennan.vue')
+		},
+		{
+			path: '/:pathMatch(.*)*',
+			name: 'not-found',
+			component: () => import('../views/NotFound.vue')
+		}
 
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
-  ]
+		// {
+		//   path: '/about',
+		//   name: 'about',
+		//   // route level code-splitting
+		//   // this generates a separate chunk (About.[hash].js) for this route
+		//   // which is lazy-loaded when the route is visited.
+		//   component: () => import('../views/AboutView.vue')
+		// }
+	]
 })
 
 router.beforeEach((to) => {
-  const userStore = UserStore()
+	const userStore = UserStore()
 
-  if (to.name === 'logout') {
-    return userStore.logOut().then(() => {
-      return { path: '/login' }
-    })
-  }
-  if (to.meta.requiresAuth && !userStore.user.isLogged) {
-    return { path: '/login', query: { redirect: to.fullPath } }
-  }
+	if (to.name === 'logout') {
+		return userStore.logOut().then(() => {
+			return { path: '/login' }
+		})
+	}
+	if (to.meta.requiresAuth && !userStore.user.isLogged) {
+		return { path: '/login', query: { redirect: to.fullPath } }
+	}
 
-  if (to.meta.exceptAuth && userStore.user.isLogged) {
-    return { path: '/dashboard' }
-  }
+	if (to.meta.exceptAuth && userStore.user.isLogged) {
+		return { path: '/dashboard' }
+	}
 })
 
 // router.beforeResolve(async to => {

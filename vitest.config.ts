@@ -4,12 +4,13 @@ import { defineConfig, mergeConfig, configDefaults } from 'vitest/config'
 import { fileURLToPath } from 'node:url'
 
 export default mergeConfig(
-  viteConfig({ mode: 'test' }),
-  defineConfig({
-    test: {
-      environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/*'],
-      root: fileURLToPath(new URL('./'))
-    }
-  })
+	viteConfig({ mode: 'test' }),
+	defineConfig({
+		test: {
+			globals: true,
+			environment: 'jsdom',
+			exclude: [...configDefaults.exclude, 'e2e/*'],
+			root: fileURLToPath(new URL('./'))
+		}
+	})
 )

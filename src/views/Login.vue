@@ -12,6 +12,7 @@ const email = ref('')
 const password = ref('')
 const error = ref(null)
 
+// TODO: Criar esquema de convite para novos usuários. Gerar link para compartilhar com amigos. Ver quem mais esta usando o Muda e quem mais recomendou
 // TODO: ADD TELEFONE LOGIN https://firebase.google.com/docs/auth/web/phone-auth?hl=pt-br
 
 const GoogleLogin = () => {
