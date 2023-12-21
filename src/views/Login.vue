@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
-import { useRouter, useRoute } from 'vue-router'
 import { NButton, NInput, NCard, NSpace, NIcon, NTag } from 'naive-ui'
 import Loading from '@/components/Loading.vue'
 
 const userStore = UserStore()
-const router = useRouter()
-const route = useRoute()
 
 const email = ref('')
 const password = ref('')
@@ -24,11 +21,9 @@ const GoogleLogin = () => {
 	userStore
 		.googleLogin()
 		.then(() => {
-			const redirectPath: any = route.query.redirect || '/'
-			router.push(redirectPath)
 			showLoading.value = false
 		})
-		.catch((err) => {
+		.catch(err => {
 			error.value = err.message
 		})
 }
@@ -52,7 +47,7 @@ const LogIn = () => {
 	// 	})
 }
 
-watch(error, (newVal) => {
+watch(error, newVal => {
 	if (newVal) {
 		setTimeout(() => {
 			error.value = null
@@ -75,25 +70,33 @@ watch(error, (newVal) => {
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
-				<n-space vertical>
-					<n-input
-						id="email"
-						type="text"
-						class="form-control"
-						name="email"
-						placeholder="E-mail"
-						v-model:value="email"
-					/>
+				<form>
+					<n-space vertical>
+						<n-input
+							id="email"
+							type="text"
+							class="form-control"
+							name="email"
+							:input-props="{
+								autocomplete: 'username'
+							}"
+							placeholder="E-mail"
+							v-model:value="email"
+						/>
 
-					<n-input
-						id="password"
-						type="password"
-						class="form-control"
-						name="password"
-						placeholder="Senha"
-						v-model:value="password"
-					/>
-				</n-space>
+						<n-input
+							id="password"
+							type="password"
+							class="form-control"
+							name="password"
+							placeholder="Senha"
+							:input-props="{
+								autocomplete: 'current-password'
+							}"
+							v-model:value="password"
+						/>
+					</n-space>
+				</form>
 				<br />
 				<template #footer>
 					<div>

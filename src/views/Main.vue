@@ -11,11 +11,11 @@ const notificationStore = NotificationStore()
 
 watch(
 	() => userStore.user.isLogged,
-	(isLogged) => {
+	isLogged => {
 		if (!isLogged) {
 			notificationStore.notify.info({
 				content: 'Voce foi deslogado!',
-				meta: 'Para continuar acesse a tela de login',
+				meta: 'Para continuar basta fazer login novamente',
 				duration: 5000,
 				keepAliveOnHover: true
 			})
@@ -27,7 +27,7 @@ const menuFlexStore = useMenuFlexStore()
 
 watch(
 	() => menuFlexStore.active,
-	(menuFlexEnabled) => {
+	menuFlexEnabled => {
 		const body: any = document.querySelector('body')
 		body.style.overflowY = menuFlexEnabled ? 'hidden' : 'auto'
 	}

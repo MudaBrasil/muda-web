@@ -11,11 +11,8 @@ const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 		{
-			path: '/logout',
-			name: 'logout'
-		},
-		{
 			path: '/login',
+			alias: '/logout',
 			name: 'login',
 			component: Login,
 			meta: { exceptAuth: true }
@@ -64,15 +61,18 @@ const router = createRouter({
 	]
 })
 
-router.beforeEach((to) => {
+const noRedirectPaths = ['/', '/login', '/logout', '/register', '/reset-password']
+const verifyRedirect = to => (noRedirectPaths.includes(to) ? undefined : to)
+
+router.beforeEach(to => {
 	const userStore = UserStore()
-	if (to.name === 'logout') {
+	if (to.path === '/logout' && userStore.user.isLogged) {
 		return userStore.googleLogout().then(() => {
-			return { path: '/login' }
+			return { path: '/login', query: { redirect: verifyRedirect(to.query.redirect) } }
 		})
 	}
 	if (to.meta.requiresAuth && !userStore.user.isLogged) {
-		return { path: '/login', query: { redirect: to.fullPath } }
+		return { path: '/login', query: { redirect: verifyRedirect(to.fullPath) } }
 	}
 
 	if (to.meta.exceptAuth && userStore.user.isLogged) {

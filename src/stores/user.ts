@@ -4,7 +4,7 @@ import { auth } from '@/services/firebase'
 import { saveUser } from '../services/firestore/users'
 import {
 	createUserWithEmailAndPassword,
-	signInWithEmailAndPassword,
+	// signInWithEmailAndPassword,
 	signOut,
 	updateProfile,
 	sendPasswordResetEmail,
@@ -24,70 +24,61 @@ class userModel {
 	displayName = ''
 	phoneNumber = ''
 	photoURL = ''
+	userAlreadyRedirected = false
 	createdAt: Date | Nullable<null>
 	lastLogin: Date | Nullable<null>
 }
 
+// TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
 export const UserStore = defineStore(
 	'user',
 	() => {
 		const axios = axiosInject()
-
 		const route = useRoute()
 		const router = useRouter()
+		const user = ref(new userModel())
+		const isLogoutRunning = ref(false)
+
+		const reset = () => (user.value = new userModel())
 
 		auth?.onAuthStateChanged(sync)
 
-		const isLogoutRunning = ref(false)
-		const user = ref(new userModel())
-		const reset = () => (user.value = new userModel())
-
-		// TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
 		// TODO: Talvez criar um store para os erros
-
 		function getError(error) {
 			const code = error.code || firebaseErrors[0].code
 			const message = error.message || firebaseErrors[0].message
 
-			return firebaseErrors.find((e) => e.code === code) || { id: 0, code, message }
+			return firebaseErrors.find(e => e.code === code) || { id: 0, code, message }
 		}
 
-		function sync(newUser) {
-			if (newUser) {
-				const redirectPath: any = route.query.redirect || '/'
-				router.push(redirectPath)
-
+		function sync(newUserData) {
+			if (newUserData) {
 				user.value = {
-					uid: newUser.uid,
-					email: newUser.email,
+					uid: newUserData.uid,
+					email: newUserData.email,
 					isLogged: true,
-					displayName: newUser.displayName,
-					phoneNumber: newUser.phoneNumber,
-					photoURL: newUser.photoURL,
-					createdAt: new Date(parseInt(newUser.metadata?.createdAt ?? null)),
-					lastLogin: new Date(parseInt(newUser.metadata?.lastLoginAt ?? null))
+					displayName: newUserData.displayName,
+					phoneNumber: newUserData.phoneNumber,
+					photoURL: newUserData.photoURL,
+					userAlreadyRedirected: user.value.userAlreadyRedirected,
+					createdAt: new Date(parseInt(newUserData.metadata?.createdAt ?? null)),
+					lastLogin: new Date(parseInt(newUserData.metadata?.lastLoginAt ?? null))
 				}
 				const createdAt = Timestamp.fromMillis(user.value.createdAt?.getTime() ?? 0)
 				saveUser({ ...user.value, createdAt })
+				if (!user.value.userAlreadyRedirected) {
+					user.value.userAlreadyRedirected = true
+
+					const redirectPath: any = route.query.redirect || '/'
+					router.push(redirectPath)
+				}
 			} else {
 				reset()
 				if (route.name !== 'login' && !isLogoutRunning.value) {
-					router.push('/logout')
+					router.push({ path: '/logout', query: { redirect: route.fullPath } })
 				}
 			}
 		}
-
-		// function logIn(user) {
-		// 	return signInWithEmailAndPassword(auth, user.email, user.password).catch((error) => {
-		// 		reset()
-		// 		throw new Error(getError(error).message)
-		// 	})
-		// }
-
-		// function logOut() {
-		// 	reset()
-		// 	return signOut(auth)
-		// }
 
 		function register(newUser) {
 			sync(auth.currentUser)
@@ -99,14 +90,14 @@ export const UserStore = defineStore(
 						throw new Error('Erro ao criar o usuário')
 					}
 				})
-				.catch((error) => {
+				.catch(error => {
 					reset()
 					throw new Error(getError(error).message)
 				})
 		}
 
 		function resetPassword(email) {
-			return sendPasswordResetEmail(auth, email).catch((error) => {
+			return sendPasswordResetEmail(auth, email).catch(error => {
 				throw new Error(getError(error).message)
 			})
 		}
@@ -118,11 +109,8 @@ export const UserStore = defineStore(
 			provider.addScope('openid')
 
 			return signInWithPopup(auth, provider)
-				.then(async (response) => {
-					sync(response.user)
-					return axios.prototype.googleLogin(await response.user.getIdToken())
-				})
-				.catch((error) => {
+				.then(async response => axios.googleLogin(await response.user.getIdToken()))
+				.catch(error => {
 					reset()
 					throw new Error(getError(error).message)
 				})
@@ -132,7 +120,7 @@ export const UserStore = defineStore(
 			if (isLogoutRunning.value) return
 
 			isLogoutRunning.value = true
-			await axios.prototype.googleLogout()
+			await axios.googleLogout()
 			reset()
 			return signOut(auth).finally(() => (isLogoutRunning.value = false))
 		}
@@ -140,8 +128,6 @@ export const UserStore = defineStore(
 		return {
 			sync,
 			user,
-			// logIn,
-			// logOut,
 			register,
 			resetPassword,
 			googleLogin,

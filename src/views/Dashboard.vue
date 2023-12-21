@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import imgTreeBackground from '@/assets/tree_background.png'
 import { UserStore } from '@/stores/user'
-import { useRouter, RouterLink } from 'vue-router'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { NAvatar } from 'naive-ui'
 
 const userStore = UserStore()
 const router = useRouter()
+const route = useRoute()
+
 const signOut = async () => {
-	router.push('/logout')
+	router.push({ path: '/logout', query: { redirect: route.fullPath } })
 }
 </script>
 

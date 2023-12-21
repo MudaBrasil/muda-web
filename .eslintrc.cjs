@@ -8,21 +8,7 @@ module.exports = {
 		es2021: true,
 		node: true
 	},
-	extends: [
-		'eslint:recommended',
-		// 'plugin:vue/vue3-essential',
-		// "plugin:vue/vue3-recommended",
-		// '@vue/eslint-config-prettier/skip-formatting',
-		// '@vue/eslint-config-typescript',
-		// '@vue/eslint-config-typescript/recommended',
-		'@vue/typescript/recommended'
-		// '@vue/eslint-config-prettier'
-
-		// '@vue/prettier',
-		// '@vue/prettier/@typescript-eslint',
-		// 'prettier',
-		// 'plugin:prettier/recommended'
-	],
+	extends: ['eslint:recommended', '@vue/typescript/recommended'],
 	parser: '@typescript-eslint/parser',
 	plugins: ['@typescript-eslint'],
 	overrides: [
@@ -32,12 +18,8 @@ module.exports = {
 		}
 	],
 	rules: {
-		// 'prettier/prettier': 'error',
-		// 'comma-dangle': ['error', 'never'],
-		// 'vue/multi-word-component-names': 0,
 		'@typescript-eslint/no-explicit-any': 'off',
 		semi: ['error', 'never']
-		// 'eol-last': ['error', 'always']
 	},
 	parserOptions: {
 		ecmaVersion: 'latest'
