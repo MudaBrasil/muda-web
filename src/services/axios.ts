@@ -1,7 +1,13 @@
 import axios, { AxiosStatic } from 'axios'
-import Cookies from 'js-cookie'
+import useCookies from 'js-cookie'
 import { auth } from '@/services/firebase'
 import { inject, App } from 'vue'
+
+const cookies = useCookies.withAttributes({
+	expires: 0.08,
+	sameSite: 'None',
+	secure: true
+})
 
 interface AxiosOptions {
 	baseUrl?: string
@@ -24,12 +30,12 @@ export default {
 		customAxios.defaults.withCredentials = true
 		customAxios.defaults.headers.common['Authorization'] = options?.token
 			? `Bearer ${options.token}`
-			: Cookies.get('bearerAuth')
+			: `Bearer ${atob(cookies.get('_fa') || '')}`
 
 		customAxios.interceptors.request.use(
 			function (config) {
 				if (!config.headers.Authorization) {
-					config.headers.Authorization = Cookies.get('bearerAuth')
+					config.headers.Authorization = `Bearer ${atob(cookies.get('_fa') || '')}`
 				}
 				return config
 			},
@@ -48,7 +54,7 @@ export default {
 					const urlsToNotRetry = ['auth/login/google', 'auth/logout/google']
 
 					if (urlsToNotRetry.includes(error.config.url)) {
-						Cookies.remove('bearerAuth')
+						cookies.remove('_fa')
 						customAxios.defaults.headers.common['Authorization'] = `Bearer `
 						return true
 					}
@@ -59,7 +65,7 @@ export default {
 						.getIdToken()
 						.then(token => {
 							customAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-							Cookies.set('bearerAuth', `Bearer ${token}`, { expires: 0.5 })
+							cookies.set('_fa', btoa(token))
 						})
 						.catch(error => {
 							return Promise.reject(error)
@@ -67,7 +73,8 @@ export default {
 						.finally(() => {
 							originalRequest._retry = false
 						})
-					// TODO: Validar se esta funcionando corretamente
+					// TODO: Validar se tem uma forma de forçar a invalidação do token do firebase
+					// TODO: Validar se esta funcionando corretamente o refresh token do firebase
 					// TODO: Verificar se precisa limpar token e refreshToken dos cookies
 				}
 				return Promise.reject(error)
@@ -77,13 +84,13 @@ export default {
 		customAxios.googleLogin = (token: string) => {
 			// TODO: Criar ID do dispositivo e salvar nos cookies
 			customAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-			Cookies.set('bearerAuth', `Bearer ${token}`, { expires: 0.5 })
+			cookies.set('_fa', btoa(token))
 			return customAxios.post('auth/login/google')
 		}
 
 		customAxios.googleLogout = async () => {
 			await customAxios.post('auth/logout/google')
-			Cookies.remove('bearerAuth')
+			cookies.remove('_fa')
 
 			// TODO: Validar se o refreshToken esta atualizando corretamente o token quando expira
 			// Cookies.remove('refreshToken')
