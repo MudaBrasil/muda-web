@@ -10,6 +10,7 @@ import {
 	sendPasswordResetEmail,
 	GoogleAuthProvider,
 	signInWithPopup
+	// TODO: setPersistence
 } from 'firebase/auth'
 import { Timestamp } from 'firebase/firestore'
 import firebaseErrors from '@/assets/errors/firebase-error-messages.json'
@@ -40,8 +41,14 @@ export const UserStore = defineStore(
 		const isLogoutRunning = ref(false)
 
 		const reset = () => (user.value = new userModel())
+		const resetAndLogout = () => {
+			reset()
+			if (route.name !== 'login' && !isLogoutRunning.value) {
+				router.push({ path: '/logout', query: { redirect: route.fullPath } })
+			}
+		}
 
-		auth?.onAuthStateChanged(sync)
+		auth?.onAuthStateChanged(sync, resetAndLogout)
 
 		// TODO: Talvez criar um store para os erros
 		function getError(error) {
@@ -73,10 +80,7 @@ export const UserStore = defineStore(
 					router.push(redirectPath)
 				}
 			} else {
-				reset()
-				if (route.name !== 'login' && !isLogoutRunning.value) {
-					router.push({ path: '/logout', query: { redirect: route.fullPath } })
-				}
+				resetAndLogout()
 			}
 		}
 
@@ -109,7 +113,7 @@ export const UserStore = defineStore(
 			provider.addScope('openid')
 
 			return signInWithPopup(auth, provider)
-				.then(async response => axios.googleLogin(await response.user.getIdToken()))
+				.then(async response => axios.googleLogin(response.user))
 				.catch(error => {
 					reset()
 					throw new Error(getError(error).message)

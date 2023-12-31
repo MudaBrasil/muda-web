@@ -28,6 +28,7 @@ const firebaseApp = initializeApp(firebaseConfig)
 const auth = getAuth(firebaseApp)
 const db = getFirestore(firebaseApp)
 
+// TODO: Remove firestore or use to store the user auth data like deviceId
 const converter = <T>(ModelClass: new (data) => T): FirestoreDataConverter<T> => ({
 	toFirestore: (data: PartialWithFieldValue<T>): PartialWithFieldValue<DocumentData> =>
 		data as PartialWithFieldValue<DocumentData>,
