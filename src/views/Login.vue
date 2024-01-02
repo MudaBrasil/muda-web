@@ -60,6 +60,7 @@ watch(error, newVal => {
 	<n-space
 		justify="center"
 		align="center"
+		class="login"
 		vertical
 		style="background-color: #114c7c"
 	>
@@ -137,6 +138,10 @@ watch(error, newVal => {
 </template>
 
 <style scoped lang="scss">
+.login{
+  min-height: 100vh;
+  padding: 20px 0;
+}
 .alert-danger {
 	color: #721c24;
 }
