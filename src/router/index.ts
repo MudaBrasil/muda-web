@@ -6,6 +6,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Register from '../views/users/Register.vue'
 import ResetPassword from '../views/users/ResetPassword.vue'
 import { UserStore } from '@/stores/user'
+import Timeline from '@/views/Timeline.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,7 +45,11 @@ const router = createRouter({
 					path: '/dashboard',
 					name: 'dashboard',
 					component: Dashboard,
-					meta: { requiresAuth: true }
+				},
+				{
+					path: '/timeline',
+					name: 'timeline',
+					component: Timeline,
 				}
 			]
 		},

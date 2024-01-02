@@ -44,7 +44,7 @@ const store = useMenuFlexStore()
 	width: 100%;
 	bottom: 0px;
 	position: fixed;
-	z-index: 0;
+	z-index: 100;
 }
 
 .floating-menu {
