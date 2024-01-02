@@ -60,7 +60,6 @@ watch(error, newVal => {
 	<n-space
 		justify="center"
 		align="center"
-		class="h-100vh"
 		vertical
 		style="background-color: #114c7c"
 	>
