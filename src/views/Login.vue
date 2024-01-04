@@ -57,13 +57,7 @@ watch(error, newVal => {
 </script>
 
 <template>
-	<n-space
-		justify="center"
-		align="center"
-		class="login"
-		vertical
-		style="background-color: #114c7c"
-	>
+	<n-space justify="center" align="center" class="login" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Acessar o Muda" style="width: 300px">
@@ -138,9 +132,9 @@ watch(error, newVal => {
 </template>
 
 <style scoped lang="scss">
-.login{
-  min-height: 100vh;
-  padding: 20px 0;
+.login {
+	min-height: 100vh;
+	padding: 20px 0;
 }
 .alert-danger {
 	color: #721c24;

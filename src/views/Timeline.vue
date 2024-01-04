@@ -5,6 +5,7 @@ import { onMounted } from 'vue'
 import { ref } from 'vue'
 import { AddSharp } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
+import Loading from '@/components/Loading.vue'
 // import SwiperCore from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
@@ -53,7 +54,7 @@ onMounted(async () => {
 
 <template>
 	<div>
-		<n-space justify="space-between">
+		<n-space class="timeline-header" justify="space-between">
 			<n-button round class="m-20" @click="goBack()">Voltar</n-button>
 			<n-button type="info" round class="m-20" @click="addTask">
 				<template #icon>
@@ -62,14 +63,15 @@ onMounted(async () => {
 				Criar Task
 			</n-button>
 		</n-space>
+		<div class="pt-70"></div>
+
 		<swiper :slides-per-view="3" :space-between="50" @swiper="onSwiper" @slideChange="onSlideChange">
 			<swiper-slide>Slide 1</swiper-slide>
 			<swiper-slide>Slide 2</swiper-slide>
 			<swiper-slide>Slide 3</swiper-slide>
-			...
 		</swiper>
 		<n-space class="p-30 mb-100" justify="center">
-			<n-timeline>
+			<n-timeline v-if="tasks.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
 					<n-card class="card" :title="task.name">
 						<template #header-extra>
@@ -79,6 +81,7 @@ onMounted(async () => {
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
+			<Loading v-else :show="true" componentClass="minimal-loading" />
 		</n-space>
 	</div>
 </template>
@@ -107,5 +110,12 @@ onMounted(async () => {
 .card-header-title {
 	font-weight: 500;
 	color: #000;
+}
+
+.timeline-header {
+	position: fixed;
+	z-index: 2;
+	background: white;
+	width: 100%;
 }
 </style>

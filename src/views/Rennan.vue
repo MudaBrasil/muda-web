@@ -1,4 +1,3 @@
-// Create a Vue component for the 404 page not found
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { NResult, NButton, NSpace } from 'naive-ui'

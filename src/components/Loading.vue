@@ -1,9 +1,5 @@
 <template>
-	<transition
-		enter-active-class="animated fadeIn"
-		leave-active-class="animated fadeOut"
-		:class="componentClass"
-	>
+	<transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" :class="componentClass">
 		<div v-if="showing" :class="{ [overlayClass]: overlay }">
 			<slot name="loading-container">
 				<div :class="loaderClass">
@@ -98,7 +94,7 @@ function registerBusMethods() {
 
 watch(
 	() => props.show,
-	(val) => (showing.value = val)
+	val => (showing.value = val)
 )
 onMounted(() => {
 	props.eventBus && registerBusMethods()
@@ -106,6 +102,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.minimal-loading {
+	position: absolute;
+}
+
 .loading {
 	position: absolute;
 	height: 100%;
