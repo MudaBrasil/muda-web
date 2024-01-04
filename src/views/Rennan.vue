@@ -8,8 +8,12 @@ const router = useRouter()
 
 <template>
 	<n-space justify="center" align="center" class="h-100vh" vertical>
-		<n-result status="404" title="Em construção"
-			description="Estamos finalizando o currículo online do Rennan!" class="h-100">
+		<n-result
+			status="404"
+			title="Em construção"
+			description="Estamos finalizando o currículo online do Rennan!"
+			class="h-100"
+		>
 			<template #footer>
 				<div>
 					<a href="/cv-rennan.pdf" download>Baixar currículo em PDF </a>

@@ -24,6 +24,8 @@ import 'vfonts/Inter.css'
 import './style.css'
 import { emitter } from './emitter'
 import axios from './services/axios'
+import SwiperCore from 'swiper'
+import { Swiper, SwiperSlide } from 'swiper/vue'
 
 declare module '@vue/runtime-core' {
 	export interface ComponentCustomProperties {
