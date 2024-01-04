@@ -52,7 +52,9 @@ const signOut = async () => {
 						<div class="card-header">
 							<router-link to="/">Ir para home</router-link>
 						</div>
-
+						<div class="card-header">
+							<router-link to="/timeline">Ir para cronograma</router-link>
+						</div>
 						<br />
 
 						<div class="d-flex jc-center">

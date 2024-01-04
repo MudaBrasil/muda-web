@@ -1,17 +1,33 @@
 import { inject, App } from 'vue'
-import axios, { AxiosStatic } from 'axios'
+import axios, { AxiosHeaderValue, AxiosRequestConfig, AxiosStatic } from 'axios'
 import useCookies from 'js-cookie'
 import { auth } from '@/services/firebase'
 import { User } from 'firebase/auth'
+import { c } from 'naive-ui'
 
 const cookies = useCookies.withAttributes({
 	// expires: 0.08,
 	sameSite: 'strict',
 	secure: true
 })
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const hasBearerToken = (auth: AxiosHeaderValue) => {
+	const [type, token] = String(auth).split(' ')
+	return type === 'Bearer' && token?.length > 10
+}
 
 interface AxiosOptions {
 	baseUrl?: string
+}
+
+interface RetryConfig extends AxiosRequestConfig {
+	retry: number
+	retryDelay: number
+}
+
+const globalConfig: RetryConfig = {
+	retry: 3,
+	retryDelay: 1000
 }
 
 export const axiosInject = () => inject<customAxiosStatic>('axios')
@@ -23,13 +39,14 @@ interface customAxiosStatic extends AxiosStatic {
 
 export default {
 	install: async (app: App, options?: AxiosOptions) => {
-		const customAxios = axios.create() as customAxiosStatic
+		const customAxios = axios.create(globalConfig) as customAxiosStatic
 
 		// TODO: Criar ID do dispositivo e salvar nos cookies
 		const saveToken = async (user = auth?.currentUser, forceRefresh = false) => {
 			if (!user) {
 				return (customAxios.defaults.headers.common['Authorization'] = 'Bearer')
 			}
+
 			return user?.getIdTokenResult(forceRefresh).then(result => {
 				const time = new Date(result.expirationTime)
 				const timeIncreased = new Date(time.getTime() - 120000)
@@ -46,18 +63,18 @@ export default {
 
 		customAxios.interceptors.request.use(
 			async function (config) {
-				const [type, token] = config.headers.Authorization.toString().split(' ') ?? []
-
-				if (type !== 'Bearer' || !token || token === 'undefined') {
-					config.headers.Authorization = await saveToken()
-				}
-
 				const expirationTime = await cookies.get('expirationTime')
 
 				if (expirationTime && new Date(expirationTime) < new Date()) {
 					config.headers.Authorization = await saveToken()
 				}
 
+				for (let attempt = 0; attempt < 10; attempt++) {
+					if (hasBearerToken(config.headers.Authorization)) break
+
+					config.headers.Authorization = await saveToken()
+					await sleep(attempt * 100)
+				}
 				return config
 			},
 			function (error) {
@@ -72,6 +89,8 @@ export default {
 			async function (error) {
 				const isAuthEndpoint = error.config.url.split('/')[0] === 'auth'
 
+				if (error.config.retry < 1) return error
+
 				if (error.response?.status === 401) {
 					if (isAuthEndpoint) {
 						customAxios.defaults.headers.common['Authorization'] = 'Bearer'
@@ -85,7 +104,9 @@ export default {
 						}
 					} else {
 						error.config.headers.Authorization = await saveToken()
+						error.config.retry--
 
+						await sleep(error.config.retryDelay)
 						return customAxios.request(error.config)
 					}
 				} else {
