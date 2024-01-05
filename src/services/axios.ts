@@ -3,7 +3,6 @@ import axios, { AxiosHeaderValue, AxiosRequestConfig, AxiosStatic } from 'axios'
 import useCookies from 'js-cookie'
 import { auth } from '@/services/firebase'
 import { User } from 'firebase/auth'
-import { c } from 'naive-ui'
 
 const cookies = useCookies.withAttributes({
 	// expires: 0.08,

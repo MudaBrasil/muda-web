@@ -1,3 +1,5 @@
+<script lang="ts"></script>
+
 <script setup lang="ts">
 import { axiosInject } from '@/services/axios'
 import { NSpace, NTimeline, NTimelineItem, NCard, NButton, NIcon } from 'naive-ui'
@@ -6,9 +8,6 @@ import { ref } from 'vue'
 import { AddSharp } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
 import Loading from '@/components/Loading.vue'
-// import SwiperCore from 'swiper'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import 'swiper/css'
 
 const router = useRouter()
 const axios = axiosInject()
@@ -40,13 +39,6 @@ const formatDate = date => {
 }
 const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/'))
 
-const onSwiper = swiper => {
-	console.log(swiper)
-}
-const onSlideChange = () => {
-	console.log('slide change')
-}
-
 onMounted(async () => {
 	tasks.value = await getTasks()
 })
@@ -63,13 +55,8 @@ onMounted(async () => {
 				Criar Task
 			</n-button>
 		</n-space>
-		<div class="pt-70"></div>
+		<div class="pt-50"></div>
 
-		<swiper :slides-per-view="3" :space-between="50" @swiper="onSwiper" @slideChange="onSlideChange">
-			<swiper-slide>Slide 1</swiper-slide>
-			<swiper-slide>Slide 2</swiper-slide>
-			<swiper-slide>Slide 3</swiper-slide>
-		</swiper>
 		<n-space class="p-30 mb-100" justify="center">
 			<n-timeline v-if="tasks.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
