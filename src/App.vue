@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { NNotificationProvider } from 'naive-ui'
+import { NNotificationProvider, NDialogProvider } from 'naive-ui'
 // import { UserStore } from '@/stores/user'
 
 // const userStore = UserStore()
@@ -13,7 +13,9 @@ console.log(
 
 <template>
 	<NNotificationProvider>
-		<RouterView></RouterView>
+		<NDialogProvider>
+			<RouterView></RouterView>
+		</NDialogProvider>
 	</NNotificationProvider>
 </template>
 
