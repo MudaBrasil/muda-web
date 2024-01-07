@@ -5794,10 +5794,10 @@ muggle-string@^0.3.1:
   resolved "https://registry.yarnpkg.com/muggle-string/-/muggle-string-0.3.1.tgz#e524312eb1728c63dd0b2ac49e3282e6ed85963a"
   integrity sha512-ckmWDJjphvd/FvZawgygcUeQCxzvohjFO5RxTjj4eq8kw359gFF3E1brjfI+viLMxss5JrHTDRHZvu2/tuy0Qg==
 
-naive-ui@^2.36.0:
-  version "2.36.0"
-  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.36.0.tgz#d91f1acb44ac8cb06bb57b85b39ba70a5205b44d"
-  integrity sha512-r1ydtEm1Ryf/aWpbLCf32mQAGK99jd1eXgpkCtIomcBRZeAtusfy6zCtIpCppoCuIKM3BW5DMafhVxilubk/lQ==
+naive-ui@^2.37.0:
+  version "2.37.0"
+  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.37.0.tgz#1c68fce8b5b3010379fed8f6a3c99dc2639fe6ef"
+  integrity sha512-TcuXM1zysnK6i/7o2ZqNjcLp3QMmcdSLWWiXcpEk+xdGpkJzs53/OXNpF4CoDM/npjha7qqtB8Pl17YPN5egFw==
   dependencies:
     "@css-render/plugin-bem" "^0.15.12"
     "@css-render/vue3-ssr" "^0.15.12"
@@ -5806,6 +5806,7 @@ naive-ui@^2.36.0:
     "@types/lodash-es" "^4.17.9"
     async-validator "^4.2.5"
     css-render "^0.15.12"
+    csstype "^3.1.3"
     date-fns "^2.30.0"
     date-fns-tz "^2.0.0"
     evtd "^0.2.4"
@@ -5816,7 +5817,7 @@ naive-ui@^2.36.0:
     treemate "^0.3.11"
     vdirs "^0.1.8"
     vooks "^0.2.12"
-    vueuc "^0.4.54"
+    vueuc "^0.4.58"
 
 nanoid@^3.3.6:
   version "3.3.6"
@@ -7696,10 +7697,10 @@ vue@^3.4.4:
     "@vue/server-renderer" "3.4.4"
     "@vue/shared" "3.4.4"
 
-vueuc@^0.4.54:
-  version "0.4.56"
-  resolved "https://registry.yarnpkg.com/vueuc/-/vueuc-0.4.56.tgz#4041995b9baac141fd26bce9e45f08e5483458c7"
-  integrity sha512-faDwItluIL0/K7UASjjyFblvnPNHZlD5b3qDn/2P7mGkweWtXzGQ+YIChQ0V+z0WwDH7lEskNvonnmGqF4T8iA==
+vueuc@^0.4.58:
+  version "0.4.58"
+  resolved "https://registry.yarnpkg.com/vueuc/-/vueuc-0.4.58.tgz#03ee2ea6febf360ca9cbe490841fce91742eea12"
+  integrity sha512-Wnj/N8WbPRSxSt+9ji1jtDHPzda5h2OH/0sFBhvdxDRuyCZbjGg3/cKMaKqEoe+dErTexG2R+i6Q8S/Toq1MYg==
   dependencies:
     "@css-render/vue3-ssr" "^0.15.10"
     "@juggle/resize-observer" "^3.3.1"

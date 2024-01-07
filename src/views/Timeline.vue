@@ -15,8 +15,17 @@ const showModal = ref({
 	newTask: false,
 	viewTask: false
 })
-const title = ref('')
-const description = ref('')
+const loading = ref({
+	newTask: false,
+	deleteTask: false
+})
+
+const newTaskInitial = () => ({
+	name: '',
+	description: '',
+	startDate: new Date()
+})
+const newTask = ref(newTaskInitial())
 
 const currentTask = ref({
 	_id: '',
@@ -30,15 +39,40 @@ onMounted(async () => {
 })
 
 const addTask = () => {
-	axios.post('/tasks', {
-		name: title.value,
-		description: description.value,
-		startDate: new Date()
-	})
+	loading.value.newTask = true
+
+	try {
+		axios
+			.post('/tasks', {
+				name: newTask.value.name,
+				description: newTask.value.description,
+				startDate: new Date()
+			})
+			.finally(async () => {
+				tasks.value = await getTasks()
+				showModal.value.newTask = false
+				loading.value.newTask = false
+				newTask.value = newTaskInitial()
+			})
+	} catch (error) {
+		loading.value.newTask = false
+		console.log(error) // TODO: Emitir notificação caso de erro
+	}
 }
 
 const deleteTask = taskId => {
-	axios.delete(`/tasks/${taskId}`)
+	loading.value.deleteTask = true
+
+	try {
+		axios.delete(`/tasks/${taskId}`).finally(() => {
+			showModal.value.viewTask = false
+			tasks.value = tasks.value.filter(task => task._id !== taskId)
+			loading.value.deleteTask = false
+		})
+	} catch (error) {
+		loading.value.deleteTask = false
+		console.log(error) // TODO: Emitir notificação caso de erro
+	}
 }
 
 const getTasks = async () => {
@@ -82,11 +116,11 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 		<n-space class="p-30 mb-100" justify="center">
 			<n-timeline v-if="tasks.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
-					<n-card class="card" :title="task.name" @click="showModalViewTask(task)">
+					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
 							<div class="card-header-title">
-								{{ formatDate(task.startDate) }}
-								<!-- <n-time :value="task.startDate" type="datetime" format="hh:mm" /> -->
+								{{ formatDate(task.startDate) }} |
+								<n-time :time="new Date(task.startDate)" time-zone="America/Sao_Paulo" format="HH:mm" />
 							</div>
 						</template>
 						<div class="card-content-text">{{ task.description }}</div>
@@ -96,10 +130,15 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 			<Loading v-else :show="true" componentClass="minimal-loading" />
 		</n-space>
 
-		<n-modal v-model:show="showModal.newTask" preset="card" style="margin: 0 10px" title="Criar nova tarefa">
-			<n-input placeholder="Titulo" class="mb-4" v-model:value="title" />
+		<n-modal
+			v-model:show="showModal.newTask"
+			preset="card"
+			style="margin: 0px auto; max-width: 600px"
+			title="Criar nova tarefa"
+		>
+			<n-input placeholder="Titulo" class="mb-4" v-model:value="newTask.name" />
 			<n-input
-				v-model:value="description"
+				v-model:value="newTask.description"
 				placeholder="Descrição"
 				type="textarea"
 				:autosize="{
@@ -109,7 +148,7 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 			/>
 			<template #footer>
 				<div class="d-flex jc-end">
-					<n-button type="info" round @click="addTask"> Criar tarefa </n-button>
+					<n-button type="info" round @click="addTask" :loading="loading.newTask"> Criar tarefa </n-button>
 				</div>
 			</template>
 		</n-modal>
@@ -126,7 +165,9 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 
 			<template #footer>
 				<div class="d-flex jc-end">
-					<n-button type="error" round class="mr-10" @click="deleteTask(currentTask._id)"> Excluir </n-button>
+					<n-button type="error" round class="mr-10" :loading="loading.deleteTask" @click="deleteTask(currentTask._id)">
+						Excluir
+					</n-button>
 					<n-button type="info" round @click=""> Iniciar </n-button>
 				</div>
 			</template>
@@ -135,15 +176,25 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 </template>
 
 <style scoped lang="scss">
-.card {
+.custom-card {
 	min-width: 50vw;
 	width: 100%;
 	height: 100%;
 	border-radius: 20px;
-	background-color: #e7e9fa;
+	cursor: pointer;
+
+	&:not(.n-button--disabled):active {
+		background-color: var(--n-color-pressed);
+		color: var(--n-text-color-pressed);
+	}
+
+	&:not(.n-button--disabled):hover {
+		background-color: var(--n-color-hover);
+		color: var(--n-text-color-hover);
+	}
 }
 
-:deep(.n-card-header__main) {
+.n-button .n-button :deep(.n-card-header__main) {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;

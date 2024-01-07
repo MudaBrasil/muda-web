@@ -44,7 +44,7 @@
 		"eslint-plugin-vue": "^9.19.2",
 		"jsdom": "^23.0.1",
 		"mitt": "^3.0.1",
-		"naive-ui": "^2.36.0",
+		"naive-ui": "^2.37.0",
 		"prettier": "^3.1.1",
 		"sass": "^1.69.7",
 		"sass-loader": "^13.3.3",
