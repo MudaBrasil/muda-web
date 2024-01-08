@@ -15,15 +15,17 @@ import {
 	NDatePicker,
 	NDrawer,
 	NDrawerContent,
-	FormInst
+	FormInst,
+	useLoadingBar
 } from 'naive-ui'
 import { AddSharp } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
-import Loading from '@/components/Loading.vue'
+// import Loading from '@/components/Loading.vue'
 
 const formRef = ref<FormInst | null>(null)
 const router = useRouter()
 const axios = axiosInject()
+const loadingBar = useLoadingBar()
 
 const tasks = ref([])
 const showModal = ref({
@@ -49,9 +51,7 @@ const currentTask = ref({
 	startDate: new Date()
 })
 
-onMounted(async () => {
-	tasks.value = await getTasks()
-})
+onMounted(async () => getTasks())
 
 const addTask = () => {
 	loading.value.newTask = true
@@ -60,7 +60,7 @@ const addTask = () => {
 
 	try {
 		axios.post('/tasks', { name, description, startDate: new Date(startDate) }).finally(async () => {
-			tasks.value = await getTasks()
+			getTasks()
 			showModal.value.newTask = false
 			loading.value.newTask = false
 			newTask.value = newTaskInitial()
@@ -76,8 +76,9 @@ const deleteTask = taskId => {
 
 	try {
 		axios.delete(`/tasks/${taskId}`).finally(() => {
-			showModal.value.viewTask = false
 			tasks.value = tasks.value.filter(task => task._id !== taskId)
+			getTasks()
+			showModal.value.viewTask = false
 			loading.value.deleteTask = false
 		})
 	} catch (error) {
@@ -86,13 +87,21 @@ const deleteTask = taskId => {
 	}
 }
 
-const getTasks = async () => {
-	try {
-		const response = await axios.get('/tasks')
-		return response.data
-	} catch (error) {
-		console.log(error)
-	}
+const getTasks = () => {
+	loadingBar.start()
+	// TODO: usar o skeleton loading
+
+	return axios
+		.get('/tasks')
+		.then(response => {
+			loadingBar.finish()
+			tasks.value = response.data
+			return response.data
+		})
+		.catch(error => {
+			loadingBar.error()
+			console.log(error)
+		})
 }
 
 const showModalViewTask = task => {
@@ -101,10 +110,10 @@ const showModalViewTask = task => {
 	showModal.value.viewTask = true
 }
 const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/'))
-// dialog.warning()
 
 const handleAddTask = (e: MouseEvent) => {
 	e.preventDefault()
+
 	formRef.value?.validate(errors => {
 		if (!errors) {
 			addTask()
@@ -126,9 +135,8 @@ const handleAddTask = (e: MouseEvent) => {
 				Tarefa
 			</n-button>
 		</n-space>
-		<div class="pt-50"></div>
 
-		<n-space class="p-30 mb-100" justify="center">
+		<n-space class="pt-100 mb-100" justify="center">
 			<n-timeline v-if="tasks.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
@@ -141,10 +149,9 @@ const handleAddTask = (e: MouseEvent) => {
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
-			<Loading v-else :show="true" componentClass="minimal-loading" />
 		</n-space>
 
-		<n-drawer v-model:show="showModal.newTask" class="drawer-task" placement="bottom" default-height="80%" resizable>
+		<n-drawer v-model:show="showModal.newTask" class="drawer-task" placement="bottom" default-height="500" resizable>
 			<n-drawer-content title="Criar nova tarefa" closable>
 				<n-form
 					ref="formRef"
@@ -199,7 +206,7 @@ const handleAddTask = (e: MouseEvent) => {
 			</n-drawer-content>
 		</n-drawer>
 
-		<n-drawer v-model:show="showModal.viewTask" class="drawer-task" placement="bottom" default-height="80%" resizable>
+		<n-drawer v-model:show="showModal.viewTask" class="drawer-task" placement="bottom" default-height="400" resizable>
 			<n-drawer-content :title="currentTask.name" closable>
 				<small>Descrição</small>
 				<div>{{ currentTask.description }}</div>

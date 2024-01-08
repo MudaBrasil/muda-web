@@ -133,7 +133,7 @@ watch(error, newVal => {
 
 <style scoped lang="scss">
 .login {
-	min-height: 100vh;
+	min-height: 100dvh;
 	padding: 20px 0;
 }
 .alert-danger {

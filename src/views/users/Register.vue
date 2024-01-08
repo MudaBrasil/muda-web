@@ -27,7 +27,7 @@ const Register = () => {
 			const redirectPath: any = route.query.redirect || '/dashboard'
 			router.push(redirectPath)
 		})
-		.catch((err) => {
+		.catch(err => {
 			error.value = err.message
 		})
 }
@@ -41,11 +41,11 @@ const GoogleLogin = () => {
 			const redirectPath: any = route.query.redirect || '/dashboard'
 			router.push(redirectPath)
 		})
-		.catch((err) => {
+		.catch(err => {
 			error.value = err.message
 		})
 }
-watch(error, (newVal) => {
+watch(error, newVal => {
 	if (newVal) {
 		setTimeout(() => {
 			error.value = null
@@ -55,28 +55,14 @@ watch(error, (newVal) => {
 </script>
 
 <template>
-	<n-space
-		justify="center"
-		align="center"
-		class="h-100vh"
-		vertical
-		style="background-color: #114c7c"
-	>
+	<n-space justify="center" align="center" class="h-100dvh" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Cadastro" hoverable style="width: 300px">
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
-				<n-input
-					id="name"
-					type="text"
-					placeholder="Nome"
-					name="name"
-					required
-					class="mb-10"
-					v-model:value="name"
-				/>
+				<n-input id="name" type="text" placeholder="Nome" name="name" required class="mb-10" v-model:value="name" />
 				<n-input
 					id="email"
 					type="text"
@@ -86,14 +72,7 @@ watch(error, (newVal) => {
 					class="mb-10"
 					v-model:value="email"
 				/>
-				<n-input
-					id="password"
-					type="password"
-					placeholder="Senha"
-					name="password"
-					required
-					v-model:value="password"
-				/>
+				<n-input id="password" type="password" placeholder="Senha" name="password" required v-model:value="password" />
 				<template #footer>
 					<div>
 						Ja possui uma conta?

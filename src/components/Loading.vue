@@ -104,6 +104,8 @@ onMounted(() => {
 <style scoped>
 .minimal-loading {
 	position: absolute;
+	display: flex;
+	justify-content: center;
 }
 
 .loading {
@@ -117,8 +119,8 @@ onMounted(() => {
 	z-index: 1000;
 	top: 0;
 	left: 0;
-	height: 100vh;
-	width: 100vw;
+	height: 100dvh;
+	width: 100dvw;
 	position: fixed;
 	margin: 0 auto;
 }
@@ -133,8 +135,8 @@ onMounted(() => {
 .loader-wrapper {
 	position: absolute;
 	display: inline-block;
-	right: 10vw;
-	bottom: 10vh;
+	right: 10dvw;
+	bottom: 10dvh;
 }
 
 .pulled-left {

@@ -19,11 +19,11 @@ const ResetPassword = () => {
 			// router.push(route.query.redirect || '/dashboard')
 			alert('Solicitação de recuperação de senha enviada com sucesso')
 		})
-		.catch((err) => {
+		.catch(err => {
 			error.value = err.message
 		})
 }
-watch(error, (newVal) => {
+watch(error, newVal => {
 	if (newVal) {
 		setTimeout(() => {
 			error.value = null
@@ -33,13 +33,7 @@ watch(error, (newVal) => {
 </script>
 
 <template>
-	<n-space
-		justify="center"
-		align="center"
-		class="h-100vh"
-		vertical
-		style="background-color: #114c7c"
-	>
+	<n-space justify="center" align="center" class="h-100dvh" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Recuperação de senha" style="width: 300px">

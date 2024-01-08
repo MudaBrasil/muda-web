@@ -6,7 +6,7 @@ const router = useRouter()
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="h-100vh" vertical>
+	<n-space justify="center" align="center" class="h-100dvh" vertical>
 		<n-result
 			status="404"
 			title="Em construção"
