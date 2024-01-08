@@ -1,12 +1,27 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { axiosInject } from '@/services/axios'
-import { NSpace, NTimeline, NTimelineItem, NCard, NButton, NIcon, NModal, NInput, NTime } from 'naive-ui'
-import { onMounted } from 'vue'
-import { ref } from 'vue'
+import {
+	NSpace,
+	NTimeline,
+	NTimelineItem,
+	NCard,
+	NButton,
+	NIcon,
+	NInput,
+	NTime,
+	NForm,
+	NFormItem,
+	NDatePicker,
+	NDrawer,
+	NDrawerContent,
+	FormInst
+} from 'naive-ui'
 import { AddSharp } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
 import Loading from '@/components/Loading.vue'
 
+const formRef = ref<FormInst | null>(null)
 const router = useRouter()
 const axios = axiosInject()
 
@@ -23,7 +38,7 @@ const loading = ref({
 const newTaskInitial = () => ({
 	name: '',
 	description: '',
-	startDate: new Date()
+	startDate: new Date().getTime()
 })
 const newTask = ref(newTaskInitial())
 
@@ -41,19 +56,15 @@ onMounted(async () => {
 const addTask = () => {
 	loading.value.newTask = true
 
+	const { name, description, startDate } = newTask.value
+
 	try {
-		axios
-			.post('/tasks', {
-				name: newTask.value.name,
-				description: newTask.value.description,
-				startDate: new Date()
-			})
-			.finally(async () => {
-				tasks.value = await getTasks()
-				showModal.value.newTask = false
-				loading.value.newTask = false
-				newTask.value = newTaskInitial()
-			})
+		axios.post('/tasks', { name, description, startDate: new Date(startDate) }).finally(async () => {
+			tasks.value = await getTasks()
+			showModal.value.newTask = false
+			loading.value.newTask = false
+			newTask.value = newTaskInitial()
+		})
 	} catch (error) {
 		loading.value.newTask = false
 		console.log(error) // TODO: Emitir notificação caso de erro
@@ -84,13 +95,6 @@ const getTasks = async () => {
 	}
 }
 
-const formatDate = date => {
-	return new Date(date).toLocaleTimeString([], {
-		hour: '2-digit',
-		minute: '2-digit'
-	})
-}
-
 const showModalViewTask = task => {
 	currentTask.value = task
 	currentTask.value.startDate = new Date(task.startDate)
@@ -98,6 +102,17 @@ const showModalViewTask = task => {
 }
 const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/'))
 // dialog.warning()
+
+const handleAddTask = (e: MouseEvent) => {
+	e.preventDefault()
+	formRef.value?.validate(errors => {
+		if (!errors) {
+			addTask()
+		} else {
+			console.log(errors)
+		}
+	})
+}
 </script>
 
 <template>
@@ -119,8 +134,7 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
 							<div class="card-header-title">
-								{{ formatDate(task.startDate) }} |
-								<n-time :time="new Date(task.startDate)" time-zone="America/Sao_Paulo" format="HH:mm" />
+								<n-time :time="new Date(task.startDate)" format="HH:mm" />
 							</div>
 						</template>
 						<div class="card-content-text">{{ task.description }}</div>
@@ -130,48 +144,87 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 			<Loading v-else :show="true" componentClass="minimal-loading" />
 		</n-space>
 
-		<n-modal
-			v-model:show="showModal.newTask"
-			preset="card"
-			style="margin: 0px auto; max-width: 600px"
-			title="Criar nova tarefa"
-		>
-			<n-input placeholder="Titulo" class="mb-4" v-model:value="newTask.name" />
-			<n-input
-				v-model:value="newTask.description"
-				placeholder="Descrição"
-				type="textarea"
-				:autosize="{
-					minRows: 3,
-					maxRows: 5
-				}"
-			/>
-			<template #footer>
-				<div class="d-flex jc-end">
-					<n-button type="info" round @click="addTask" :loading="loading.newTask"> Criar tarefa </n-button>
-				</div>
-			</template>
-		</n-modal>
+		<n-drawer v-model:show="showModal.newTask" class="drawer-task" placement="bottom" default-height="80%" resizable>
+			<n-drawer-content title="Criar nova tarefa" closable>
+				<n-form
+					ref="formRef"
+					:model="newTask"
+					:rules="{
+						name: {
+							required: true,
+							message: 'Atenção: Informe o titulo da tarefa.',
+							trigger: 'blur',
+							pattern: /^.{3,}$/
+						},
+						description: {
+							required: true,
+							message: 'Atenção: Informe a descrição da tarefa.',
+							trigger: 'blur',
+							pattern: /^.{3,}$/
+						},
+						startDate: {
+							required: true,
+							message: 'Atenção: Informe a data de inicio da tarefa.',
+							trigger: 'blur',
+							type: 'date'
+						}
+					}"
+				>
+					<n-form-item label="Titulo" path="name">
+						<n-input v-model:value="newTask.name" placeholder="Informe o titulo da tarefa" />
+					</n-form-item>
+					<n-form-item label="Descrição" path="description">
+						<n-input
+							v-model:value="newTask.description"
+							placeholder="Informe a descrição da tarefa"
+							type="textarea"
+							:autosize="{ minRows: 4 }"
+						/>
+					</n-form-item>
+					<n-form-item label="Data de inicio" path="startDate">
+						<n-date-picker
+							v-model:value="newTask.startDate"
+							type="datetime"
+							style="width: 100%"
+							format="dd/MM/yyyy HH:mm:ss"
+							clearable
+						/>
+					</n-form-item>
+				</n-form>
+				<template #footer>
+					<div class="d-flex jc-end">
+						<n-button type="info" round @click="handleAddTask" :loading="loading.newTask"> Criar tarefa </n-button>
+					</div>
+				</template>
+			</n-drawer-content>
+		</n-drawer>
 
-		<n-modal v-model:show="showModal.viewTask" preset="card" style="margin: 0 10px" :title="currentTask.name">
-			<small>Descrição</small>
-			<div>{{ currentTask.description }}</div>
-			<br />
-			<small>Tempo de execução</small>
-			<!-- <n-statistic :value="currentTask.startDate" :precision="0" /> -->
-			<div>
-				<n-time v-model:value="currentTask.startDate" type="datetime" format="hh:mm" />
-			</div>
-
-			<template #footer>
-				<div class="d-flex jc-end">
-					<n-button type="error" round class="mr-10" :loading="loading.deleteTask" @click="deleteTask(currentTask._id)">
-						Excluir
-					</n-button>
-					<n-button type="info" round @click=""> Iniciar </n-button>
+		<n-drawer v-model:show="showModal.viewTask" class="drawer-task" placement="bottom" default-height="80%" resizable>
+			<n-drawer-content :title="currentTask.name" closable>
+				<small>Descrição</small>
+				<div>{{ currentTask.description }}</div>
+				<br />
+				<small>Data de inicio</small>
+				<div>
+					<n-time :time="new Date(currentTask.startDate)" type="datetime" format="dd/MM/yyyy HH:mm" />
 				</div>
-			</template>
-		</n-modal>
+
+				<template #footer>
+					<div class="d-flex jc-end">
+						<n-button
+							@click="deleteTask(currentTask._id)"
+							:loading="loading.deleteTask"
+							type="error"
+							class="mr-10"
+							round
+						>
+							Excluir
+						</n-button>
+						<n-button type="info" round @click="">Iniciar</n-button>
+					</div>
+				</template>
+			</n-drawer-content>
+		</n-drawer>
 	</div>
 </template>
 
@@ -194,7 +247,15 @@ const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/
 	}
 }
 
-.n-button .n-button :deep(.n-card-header__main) {
+:global(.drawer-task) {
+	margin: auto;
+
+	@media (min-width: 1000px) {
+		width: 60vw;
+	}
+}
+
+.n-button :deep(.n-card-header__main) {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;

@@ -1,0 +1,10 @@
+* {
+	--n-close-color-hover: transparent; // TODO: this is because every time the close button starts with active hover
+}
+
+.n-form-item .n-form-item-feedback-wrapper:not(:empty) {
+	font-size: 12px;
+	line-height: 1;
+	display: flex;
+	justify-content: end;
+}
