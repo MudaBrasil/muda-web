@@ -136,7 +136,7 @@ const handleAddTask = (e: MouseEvent) => {
 			</n-button>
 		</n-space>
 
-		<n-space class="pt-100 mb-100" justify="center">
+		<n-space class="pt-100 ph-30 mb-100" justify="center">
 			<n-timeline v-if="tasks.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
