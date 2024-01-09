@@ -105,7 +105,7 @@ const deleteTask = taskId => {
 			notification.error({
 				title: 'Erro ao adicionar tarefa',
 				description:
-					'Aconteceu um erro inesperado ao adicionar esta tarefa. Tente novamente e caso o problema persista entre em contato conosco para dar mais detalhes sobre o que aconteceu.'
+					'Aconteceu um erro inesperado ao adicionar esta tarefa. Tente novamente e caso o problema persista entre em contato conosco para dar mais detalhes sobre seus últimos passos.'
 			})
 		})
 }
