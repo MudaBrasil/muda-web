@@ -10,13 +10,14 @@ import {
 	sendPasswordResetEmail,
 	GoogleAuthProvider,
 	signInWithPopup
-	// TODO: setPersistence
+	// TODO: maybe use setPersistence to persist the user login(But today this maybe is already resolved)
 } from 'firebase/auth'
 import { Timestamp } from 'firebase/firestore'
 import firebaseErrors from '@/assets/errors/firebase-error-messages.json'
 import { Nullable } from 'vitest'
 import { axiosInject } from '@/services/axios'
 import { useRouter, useRoute } from 'vue-router'
+import { NotificationStore } from '@/stores/notification'
 
 class userModel {
 	uid = ''
@@ -45,7 +46,9 @@ export const UserStore = defineStore(
 			reset()
 			if (route.name !== 'login' && !isLogoutRunning.value) {
 				router.push({ path: '/logout', query: { redirect: route.fullPath } })
+				return true
 			}
+			return false
 		}
 
 		auth?.onAuthStateChanged(sync, resetAndLogout)
@@ -124,9 +127,16 @@ export const UserStore = defineStore(
 			if (isLogoutRunning.value) return
 
 			isLogoutRunning.value = true
-			await axios.googleLogout()
-			reset()
-			return signOut(auth).finally(() => (isLogoutRunning.value = false))
+
+			await axios.googleLogout().catch(({ title, description }) => {
+				NotificationStore().error({ title, description })
+			})
+
+			signOut(auth)
+			isLogoutRunning.value = false
+			resetAndLogout()
+
+			return true
 		}
 
 		return {

@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { NNotificationProvider, NDialogProvider, NLoadingBarProvider } from 'naive-ui'
-// import { UserStore } from '@/stores/user'
-
-// const userStore = UserStore()
 
 console.log(
 	'%c' + 'Bem vindo ao MUDA!',
@@ -12,7 +9,7 @@ console.log(
 </script>
 
 <template>
-	<NNotificationProvider>
+	<NNotificationProvider :max="3" :keep-alive-on-hover="true">
 		<NDialogProvider>
 			<NLoadingBarProvider>
 				<RouterView></RouterView>

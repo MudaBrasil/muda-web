@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import imgTreeBackground from '@/assets/tree_background.png'
-import { UserStore } from '@/stores/user'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
-import { NAvatar } from 'naive-ui'
+import { NAvatar, NButton } from 'naive-ui'
+import { UserStore } from '@/stores/user'
 
 const userStore = UserStore()
 const router = useRouter()
@@ -58,7 +58,7 @@ const signOut = async () => {
 						<br />
 
 						<div class="d-flex jc-center">
-							<button @click.prevent="signOut" class="btn btn-primary">Log Out</button>
+							<n-button type="error" round class="m-20" @click.prevent="signOut">Logout</n-button>
 						</div>
 					</div>
 

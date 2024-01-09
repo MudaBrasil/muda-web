@@ -7,19 +7,18 @@ import { UserStore } from '@/stores/user'
 import { NotificationStore } from '@/stores/notification'
 
 const userStore = UserStore()
-const notificationStore = NotificationStore()
+const notification = NotificationStore()
 
 watch(
 	() => userStore.user.isLogged,
 	isLogged => {
-		if (!isLogged) {
-			notificationStore.notify.info({
-				content: 'Voce foi deslogado!',
-				meta: 'Para continuar basta fazer login novamente',
-				duration: 5000,
-				keepAliveOnHover: true
-			})
-		}
+		!isLogged &&
+			setTimeout(() => {
+				notification.info({
+					title: 'Voce foi deslogado!',
+					description: 'Para continuar basta fazer login novamente'
+				})
+			}, 300)
 	}
 )
 

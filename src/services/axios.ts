@@ -25,7 +25,7 @@ interface RetryConfig extends AxiosRequestConfig {
 }
 
 const globalConfig: RetryConfig = {
-	retry: 3,
+	retry: 2,
 	retryDelay: 1000
 }
 
@@ -86,9 +86,18 @@ export default {
 				return response
 			},
 			async function (error) {
-				const isAuthEndpoint = error.config.url.split('/')[0] === 'auth'
+				if (!auth?.currentUser) return error
 
-				if (error.config.retry < 1) return error
+				if (error.config.retry < 1)
+					return Promise.reject({
+						...error,
+						title: 'Falha na conexão',
+						description: 'Máximo de tentativas feitas.'
+					})
+
+				error.config.retry--
+
+				const isAuthEndpoint = error.config.url.split('/')[0] === 'auth'
 
 				if (error.response?.status === 401) {
 					if (isAuthEndpoint) {
@@ -103,20 +112,30 @@ export default {
 						}
 					} else {
 						error.config.headers.Authorization = await saveToken()
-						error.config.retry--
 
 						await sleep(error.config.retryDelay)
 						return customAxios.request(error.config)
 					}
 				} else {
+					if (!error.response) {
+						error.title = error.message === 'Network Error' ? 'Falha na conexão' : 'Falha desconhecida'
+						error.description = 'Não foi possível estabelecer uma conexão com o servidor.'
+					}
+
 					if (isAuthEndpoint) {
 						customAxios.defaults.headers.common['Authorization'] = 'Bearer'
 						cookies.remove('expirationTime')
 						await auth.signOut()
-						return error
+
+						return Promise.reject(error)
+					} else {
+						error.config.headers.Authorization = await saveToken()
+
+						await sleep(error.config.retryDelay)
+						return customAxios.request(error.config)
 					}
 				}
-				return error
+				return Promise.reject(error)
 			}
 		)
 
@@ -129,6 +148,7 @@ export default {
 			await customAxios.post('auth/logout/google')
 			cookies.remove('expirationTime')
 			customAxios.defaults.headers.common['Authorization'] = 'Bearer'
+			return true
 		}
 
 		app.config.globalProperties.axios = customAxios

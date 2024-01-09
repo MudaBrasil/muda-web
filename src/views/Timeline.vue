@@ -19,13 +19,16 @@ import {
 	useLoadingBar
 } from 'naive-ui'
 import { AddSharp } from '@vicons/ionicons5'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { NotificationStore } from '@/stores/notification'
 // import Loading from '@/components/Loading.vue'
 
 const formRef = ref<FormInst | null>(null)
 const router = useRouter()
+const route = useRoute()
 const axios = axiosInject()
 const loadingBar = useLoadingBar()
+const notification = NotificationStore()
 
 const tasks = ref([])
 const showModal = ref({
@@ -58,33 +61,53 @@ const addTask = () => {
 
 	const { name, description, startDate } = newTask.value
 
-	try {
-		axios.post('/tasks', { name, description, startDate: new Date(startDate) }).finally(async () => {
+	axios
+		.post('/tasks', { name, description, startDate: new Date(startDate) })
+		.then(async () => {
 			getTasks()
 			showModal.value.newTask = false
 			loading.value.newTask = false
 			newTask.value = newTaskInitial()
 		})
-	} catch (error) {
-		loading.value.newTask = false
-		console.log(error) // TODO: Emitir notificação caso de erro
-	}
+		.catch(error => {
+			loading.value.newTask = false
+
+			if (error?.title && error?.description) {
+				notification.error({ title: error.title, description: error.description })
+			}
+
+			notification.error({
+				title: 'Erro ao adicionar tarefa',
+				description:
+					'Aconteceu um erro inesperado ao adicionar esta tarefa. Tente novamente e caso o problema persista entre em contato conosco para dar mais detalhes sobre o que aconteceu.'
+			})
+		})
 }
 
 const deleteTask = taskId => {
 	loading.value.deleteTask = true
 
-	try {
-		axios.delete(`/tasks/${taskId}`).finally(() => {
+	axios
+		.delete(`/tasks/${taskId}`)
+		.then(() => {
 			tasks.value = tasks.value.filter(task => task._id !== taskId)
 			getTasks()
 			showModal.value.viewTask = false
 			loading.value.deleteTask = false
 		})
-	} catch (error) {
-		loading.value.deleteTask = false
-		console.log(error) // TODO: Emitir notificação caso de erro
-	}
+		.catch(error => {
+			loading.value.deleteTask = false
+
+			if (error?.title && error?.description) {
+				notification.error({ title: error.title, description: error.description })
+			}
+
+			notification.error({
+				title: 'Erro ao adicionar tarefa',
+				description:
+					'Aconteceu um erro inesperado ao adicionar esta tarefa. Tente novamente e caso o problema persista entre em contato conosco para dar mais detalhes sobre o que aconteceu.'
+			})
+		})
 }
 
 const getTasks = () => {
@@ -95,12 +118,11 @@ const getTasks = () => {
 		.get('/tasks')
 		.then(response => {
 			loadingBar.finish()
-			tasks.value = response.data
-			return response.data
+			return (tasks.value = response.data)
 		})
-		.catch(error => {
+		.catch(({ title, description }) => {
+			notification.error({ title, description })
 			loadingBar.error()
-			console.log(error)
 		})
 }
 
@@ -109,24 +131,30 @@ const showModalViewTask = task => {
 	currentTask.value.startDate = new Date(task.startDate)
 	showModal.value.viewTask = true
 }
-const goBack = () => (window.history.length > 1 ? router.go(-1) : router.push('/'))
+const goBack = () => {
+	if (!window.history.state.back || window.history.length < 2) return router.push('/')
 
+	return router.go(-1)
+}
 const handleAddTask = (e: MouseEvent) => {
 	e.preventDefault()
 
 	formRef.value?.validate(errors => {
 		if (!errors) {
 			addTask()
-		} else {
-			console.log(errors)
 		}
 	})
+}
+
+const signOut = async () => {
+	router.push({ path: '/logout', query: { redirect: route.fullPath } })
 }
 </script>
 
 <template>
 	<div>
 		<n-space class="timeline-header" justify="space-between">
+			<n-button type="error" round class="m-20" @click.prevent="signOut">Logout</n-button>
 			<n-button round class="m-20" @click="goBack()">Voltar</n-button>
 			<n-button type="info" round class="m-20" @click="showModal.newTask = true">
 				<template #icon>
@@ -137,7 +165,7 @@ const handleAddTask = (e: MouseEvent) => {
 		</n-space>
 
 		<n-space class="pt-100 ph-30 mb-100" justify="center">
-			<n-timeline v-if="tasks.length">
+			<n-timeline v-if="tasks?.length">
 				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
@@ -254,7 +282,7 @@ const handleAddTask = (e: MouseEvent) => {
 	}
 }
 
-:global(.drawer-task) {
+:deep(.drawer-task) {
 	margin: auto;
 
 	@media (min-width: 1000px) {
