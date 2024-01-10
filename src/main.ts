@@ -16,6 +16,7 @@ import './assets/main.scss'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
+import { PiniaSharedState } from 'pinia-shared-state'
 // import * as Sentry from '@sentry/vue' TODO: Enable Sentry (actually has a console error)
 import App from './App.vue'
 import router from './router'
@@ -32,6 +33,8 @@ declare module '@vue/runtime-core' {
 
 const app = createApp(App)
 const pinia = createPinia()
+
+pinia.use(PiniaSharedState({}))
 pinia.use(piniaPluginPersistedState)
 
 app.use(pinia)

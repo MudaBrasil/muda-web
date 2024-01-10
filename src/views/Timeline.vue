@@ -21,6 +21,8 @@ import {
 import { AddSharp } from '@vicons/ionicons5'
 import { useRouter, useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
+import { UserStore } from '@/stores/user'
+
 // import Loading from '@/components/Loading.vue'
 
 const formRef = ref<FormInst | null>(null)
@@ -29,8 +31,8 @@ const route = useRoute()
 const axios = axiosInject()
 const loadingBar = useLoadingBar()
 const notification = NotificationStore()
+const userStore = UserStore()
 
-const tasks = ref([])
 const showModal = ref({
 	newTask: false,
 	viewTask: false
@@ -90,7 +92,8 @@ const deleteTask = taskId => {
 	axios
 		.delete(`/tasks/${taskId}`)
 		.then(() => {
-			tasks.value = tasks.value.filter(task => task._id !== taskId)
+			userStore.tasks = userStore.tasks.filter(task => task._id !== taskId)
+
 			getTasks()
 			showModal.value.viewTask = false
 			loading.value.deleteTask = false
@@ -118,7 +121,7 @@ const getTasks = () => {
 		.get('/tasks')
 		.then(response => {
 			loadingBar.finish()
-			return (tasks.value = response.data)
+			return (userStore.tasks = response.data)
 		})
 		.catch(({ title, description }) => {
 			notification.error({ title, description })
@@ -165,8 +168,8 @@ const signOut = async () => {
 		</n-space>
 
 		<n-space class="pt-100 ph-30 mb-100" justify="center">
-			<n-timeline v-if="tasks?.length">
-				<n-timeline-item v-for="task in tasks" type="success" :key="task._id">
+			<n-timeline v-if="userStore.tasks?.length">
+				<n-timeline-item v-for="task in userStore.tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
 							<div class="card-header-title">

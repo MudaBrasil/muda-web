@@ -19,7 +19,7 @@ import { axiosInject } from '@/services/axios'
 import { useRouter, useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 
-class userModel {
+class UserModel {
 	uid = ''
 	email = ''
 	isLogged = false
@@ -31,6 +31,38 @@ class userModel {
 	lastLogin: Date | Nullable<null>
 }
 
+class TaskModel {
+	_id: string
+	name: string
+	owner: string
+	status: string
+	priority: string
+
+	children: string[]
+	assignees: string[]
+	tags: string[]
+	url: string
+	description: string
+	active: boolean
+	archived: boolean
+	deleted: boolean
+	parent: string
+	orderIndex: number
+	dateDone: Date
+	dateClosed: Date
+	startDate: Date
+	started: boolean
+	dueDate: Date
+	lated: boolean
+	timeEstimate: number
+	timeSpent: number
+	timeTracked: object[]
+}
+
+class TaskListModel {
+	tasks: TaskModel[] | Nullable<null>
+}
+
 // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
 export const UserStore = defineStore(
 	'user',
@@ -38,10 +70,11 @@ export const UserStore = defineStore(
 		const axios = axiosInject()
 		const route = useRoute()
 		const router = useRouter()
-		const user = ref(new userModel())
+		const user = ref(new UserModel())
+		const tasks = ref(new TaskListModel().tasks)
 		const isLogoutRunning = ref(false)
 
-		const reset = () => (user.value = new userModel())
+		const reset = () => (user.value = new UserModel())
 		const resetAndLogout = () => {
 			reset()
 			if (route.name !== 'login' && !isLogoutRunning.value) {
@@ -142,11 +175,17 @@ export const UserStore = defineStore(
 		return {
 			sync,
 			user,
+			tasks,
 			register,
 			resetPassword,
 			googleLogin,
 			googleLogout
 		}
 	},
-	{ persist: true }
+	{
+		persist: true,
+		share: {
+			omit: ['user']
+		}
+	}
 )
