@@ -182,7 +182,16 @@ const signOut = async () => {
 			</n-timeline>
 		</n-space>
 
-		<n-drawer v-model:show="showModal.newTask" class="drawer-task" placement="bottom" default-height="500" resizable>
+		<n-drawer
+			v-model:show="showModal.newTask"
+			class="drawer-task"
+			placement="bottom"
+			default-height="500"
+			:max-height="700"
+			:min-height="300"
+			resizable
+		>
+			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
 			<n-drawer-content title="Criar nova tarefa" closable>
 				<n-form
 					ref="formRef"
@@ -192,13 +201,13 @@ const signOut = async () => {
 							required: true,
 							message: 'Atenção: Informe o titulo da tarefa.',
 							trigger: 'blur',
-							pattern: /^.{3,}$/
+							pattern: /[\S\s]+/
 						},
 						description: {
 							required: true,
 							message: 'Atenção: Informe a descrição da tarefa.',
 							trigger: 'blur',
-							pattern: /^.{3,}$/
+							pattern: /[\S\s]{0,100}/
 						},
 						startDate: {
 							required: true,
@@ -237,10 +246,18 @@ const signOut = async () => {
 			</n-drawer-content>
 		</n-drawer>
 
-		<n-drawer v-model:show="showModal.viewTask" class="drawer-task" placement="bottom" default-height="400" resizable>
+		<n-drawer
+			v-model:show="showModal.viewTask"
+			class="drawer-task"
+			placement="bottom"
+			default-height="500"
+			:max-height="700"
+			:min-height="300"
+			resizable
+		>
 			<n-drawer-content :title="currentTask.name" closable>
 				<small>Descrição</small>
-				<div>{{ currentTask.description }}</div>
+				<div style="white-space: pre-wrap">{{ currentTask.description }}</div>
 				<br />
 				<small>Data de inicio</small>
 				<div>
