@@ -34,7 +34,12 @@ declare module '@vue/runtime-core' {
 const app = createApp(App)
 const pinia = createPinia()
 
-pinia.use(PiniaSharedState({}))
+pinia.use(
+	PiniaSharedState({
+		enable: false,
+		initialize: false
+	})
+)
 pinia.use(piniaPluginPersistedState)
 
 app.use(pinia)

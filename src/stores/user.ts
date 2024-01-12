@@ -185,7 +185,9 @@ export const UserStore = defineStore(
 	{
 		persist: true,
 		share: {
-			omit: ['user']
+			omit: ['user'],
+			enable: true,
+			initialize: true
 		}
 	}
 )

@@ -15,7 +15,9 @@ import {
 	NDatePicker,
 	NDrawer,
 	NDrawerContent,
+	NPerformantEllipsis,
 	FormInst,
+	FormRules,
 	useLoadingBar
 } from 'naive-ui'
 import { AddSharp } from '@vicons/ionicons5'
@@ -41,6 +43,27 @@ const loading = ref({
 	newTask: false,
 	deleteTask: false
 })
+
+const validationTaskRules: FormRules = {
+	name: {
+		required: true,
+		message: 'Atenção: Informe o titulo da tarefa.',
+		trigger: 'blur',
+		pattern: /[\S]/
+	},
+	description: {
+		required: true,
+		message: 'Atenção: Informe a descrição da tarefa.',
+		trigger: 'blur',
+		pattern: /[\S]/
+	},
+	startDate: {
+		required: true,
+		message: 'Atenção: Informe a data de inicio da tarefa.',
+		trigger: 'blur',
+		type: 'date'
+	}
+}
 
 const newTaskInitial = () => ({
 	name: '',
@@ -116,6 +139,7 @@ const deleteTask = taskId => {
 const getTasks = () => {
 	loadingBar.start()
 	// TODO: usar o skeleton loading
+	// TODO: Verificar se ao logar em outro usuario esta cacheando as tarefas do usuario antigo
 
 	return axios
 		.get('/tasks')
@@ -176,7 +200,17 @@ const signOut = async () => {
 								<n-time :time="new Date(task.startDate)" format="HH:mm" />
 							</div>
 						</template>
-						<div class="card-content-text">{{ task.description }}</div>
+						<div class="card-content-text">
+							<n-performant-ellipsis :line-clamp="2" :tooltip="{ delay: 1200 }">
+								<template #tooltip>
+									<div style="max-width: 70dvw">
+										<!-- TODO: test in real task if is better using this "white-space: pre-wrap" -->
+										{{ task.description }}
+									</div>
+								</template>
+								{{ task.description }}
+							</n-performant-ellipsis>
+						</div>
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
@@ -193,30 +227,7 @@ const signOut = async () => {
 		>
 			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
 			<n-drawer-content title="Criar nova tarefa" closable>
-				<n-form
-					ref="formRef"
-					:model="newTask"
-					:rules="{
-						name: {
-							required: true,
-							message: 'Atenção: Informe o titulo da tarefa.',
-							trigger: 'blur',
-							pattern: /[\S\s]+/
-						},
-						description: {
-							required: true,
-							message: 'Atenção: Informe a descrição da tarefa.',
-							trigger: 'blur',
-							pattern: /[\S\s]{0,100}/
-						},
-						startDate: {
-							required: true,
-							message: 'Atenção: Informe a data de inicio da tarefa.',
-							trigger: 'blur',
-							type: 'date'
-						}
-					}"
-				>
+				<n-form ref="formRef" :model="newTask" :rules="validationTaskRules">
 					<n-form-item label="Titulo" path="name">
 						<n-input v-model:value="newTask.name" placeholder="Informe o titulo da tarefa" />
 					</n-form-item>
