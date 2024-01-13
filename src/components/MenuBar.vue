@@ -1,7 +1,84 @@
 <script setup lang="ts">
 import MenuFlex from '@/components/MenuFlex.vue'
 import { useMenuFlexStore } from '@/stores/menuFlex'
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import homeIcon from '@/assets/icons/home.svg'
+import studentBookIcon from '@/assets/icons/student-book.svg'
+import plusIcon from '@/assets/icons/plus.svg'
+import socialIcon from '@/assets/icons/social.svg'
+import progressIcon from '@/assets/icons/progress.svg'
+
 const store = useMenuFlexStore()
+
+const router = useRouter()
+const route = useRoute()
+
+const menuOptions = ref([
+	{
+		icon: homeIcon,
+		title: 'Home',
+		alt: 'Ícone de casa',
+		path: '/',
+		class: '',
+		active: route.path === '/',
+		click: () => router.push({ path: '/' })
+	},
+	{
+		icon: studentBookIcon,
+		title: 'Livro de estudos',
+		alt: 'Ícone de livro de estudos',
+		path: '/timeline',
+		class: '',
+		active: route.path === '/timeline',
+		click: () => router.push({ path: '/timeline' })
+	},
+	{
+		icon: plusIcon,
+		title: 'Menu de adição',
+		alt: 'Ícone de adição',
+		path: '',
+		class: 'center-btn img-close-menu',
+		active: store.active,
+		click: () => (store.active = true)
+	},
+	{
+		icon: socialIcon,
+		title: 'Social',
+		alt: 'Ícone de socialização',
+		path: '/social',
+		class: '',
+		active: route.path === '/social',
+		click: () => router.push({ path: '/timeline' })
+	},
+	{
+		icon: progressIcon,
+		title: 'Progresso',
+		alt: 'Ícone de progresso',
+		path: '/progress',
+		class: '',
+		active: route.path === '/progress',
+		click: () => router.push({ path: '/timeline' })
+	}
+])
+
+watch(
+	() => route.path,
+	path => {
+		menuOptions.value.forEach(option => {
+			option.active = option.path === path
+		})
+	}
+)
+
+watch(
+	() => store.active,
+	active => {
+		if (menuOptions) {
+			menuOptions.value[2].active = active
+		}
+	}
+)
 </script>
 
 <template>
@@ -14,25 +91,33 @@ const store = useMenuFlexStore()
 			<div class="floating-menu-circle-border"></div>
 
 			<div class="floating-menu-options">
-				<div class="floating-menu-options-btn active">
-					<img src="@/assets/icons/home.svg" alt="Ícone de casa" />
-				</div>
-				<div class="floating-menu-options-btn">
-					<img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
-				</div>
 				<div
+					v-for="(option, index) in menuOptions"
+					:key="index"
+					:class="['floating-menu-options-btn', option.class, { active: option.active }]"
+					@click="option.click"
+				>
+					<img :src="option.icon" :alt="option.alt" />
+				</div>
+				<!-- <div :class="['floating-menu-options-btn', { active: menuOptions[0].active }]">
+					<img src="@/assets/icons/home.svg" alt="Ícone de casa" />
+				</div> -->
+				<!-- <div class="floating-menu-options-btn">
+					<img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
+				</div> -->
+				<!-- <div
 					class="floating-menu-options-btn center-btn"
 					@click="store.active = true"
 					:class="['img-close-menu', { active: store.active }]"
 				>
 					<img src="@/assets/icons/plus.svg" alt="Ícone de adição" />
-				</div>
-				<div class="floating-menu-options-btn">
+				</div> -->
+				<!-- <div class="floating-menu-options-btn">
 					<img src="@/assets/icons/social.svg" alt="Ícone de socialização" />
 				</div>
 				<div class="floating-menu-options-btn">
 					<img src="@/assets/icons/progress.svg" alt="Ícone de progresso" />
-				</div>
+				</div> -->
 			</div>
 			<div class="floating-menu-bar"></div>
 		</div>
@@ -135,8 +220,10 @@ const store = useMenuFlexStore()
 	height: 52px;
 	border-radius: 50%;
 	cursor: pointer;
+	filter: grayscale(1);
 
 	&.active {
+		filter: grayscale(0);
 		background-color: #f1f1f2;
 	}
 }
