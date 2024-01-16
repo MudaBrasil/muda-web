@@ -5,6 +5,7 @@
   <path d="M29.9023 10.1016L10.1034 29.9006" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 </svg> -->
 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" fill="none">
-  <path d="M16 2V30" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M2 16H30" stroke="#15BE77" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M16 2V30" stroke="#1a9561" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M2 16H30" stroke="#1a9561" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 </svg>
+    <!-- fill="#15BE77"  -->
