@@ -20,12 +20,10 @@ const GoogleLogin = () => {
 
 	userStore
 		.googleLogin()
-		.then(() => {
-			showLoading.value = false
-		})
 		.catch(err => {
 			error.value = err.message
 		})
+		.finally(() => (showLoading.value = false))
 }
 
 const LogIn = () => {
@@ -57,40 +55,38 @@ watch(error, newVal => {
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="login" vertical style="background-color: #114c7c">
+	<Loading :show="showLoading" :overlay="true"> </Loading>
+
+	<n-space justify="center" align="center" class="auth" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Acessar o Muda" style="width: 300px">
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
-				<form>
-					<n-space vertical>
-						<n-input
-							id="email"
-							type="text"
-							class="form-control"
-							name="email"
-							:input-props="{
-								autocomplete: 'username'
-							}"
-							placeholder="E-mail"
-							v-model:value="email"
-						/>
 
-						<n-input
-							id="password"
-							type="password"
-							class="form-control"
-							name="password"
-							placeholder="Senha"
-							:input-props="{
-								autocomplete: 'current-password'
-							}"
-							v-model:value="password"
-						/>
-					</n-space>
-				</form>
+				<n-input
+					id="email"
+					type="text"
+					class="mb-10"
+					name="email"
+					required
+					:input-props="{ autocomplete: 'username' }"
+					placeholder="E-mail"
+					v-model:value="email"
+				/>
+
+				<n-input
+					id="password"
+					type="password"
+					class="mb-10"
+					name="password"
+					required
+					placeholder="Senha"
+					:input-props="{ autocomplete: 'current-password' }"
+					v-model:value="password"
+				/>
+
 				<br />
 				<template #footer>
 					<div>
@@ -122,17 +118,15 @@ watch(error, newVal => {
 								</n-icon>
 							</template>
 						</n-button>
-						<!-- <NButton @click="notify('info')"> Info </NButton> -->
 					</n-space>
 				</template>
 			</n-card>
-			<Loading :show="showLoading" :overlay="true" />
 		</n-space>
 	</n-space>
 </template>
 
 <style scoped lang="scss">
-.login {
+.auth {
 	min-height: 100dvh;
 	padding: 20px 0;
 }

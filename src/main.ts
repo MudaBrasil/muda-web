@@ -22,6 +22,7 @@ import App from './App.vue'
 import router from './router'
 import './registerServiceWorker'
 import 'vfonts/Inter.css'
+import 'vfonts/FiraCode.css'
 import { emitter } from './emitter'
 import axios from './services/axios'
 

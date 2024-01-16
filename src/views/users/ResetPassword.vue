@@ -2,9 +2,11 @@
 import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
 import { NButton, NInput, NCard, NSpace, NTag } from 'naive-ui'
+import Loading from '@/components/Loading.vue'
 
 const email = ref('')
 const error = ref(null)
+const showLoading = ref(false)
 
 const userStore = UserStore()
 // const router = useRouter()
@@ -12,6 +14,8 @@ const userStore = UserStore()
 
 const ResetPassword = () => {
 	error.value = null
+	showLoading.value = true
+
 	userStore
 		.resetPassword(email.value)
 		.then(() => {
@@ -22,7 +26,9 @@ const ResetPassword = () => {
 		.catch(err => {
 			error.value = err.message
 		})
+		.finally(() => (showLoading.value = false))
 }
+
 watch(error, newVal => {
 	if (newVal) {
 		setTimeout(() => {
@@ -33,26 +39,27 @@ watch(error, newVal => {
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="h-100dvh" vertical style="background-color: #114c7c">
+	<Loading :show="showLoading" :overlay="true"> </Loading>
+
+	<n-space justify="center" align="center" class="auth" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
 			<n-card title="Recuperação de senha" style="width: 300px">
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
-				<n-space>
-					<div>Informe o email de cadastro</div>
-					<n-input
-						id="email"
-						type="text"
-						class="form-control"
-						name="email"
-						placeholder="E-mail"
-						required
-						autofocus
-						v-model:value="email"
-					/>
-				</n-space>
+				<div>Informe o email de cadastro</div>
+				<n-input
+					id="email"
+					type="text"
+					class="mb-10"
+					name="email"
+					placeholder="E-mail"
+					required
+					:input-props="{ autocomplete: 'username' }"
+					autofocus
+					v-model:value="email"
+				/>
 				<br />
 				<template #footer>
 					<div>
@@ -76,6 +83,10 @@ watch(error, newVal => {
 </template>
 
 <style scoped lang="scss">
+.auth {
+	min-height: 100dvh;
+	padding: 20px 0;
+}
 .alert-danger {
 	color: #721c24;
 }

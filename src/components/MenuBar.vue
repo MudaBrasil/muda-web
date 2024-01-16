@@ -24,14 +24,15 @@ const menuOptions = ref([
 		active: route.path === '/',
 		click: () => router.push({ path: '/' })
 	},
+
 	{
-		icon: studentBookIcon,
-		title: 'Livro de estudos',
-		alt: 'Ícone de livro de estudos',
-		path: '/timeline',
+		icon: socialIcon,
+		title: 'Social',
+		alt: 'Ícone de socialização',
+		path: '/dashboard',
 		class: '',
-		active: route.path === '/timeline',
-		click: () => router.push({ path: '/timeline' })
+		active: route.path === '/dashboard',
+		click: () => router.push({ path: '/dashboard' })
 	},
 	{
 		icon: plusIcon,
@@ -43,22 +44,22 @@ const menuOptions = ref([
 		click: () => (store.active = true)
 	},
 	{
-		icon: socialIcon,
-		title: 'Social',
-		alt: 'Ícone de socialização',
-		path: '/social',
-		class: '',
-		active: route.path === '/social',
-		click: () => router.push({ path: '/timeline' })
-	},
-	{
 		icon: progressIcon,
 		title: 'Progresso',
 		alt: 'Ícone de progresso',
-		path: '/progress',
+		path: '/timeline',
 		class: '',
-		active: route.path === '/progress',
+		active: route.path === '/timeline',
 		click: () => router.push({ path: '/timeline' })
+	},
+	{
+		icon: studentBookIcon,
+		title: 'Livro de estudos',
+		alt: 'Ícone de livro de estudos',
+		path: '/rennan',
+		class: '',
+		active: route.path === '/rennan',
+		click: () => router.push({ path: '/rennan' })
 	}
 ])
 
@@ -82,7 +83,7 @@ watch(
 </script>
 
 <template>
-	<div class="menu-background" :class="['menu-background', { 'h-100': store.active }]">
+	<div class="menu-background" :class="['menu-background', { 'h-100d': store.active }]">
 		<MenuFlex />
 		<div class="floating-menu">
 			<div class="floating-menu-bar-shadow"></div>
@@ -99,25 +100,6 @@ watch(
 				>
 					<img :src="option.icon" :alt="option.alt" />
 				</div>
-				<!-- <div :class="['floating-menu-options-btn', { active: menuOptions[0].active }]">
-					<img src="@/assets/icons/home.svg" alt="Ícone de casa" />
-				</div> -->
-				<!-- <div class="floating-menu-options-btn">
-					<img src="@/assets/icons/student-book.svg" alt="Ícone de livro de estudos" />
-				</div> -->
-				<!-- <div
-					class="floating-menu-options-btn center-btn"
-					@click="store.active = true"
-					:class="['img-close-menu', { active: store.active }]"
-				>
-					<img src="@/assets/icons/plus.svg" alt="Ícone de adição" />
-				</div> -->
-				<!-- <div class="floating-menu-options-btn">
-					<img src="@/assets/icons/social.svg" alt="Ícone de socialização" />
-				</div>
-				<div class="floating-menu-options-btn">
-					<img src="@/assets/icons/progress.svg" alt="Ícone de progresso" />
-				</div> -->
 			</div>
 			<div class="floating-menu-bar"></div>
 		</div>
@@ -136,7 +118,7 @@ watch(
 	position: absolute;
 	bottom: 0px;
 	z-index: 100;
-	left: 50%;
+	left: 50dvw;
 	transform: translate(-50%, -50%);
 }
 
@@ -221,6 +203,7 @@ watch(
 	border-radius: 50%;
 	cursor: pointer;
 	filter: grayscale(1);
+	transition: background-color 0.2s ease-in;
 
 	&.active {
 		filter: grayscale(0);
@@ -229,7 +212,7 @@ watch(
 }
 
 .center-btn {
-	margin: 0px 12px;
+	// margin: 0px 12px;
 }
 
 .img-close-menu {

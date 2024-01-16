@@ -3,11 +3,13 @@ import { ref, watch } from 'vue'
 import { UserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
 import { NButton, NInput, NCard, NSpace, NIcon, NTag } from 'naive-ui'
+import Loading from '@/components/Loading.vue'
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const error = ref(null)
+const showLoading = ref(false)
 
 const userStore = UserStore()
 const router = useRouter()
@@ -15,6 +17,7 @@ const route = useRoute()
 
 const Register = () => {
 	error.value = null
+	showLoading.value = true
 
 	userStore
 		.register({
@@ -30,10 +33,12 @@ const Register = () => {
 		.catch(err => {
 			error.value = err.message
 		})
+		.finally(() => (showLoading.value = false))
 }
 
 const GoogleLogin = () => {
 	error.value = null
+	showLoading.value = true
 
 	userStore
 		.googleLogin()
@@ -44,6 +49,7 @@ const GoogleLogin = () => {
 		.catch(err => {
 			error.value = err.message
 		})
+		.finally(() => (showLoading.value = false))
 }
 watch(error, newVal => {
 	if (newVal) {
@@ -55,10 +61,12 @@ watch(error, newVal => {
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="h-100dvh" vertical style="background-color: #114c7c">
+	<Loading :show="showLoading" :overlay="true"> </Loading>
+
+	<n-space justify="center" align="center" class="auth" vertical style="background-color: #114c7c">
 		<img src="@/assets/logo.png" alt="Logo do Muda" height="150" />
 		<n-space justify="center" align="center">
-			<n-card title="Cadastro" hoverable style="width: 300px">
+			<n-card title="Cadastro" style="width: 300px">
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
@@ -68,11 +76,20 @@ watch(error, newVal => {
 					type="text"
 					placeholder="E-mail"
 					name="email"
+					:input-props="{ autocomplete: 'username' }"
 					required
 					class="mb-10"
 					v-model:value="email"
 				/>
-				<n-input id="password" type="password" placeholder="Senha" name="password" required v-model:value="password" />
+				<n-input
+					id="password"
+					type="password"
+					placeholder="Senha"
+					name="password"
+					:input-props="{ autocomplete: 'current-password' }"
+					required
+					v-model:value="password"
+				/>
 				<template #footer>
 					<div>
 						Ja possui uma conta?
@@ -110,8 +127,9 @@ watch(error, newVal => {
 </template>
 
 <style scoped lang="scss">
-.n-card {
-	max-width: 300px;
+.auth {
+	min-height: 100dvh;
+	padding: 20px 0;
 }
 .alert-danger {
 	color: #721c24;

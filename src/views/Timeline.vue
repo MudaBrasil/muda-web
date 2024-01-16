@@ -25,8 +25,6 @@ import { useRouter, useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 import { UserStore } from '@/stores/user'
 
-// import Loading from '@/components/Loading.vue'
-
 const formRef = ref<FormInst | null>(null)
 const router = useRouter()
 const route = useRoute()
@@ -140,6 +138,7 @@ const getTasks = () => {
 	loadingBar.start()
 	// TODO: usar o skeleton loading
 	// TODO: Verificar se ao logar em outro usuario esta cacheando as tarefas do usuario antigo
+	// TODO: Criar verificador de ultima vez que fez o get/tasks para nao fazer toda vez que entrar na pagina
 
 	return axios
 		.get('/tasks')
@@ -190,7 +189,6 @@ const signOut = async () => {
 				Tarefa
 			</n-button>
 		</n-space>
-
 		<n-space class="pt-100 ph-30 mb-100" justify="center">
 			<n-timeline v-if="userStore.tasks?.length">
 				<n-timeline-item v-for="task in userStore.tasks" type="success" :key="task._id">
@@ -201,13 +199,7 @@ const signOut = async () => {
 							</div>
 						</template>
 						<div class="card-content-text">
-							<n-performant-ellipsis :line-clamp="2" :tooltip="{ delay: 1200 }">
-								<template #tooltip>
-									<div style="max-width: 70dvw">
-										<!-- TODO: test in real task if is better using this "white-space: pre-wrap" -->
-										{{ task.description }}
-									</div>
-								</template>
+							<n-performant-ellipsis :line-clamp="2" :tooltip="{ disabled: true }">
 								{{ task.description }}
 							</n-performant-ellipsis>
 						</div>

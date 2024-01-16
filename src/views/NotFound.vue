@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { NResult, NButton, NSpace } from 'naive-ui'
+import { NResult, NButton, NFlex } from 'naive-ui'
 const router = useRouter()
 </script>
 
 <template>
-	<n-space justify="center" align="center" class="h-100dvh" vertical>
+	<n-flex justify="center" align="center" class="h-100">
 		<n-result
 			status="404"
 			title="Página não encontrada"
 			description="Algo deu errado, não sabemos onde esta essa página."
-			class="h-100"
 		>
 			<template #footer>
 				<n-button @click="router.push('/')">Voltar para o inicio</n-button>
 			</template>
 		</n-result>
-	</n-space>
+	</n-flex>
 </template>
 
 <style lang="scss">

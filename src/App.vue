@@ -4,8 +4,9 @@ import { NNotificationProvider, NDialogProvider, NLoadingBarProvider } from 'nai
 
 console.log(
 	'%c' + 'Bem vindo ao MUDA!',
-	'color: #15BE77; -webkit-text-stroke: 3px black; font-size: 60px; font-weight: bold;'
+	'color: #1a9561; -webkit-text-stroke: 3px black; font-size: 60px; font-weight: bold;'
 )
+// #15BE77
 </script>
 
 <template>
