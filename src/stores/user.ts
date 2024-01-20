@@ -19,7 +19,7 @@ import { axiosInject } from '@/services/axios'
 import { useRouter, useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 
-class UserModel {
+export class UserModel {
 	uid = ''
 	email = ''
 	isLogged = false
@@ -31,13 +31,12 @@ class UserModel {
 	lastLogin: Date | Nullable<null>
 }
 
-class TaskModel {
+class Cell {
 	_id: string
 	name: string
 	owner: string
 	status: string
 	priority: string
-
 	children: string[]
 	assignees: string[]
 	tags: string[]
@@ -46,6 +45,28 @@ class TaskModel {
 	active: boolean
 	archived: boolean
 	deleted: boolean
+}
+
+export class SpaceModel extends Cell {
+	avatar: string
+	color: string
+	terms: string
+	rules: string[]
+	private: boolean
+	members: object[]
+	lists: ListModel[] | Nullable<[]>
+}
+
+export class ListModel extends Cell {
+	parent: string
+	orderIndex: number
+	taskCount: number
+	private: boolean
+	grantedPermissions: object[]
+	tasks: TaskModel[] | Nullable<[]>
+}
+
+export class TaskModel extends Cell {
 	parent: string
 	orderIndex: number
 	dateDone: Date
@@ -59,10 +80,6 @@ class TaskModel {
 	timeTracked: object[]
 }
 
-class TaskListModel {
-	tasks: TaskModel[] | Nullable<null>
-}
-
 // TODO: Fazer internacionalização dos textos testando o i18n ou do jeito que eu fiz antes
 export const UserStore = defineStore(
 	'user',
@@ -71,7 +88,8 @@ export const UserStore = defineStore(
 		const route = useRoute()
 		const router = useRouter()
 		const user = ref(new UserModel())
-		const tasks = ref(new TaskListModel().tasks)
+		const tasks = ref<TaskModel[]>([])
+		const spaces = ref<SpaceModel[]>([])
 		const isLogoutRunning = ref(false)
 
 		const reset = () => (user.value = new UserModel())
@@ -149,7 +167,12 @@ export const UserStore = defineStore(
 			provider.addScope('openid')
 
 			return signInWithPopup(auth, provider)
-				.then(async response => axios.googleLogin(response.user))
+				.then(async response => {
+					if (!response.user) throw new Error('Erro ao logar com o Google - Usuário não encontrado')
+					const user = await axios.googleLogin(response.user)
+					spaces.value = user.data.spaces
+					return user
+				})
 				.catch(error => {
 					reset()
 					throw new Error(getError(error).message)
@@ -175,6 +198,7 @@ export const UserStore = defineStore(
 		return {
 			sync,
 			user,
+			spaces,
 			tasks,
 			register,
 			resetPassword,
