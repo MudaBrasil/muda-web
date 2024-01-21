@@ -44,12 +44,19 @@ const router = createRouter({
 				{
 					path: '/dashboard',
 					name: 'dashboard',
-					component: Dashboard,
+					component: Dashboard
 				},
+
 				{
 					path: '/timeline',
 					name: 'timeline',
-					component: Timeline,
+					component: Timeline
+				},
+				{
+					path: '/timeline/spaces/:spaceId/lists/:listId',
+					name: 'timelineSpaceList',
+					props: true,
+					component: Timeline
 				}
 			]
 		},

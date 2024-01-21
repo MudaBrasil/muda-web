@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import HomeContext from '@/components/HomeContext.vue'
 import { axiosInject } from '@/services/axios'
-import { UserStore, SpaceModel } from '@/stores/user'
+import { UserStore, SpaceModel, ListModel } from '@/stores/user'
 import { NotificationStore } from '@/stores/notification'
 import {
 	NAvatar,
@@ -18,15 +18,16 @@ import {
 	NTabPane,
 	NDrawer,
 	NDrawerContent,
+	NDivider,
 	NDynamicTags,
-	NCollapse,
-	NCollapseItem,
+	NPerformantEllipsis,
 	useLoadingBar,
 	FormRules,
 	FormInst
 } from 'naive-ui'
-import { Menu, PencilSharp, EllipsisVertical } from '@vicons/ionicons5'
+import { Menu, EllipsisVertical } from '@vicons/ionicons5'
 import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 const formRef = ref<FormInst | null>(null)
 const axios = axiosInject()
@@ -34,21 +35,28 @@ const loadingBar = useLoadingBar()
 const userStore = UserStore()
 const notification = NotificationStore()
 
+const router = useRouter()
 const spaceCurrentTab = ref(0)
+const listCurrentTab = ref(0)
 const listExpandedNames = ref(userStore.spaces.map(() => []))
 const photoURL = userStore.user.photoURL
-const newSpace = ref({} as SpaceModel)
 const currentSpace = ref({} as SpaceModel)
+const currentList = ref({} as ListModel)
 const isEditingSpace = ref(false)
+const isEditingList = ref(false)
 
 const loading = ref({
 	newSpace: false,
-	deleteSpace: false
+	newList: false,
+	deleteSpace: false,
+	deleteList: false
 })
 
 const showModal = ref({
 	newSpace: false,
-	viewSpace: false
+	newList: false,
+	viewSpace: false,
+	viewList: false
 })
 
 const validationSpaceRules: FormRules = {
@@ -72,9 +80,23 @@ const validationSpaceRules: FormRules = {
 	}
 }
 
+const validationListRules: FormRules = {
+	name: {
+		required: true,
+		message: 'Atenção: Informe o titulo da lista.',
+		trigger: 'blur',
+		pattern: /[\S]/
+	},
+	description: {
+		required: true,
+		message: 'Atenção: Informe a descrição da lista.',
+		trigger: 'blur',
+		pattern: /[\S]/
+	}
+}
+
 onMounted(async () => {
 	await getSpaces()
-
 	listExpandedNames.value = userStore.spaces.map(() => [])
 })
 
@@ -82,6 +104,46 @@ watch(
 	() => userStore.spaces.length,
 	() => (listExpandedNames.value = userStore.spaces.map(() => []))
 )
+
+const handleAddSpace = (e: MouseEvent) => {
+	e.preventDefault()
+
+	formRef.value?.validate(errors => {
+		if (!errors) {
+			addSpace()
+		}
+	})
+}
+
+const handleAddList = (e: MouseEvent) => {
+	e.preventDefault()
+
+	formRef.value?.validate(errors => {
+		if (!errors) {
+			addList()
+		}
+	})
+}
+
+const openViewSpace = () => {
+	currentSpace.value = Object.assign({}, userStore.spaces[spaceCurrentTab.value])
+	showModal.value.viewSpace = true
+}
+
+const cleanSpaceFields = () => {
+	currentSpace.value = {} as SpaceModel
+	isEditingSpace.value = false
+}
+
+const openViewList = () => {
+	currentList.value = Object.assign({}, userStore.spaces[spaceCurrentTab.value].lists[listCurrentTab.value])
+	showModal.value.viewList = true
+}
+
+const cleanListFields = () => {
+	currentList.value = {} as ListModel
+	isEditingList.value = false
+}
 
 const getSpaces = () => {
 	loadingBar.start()
@@ -104,12 +166,12 @@ const addSpace = () => {
 	loading.value.newSpace = true
 
 	return axios
-		.post('/users/spaces', newSpace.value)
+		.post('/users/spaces', currentSpace.value)
 		.then(() => {
 			loadingBar.finish()
 			showModal.value.newSpace = false
 			loading.value.newSpace = false
-			newSpace.value = {} as SpaceModel
+			currentSpace.value = {} as SpaceModel
 			return getSpaces().then(spaces => (spaceCurrentTab.value = spaces.length - 1))
 		})
 		.catch(({ title, description }) => {
@@ -120,8 +182,8 @@ const addSpace = () => {
 
 const updateSpace = space => {
 	loadingBar.start()
-
 	delete space.lists
+
 	return axios
 		.put(`/users/spaces/${space._id}`, space)
 		.then(() => {
@@ -155,19 +217,62 @@ const deleteSpace = spaceId => {
 		})
 }
 
-const handleAddSpace = (e: MouseEvent) => {
-	e.preventDefault()
+const addList = () => {
+	loadingBar.start()
+	loading.value.newList = true
 
-	formRef.value?.validate(errors => {
-		if (!errors) {
-			addSpace()
-		}
-	})
+	return axios
+		.post(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists`, currentList.value)
+		.then(() => {
+			loadingBar.finish()
+			showModal.value.newList = false
+			loading.value.newList = false
+			currentList.value = {} as ListModel
+			return getSpaces().then(spaces => (listCurrentTab.value = spaces[spaceCurrentTab.value]?.lists.length - 1))
+		})
+		.catch(({ title, description }) => {
+			notification.error({ title, description })
+			loadingBar.error()
+		})
 }
 
-const openViewSpace = () => {
-	currentSpace.value = Object.assign({}, userStore.spaces[spaceCurrentTab.value])
-	showModal.value.viewSpace = true
+const updateList = list => {
+	loadingBar.start()
+	delete list.tasks
+
+	return axios
+		.put(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${list._id}`, list)
+		.then(() => {
+			showModal.value.viewList = false
+			loadingBar.finish()
+			return getSpaces()
+		})
+		.catch(({ title, description }) => {
+			notification.error({ title, description })
+			loadingBar.error()
+		})
+}
+
+const deleteList = listId => {
+	loading.value.deleteList = true
+
+	axios
+		.delete(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${listId}`)
+		.then(() => {
+			userStore.spaces[spaceCurrentTab.value].lists = userStore.spaces[spaceCurrentTab.value].lists.filter(
+				list => list._id !== listId
+			)
+
+			showModal.value.viewList = false
+			loading.value.deleteList = false
+
+			listCurrentTab.value = listCurrentTab.value > 0 ? listCurrentTab.value - 1 : 0
+			return getSpaces()
+		})
+		.catch(({ title, description }) => {
+			notification.error({ title, description })
+			loadingBar.error()
+		})
 }
 </script>
 
@@ -183,7 +288,7 @@ const openViewSpace = () => {
 			</n-flex>
 			<HomeContext v-if="false" />
 
-			<div class="m-10 pl-5">
+			<div class="m-10">
 				<n-flex class="mb-5">
 					<h3 style="color: rgb(83, 83, 83); font-size: 20px">Espaços</h3>
 				</n-flex>
@@ -196,9 +301,10 @@ const openViewSpace = () => {
 						v-model:value="spaceCurrentTab"
 						addable
 						@add="showModal.newSpace = true"
+						@update-value="listCurrentTab = 0"
 						tab-style="padding: 0"
 					>
-						<n-tab-pane v-for="(space, index) in userStore.spaces" :key="index" :name="index" :tab="space.name">
+						<n-tab-pane v-for="(space, index) in userStore.spaces" :key="index" :name="index">
 							<template #tab>
 								<div class="p-10 d-flex ai-center">
 									<div class="mh-6">{{ space.name }}</div>
@@ -208,39 +314,76 @@ const openViewSpace = () => {
 									</n-button>
 								</div>
 							</template>
-							<n-collapse
-								arrow-placement="right"
-								accordion
-								v-model:expanded-names="listExpandedNames[index]"
-								:trigger-areas="['main', 'arrow']"
-							>
-								<n-collapse-item
-									v-for="(list, indexList) in space.lists"
-									:key="indexList"
-									:name="indexList"
-									:title="`${list.name} (Tarefas: ${list.tasks.length})`"
+
+							<div class="mb-20">
+								<h3>Descrição</h3>
+
+								<n-performant-ellipsis :line-clamp="1" :tooltip="{ disabled: true }">
+									{{ space.description }}
+								</n-performant-ellipsis>
+							</div>
+
+							<div class="mb-20">
+								<h3>Tags</h3>
+								<n-tag v-for="(tag, index) in space.tags" :key="index" style="margin-right: 8px">{{ tag }}</n-tag>
+							</div>
+
+							<div class="mb-20">
+								<n-divider dashed> Listas </n-divider>
+
+								<n-tabs
+									type="card"
+									size="small"
+									:default-value="1"
+									v-model:value="listCurrentTab"
+									addable
+									@add="showModal.newList = true"
+									tab-style="padding: 0"
 								>
-									<!-- :disabled="!list.tasks.length" -->
-									<template #header-extra>
-										<n-button
-											v-if="listExpandedNames[index].includes(indexList)"
-											circle
-											quaternary
-											style="height: 22px"
-											@click="openViewSpace"
-										>
-											<n-icon size="16" color="#1a9561"><PencilSharp /></n-icon>
-										</n-button>
-									</template>
-									<n-flex>
-										<n-card v-for="(task, indexTask) in list.tasks" :key="indexTask">
-											<h5>{{ task.name }}</h5>
-											<br />
-											<p>{{ task.description }}</p>
-										</n-card>
-									</n-flex>
-								</n-collapse-item>
-							</n-collapse>
+									<n-tab-pane v-for="(list, indexList) in space.lists" :key="indexList" :name="indexList">
+										<template #tab>
+											<div class="p-4 d-flex ai-center">
+												<div class="ml-8 mr-2">{{ list.name }}</div>
+
+												<n-button
+													v-if="spaceCurrentTab == index && listCurrentTab == indexList"
+													circle
+													quaternary
+													size="small"
+													@click="openViewList"
+												>
+													<n-icon size="16" color="#1a9561"><EllipsisVertical /></n-icon>
+												</n-button>
+											</div>
+										</template>
+										<div class="mb-10">
+											<p>
+												Total de Tarefas: <strong> {{ list.tasks.length }}</strong>
+											</p>
+											<n-performant-ellipsis :line-clamp="1" :tooltip="{ disabled: true }">
+												<p>
+													Descrição:
+													<strong>{{ list.description }}</strong>
+												</p>
+											</n-performant-ellipsis>
+										</div>
+										<div class="cards-scrollbar">
+											<n-scrollbar x-scrollable trigger="hover">
+												<div class="d-flex" style="gap: 8px">
+													<n-card v-for="(task, indexTask) in list.tasks" :key="indexTask" style="width: 200px">
+														<h4 style="color: rgb(104, 104, 104)">{{ task.name }}</h4>
+														<br />
+
+														<n-performant-ellipsis :line-clamp="3" :tooltip="{ disabled: true }">
+															{{ task.description }}
+														</n-performant-ellipsis>
+													</n-card>
+												</div>
+											</n-scrollbar>
+										</div>
+									</n-tab-pane>
+								</n-tabs>
+							</div>
 						</n-tab-pane>
 					</n-tabs>
 				</n-card>
@@ -251,7 +394,6 @@ const openViewSpace = () => {
 					<h3 style="color: rgb(83, 83, 83); font-size: 20px">Listas</h3>
 
 					<n-scrollbar x-scrollable trigger="hover">
-						<!-- <div class="d-flex" style="gap: 8px 12px; z-index: 0"> -->
 						<div class="d-flex ph-5" style="gap: 8px 12px">
 							<n-card class="home-card">
 								<h3>Ver cris no domingo</h3>
@@ -293,7 +435,7 @@ const openViewSpace = () => {
 			:max-height="700"
 			:min-height="300"
 			resizable
-			@after-leave="isEditingSpace = false"
+			@after-leave="cleanSpaceFields"
 		>
 			<n-drawer-content closable>
 				<template #header>
@@ -319,10 +461,6 @@ const openViewSpace = () => {
 						tag
 					}}</n-tag>
 				</div>
-
-				<!-- <div>
-					<n-time :time="new Date(currentSpace.startDate)" type="datetime" format="dd/MM/yyyy HH:mm" />
-				</div> -->
 
 				<template #footer>
 					<div class="d-flex jc-end">
@@ -353,25 +491,130 @@ const openViewSpace = () => {
 		>
 			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
 			<n-drawer-content title="Criar novo espaço" closable>
-				<n-form ref="formRef" :model="newSpace" :rules="validationSpaceRules">
+				<n-form ref="formRef" :model="currentSpace" :rules="validationSpaceRules">
 					<n-form-item label="Titulo" path="name">
-						<n-input v-model:value="newSpace.name" placeholder="Informe o titulo do espaço" />
+						<n-input v-model:value="currentSpace.name" placeholder="Informe o titulo do espaço" />
 					</n-form-item>
 					<n-form-item label="Descrição" path="description">
 						<n-input
-							v-model:value="newSpace.description"
+							v-model:value="currentSpace.description"
 							placeholder="Informe a descrição do espaço"
 							type="textarea"
 							:autosize="{ minRows: 4 }"
 						/>
 					</n-form-item>
 					<n-form-item path="tags" label="Tags">
-						<n-dynamic-tags v-model:value="newSpace.tags" />
+						<n-dynamic-tags v-model:value="currentSpace.tags" />
 					</n-form-item>
 				</n-form>
 				<template #footer>
 					<div class="d-flex jc-end">
 						<n-button type="info" round @click="handleAddSpace" :loading="loading.newSpace"> Criar espaço </n-button>
+					</div>
+				</template>
+			</n-drawer-content>
+		</n-drawer>
+
+		<n-drawer
+			v-model:show="showModal.viewList"
+			class="drawer-task"
+			placement="bottom"
+			default-height="500"
+			:max-height="700"
+			:min-height="300"
+			resizable
+			@after-leave="cleanListFields"
+		>
+			<n-drawer-content closable>
+				<template #header>
+					<n-input v-if="isEditingList" v-model:value="currentList.name" type="text" placeholder="Titulo da lista" />
+					<div v-else>
+						{{ currentList.name }}
+					</div>
+				</template>
+				<small>Descrição</small>
+				<n-input
+					v-if="isEditingList"
+					v-model:value="currentList.description"
+					type="textarea"
+					placeholder="Descrição da lista"
+					class="mb-10"
+				/>
+				<div v-else style="white-list: pre-wrap">{{ currentList.description }}</div>
+				<br />
+				<small>Tags</small>
+				<div>
+					<n-dynamic-tags v-if="isEditingList" v-model:value="currentList.tags" />
+					<n-tag v-else v-for="(tag, index) in currentList.tags" :key="index" style="margin-right: 8px">{{
+						tag
+					}}</n-tag>
+				</div>
+
+				<template #footer>
+					<div class="d-flex jc-end">
+						<n-button
+							@click="deleteList(currentList._id)"
+							:loading="loading.deleteList"
+							type="error"
+							class="mr-10"
+							round
+						>
+							Excluir
+						</n-button>
+
+						<n-button
+							class="mr-10"
+							type="info"
+							round
+							@click="
+								router.push({
+									name: 'timelineSpaceList',
+									params: {
+										spaceId: userStore.spaces[spaceCurrentTab]._id,
+										listId: userStore.spaces[spaceCurrentTab].lists[listCurrentTab]._id
+									}
+								})
+							"
+						>
+							Tarefas
+						</n-button>
+						<n-button v-if="isEditingList" type="success" round @click="updateList(currentList)">Salvar</n-button>
+						<n-button v-else type="tertiary" round @click="isEditingList = true">Editar</n-button>
+					</div>
+				</template>
+			</n-drawer-content>
+		</n-drawer>
+
+		<n-drawer
+			v-model:show="showModal.newList"
+			class="drawer-task"
+			placement="bottom"
+			default-height="500"
+			:max-height="700"
+			:min-height="300"
+			resizable
+		>
+			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
+			<n-drawer-content title="Criar nova lista" closable>
+				<n-form ref="formRef" :model="currentList" :rules="validationListRules">
+					<n-form-item label="Titulo" path="name">
+						<n-input v-model:value="currentList.name" placeholder="Informe o titulo da lista" />
+					</n-form-item>
+					<n-form-item label="Descrição" path="description">
+						<n-input
+							v-model:value="currentList.description"
+							placeholder="Informe a descrição da lista"
+							type="textarea"
+							:autosize="{ minRows: 4 }"
+						/>
+					</n-form-item>
+					<n-form-item path="tags" label="Tags">
+						<n-dynamic-tags v-model:value="currentList.tags" />
+					</n-form-item>
+				</n-form>
+				<template #footer>
+					<div class="d-flex jc-end">
+						<n-button type="info" round @click="handleAddList" :loading="loading.newList">Criar lista</n-button>
 					</div>
 				</template>
 			</n-drawer-content>

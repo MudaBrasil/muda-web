@@ -32,6 +32,8 @@ const axios = axiosInject()
 const loadingBar = useLoadingBar()
 const notification = NotificationStore()
 const userStore = UserStore()
+const hasSpaceList = ref(false)
+const requestEndpoint = ref('/tasks')
 
 const showModal = ref({
 	newTask: false,
@@ -77,7 +79,13 @@ const currentTask = ref({
 	startDate: new Date()
 })
 
-onMounted(async () => getTasks())
+onMounted(async () => {
+	const { spaceId, listId }: any = route.params
+	hasSpaceList.value = spaceId && listId
+	requestEndpoint.value = hasSpaceList.value ? `/users/spaces/${spaceId}/lists/${listId}/tasks` : '/tasks'
+
+	getTasks()
+})
 
 const addTask = () => {
 	loading.value.newTask = true
@@ -85,7 +93,7 @@ const addTask = () => {
 	const { name, description, startDate } = newTask.value
 
 	axios
-		.post('/tasks', { name, description, startDate: new Date(startDate) })
+		.post(requestEndpoint.value, { name, description, startDate: new Date(startDate) })
 		.then(async () => {
 			getTasks()
 			showModal.value.newTask = false
@@ -111,7 +119,7 @@ const deleteTask = taskId => {
 	loading.value.deleteTask = true
 
 	axios
-		.delete(`/tasks/${taskId}`)
+		.delete(`${requestEndpoint.value}/${taskId}`)
 		.then(() => {
 			userStore.tasks = userStore.tasks.filter(task => task._id !== taskId)
 
@@ -141,7 +149,7 @@ const getTasks = () => {
 	// TODO: Criar verificador de ultima vez que fez o get/tasks para nao fazer toda vez que entrar na pagina
 
 	return axios
-		.get('/tasks')
+		.get(requestEndpoint.value)
 		.then(response => {
 			loadingBar.finish()
 			return (userStore.tasks = response.data)
