@@ -180,15 +180,15 @@ const handleAddTask = (e: MouseEvent) => {
 	})
 }
 
-const signOut = async () => {
-	router.push({ path: '/logout', query: { redirect: route.fullPath } })
-}
+// const signOut = async () => {
+// 	router.push({ path: '/logout', query: { redirect: route.fullPath } })
+// }
 </script>
 
 <template>
 	<div>
 		<n-space class="timeline-header" justify="space-between">
-			<n-button type="error" round class="m-20" @click.prevent="signOut">Logout</n-button>
+			<!-- <n-button type="error" round class="m-20" @click.prevent="signOut">Logout</n-button> -->
 			<n-button round class="m-20" @click="goBack()">Voltar</n-button>
 			<n-button type="info" round class="m-20" @click="showModal.newTask = true">
 				<template #icon>
@@ -197,7 +197,7 @@ const signOut = async () => {
 				Tarefa
 			</n-button>
 		</n-space>
-		<n-space class="pt-100 ph-30 mb-100" justify="center">
+		<div class="pt-100 ph-30 mb-100">
 			<n-timeline v-if="userStore.tasks?.length">
 				<n-timeline-item v-for="task in userStore.tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
@@ -214,7 +214,7 @@ const signOut = async () => {
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
-		</n-space>
+		</div>
 
 		<n-drawer
 			v-model:show="showModal.newTask"
