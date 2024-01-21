@@ -297,7 +297,6 @@ const signOut = async () => {
 <style scoped lang="scss">
 .custom-card {
 	min-width: 50vw;
-	width: 100%;
 	height: 100%;
 	border-radius: 20px;
 	cursor: pointer;
