@@ -149,7 +149,7 @@ const getSpaces = () => {
 	loadingBar.start()
 
 	return axios
-		.get('/users/spaces')
+		.get('/me/spaces')
 		.then(response => {
 			loadingBar.finish()
 			// listExpandedNames.value = [[], []]
@@ -166,7 +166,7 @@ const addSpace = () => {
 	loading.value.newSpace = true
 
 	return axios
-		.post('/users/spaces', currentSpace.value)
+		.post('/me/spaces', currentSpace.value)
 		.then(() => {
 			loadingBar.finish()
 			showModal.value.newSpace = false
@@ -185,7 +185,7 @@ const updateSpace = space => {
 	delete space.lists
 
 	return axios
-		.put(`/users/spaces/${space._id}`, space)
+		.put(`/me/spaces/${space._id}`, space)
 		.then(() => {
 			loadingBar.finish()
 			showModal.value.viewSpace = false
@@ -201,7 +201,7 @@ const deleteSpace = spaceId => {
 	loading.value.deleteSpace = true
 
 	axios
-		.delete(`/users/spaces/${spaceId}`)
+		.delete(`/me/spaces/${spaceId}`)
 		.then(() => {
 			userStore.spaces = userStore.spaces.filter(space => space._id !== spaceId)
 
@@ -222,7 +222,7 @@ const addList = () => {
 	loading.value.newList = true
 
 	return axios
-		.post(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists`, currentList.value)
+		.post(`/me/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists`, currentList.value)
 		.then(() => {
 			loadingBar.finish()
 			showModal.value.newList = false
@@ -241,7 +241,7 @@ const updateList = list => {
 	delete list.tasks
 
 	return axios
-		.put(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${list._id}`, list)
+		.put(`/me/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${list._id}`, list)
 		.then(() => {
 			showModal.value.viewList = false
 			loadingBar.finish()
@@ -257,7 +257,7 @@ const deleteList = listId => {
 	loading.value.deleteList = true
 
 	axios
-		.delete(`/users/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${listId}`)
+		.delete(`/me/spaces/${userStore.spaces[spaceCurrentTab.value]._id}/lists/${listId}`)
 		.then(() => {
 			userStore.spaces[spaceCurrentTab.value].lists = userStore.spaces[spaceCurrentTab.value].lists.filter(
 				list => list._id !== listId

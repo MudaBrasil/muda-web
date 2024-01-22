@@ -6191,11 +6191,6 @@ pascal-case@^3.1.2:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
-passive-events-support@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/passive-events-support/-/passive-events-support-1.1.0.tgz#243d9597ac3f921f3173836c9f78515c0ec392f0"
-  integrity sha512-MNkNItIS7Ufwp0OrBIImkYlJmGmdFullI7KaEUPnKRpxf/QYQu6rI1VpCXVnW2LiRcnKPcpLvwFY5KfXOXqqWA==
-
 path-browserify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/path-browserify/-/path-browserify-1.0.1.tgz#d98454a9c3753d5790860f16f68867b9e46be1fd"
@@ -7795,6 +7790,11 @@ vue-full-loading@^1.2.1:
   integrity sha512-zD5bi2zsmrowQJIg8pF6NThNvnmzDeCg9gtfAH9c+lC3nCHlrxmpYHhi75TQmS3m0myKK17M/Lk25kgZEfgswQ==
   dependencies:
     vue "^2.2.1"
+
+vue-rewards@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/vue-rewards/-/vue-rewards-1.0.1.tgz#ae5a544888b1b53a1bcdc317ba25606940f8736b"
+  integrity sha512-9wmwoQevdbrGBa6XUjNnPRT0+croXPydxeyIkZKpqJEJ32FFRj8U239oiTKuXgLWil7y+JAH8D/NJ6R7llIfaA==
 
 vue-router@^4.2.5:
   version "4.2.5"

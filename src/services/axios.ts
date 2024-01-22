@@ -25,7 +25,7 @@ interface RetryConfig extends AxiosRequestConfig {
 }
 
 const globalConfig: RetryConfig = {
-	retry: 2,
+	retry: 3,
 	retryDelay: 1000
 }
 
@@ -94,6 +94,8 @@ export default {
 						title: 'Falha na conexão',
 						description: 'Máximo de tentativas feitas.'
 					})
+
+				if (error.config.retry === 1) sleep(10000)
 
 				error.config.retry--
 

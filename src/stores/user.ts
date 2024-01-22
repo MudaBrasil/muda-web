@@ -91,6 +91,7 @@ export const UserStore = defineStore(
 		const tasks = ref<TaskModel[]>([])
 		const spaces = ref<SpaceModel[]>([])
 		const isLogoutRunning = ref(false)
+		const isNewUser = ref(false)
 
 		const reset = () => (user.value = new UserModel())
 		const resetAndLogout = () => {
@@ -170,6 +171,7 @@ export const UserStore = defineStore(
 				.then(async response => {
 					if (!response.user) throw new Error('Erro ao logar com o Google - Usuário não encontrado')
 					const user = await axios.googleLogin(response.user)
+					isNewUser.value = user.data._newUser
 					spaces.value = user.data.spaces
 					return user
 				})
@@ -200,6 +202,7 @@ export const UserStore = defineStore(
 			user,
 			spaces,
 			tasks,
+			isNewUser,
 			register,
 			resetPassword,
 			googleLogin,

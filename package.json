@@ -9,7 +9,7 @@
 		"test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
 		"lint": "eslint . --ext .vue,.js,.ts,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
 		"dev": "vite",
-		"ngrok": "ngrok http --domain=634f81e96ae4-6577390206567197016.ngrok-free.app 8080",
+		"ngrok": "ngrok start --all",
 		"format": "prettier --write src/",
 		"preview": "vite preview",
 		"test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'"
@@ -23,6 +23,7 @@
 		"pinia-shared-state": "^0.5.1",
 		"register-service-worker": "^1.7.2",
 		"vue": "^3.4.14",
+		"vue-rewards": "^1.0.1",
 		"vue-router": "^4.2.5"
 	},
 	"devDependencies": {

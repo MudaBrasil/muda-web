@@ -26,6 +26,8 @@ import 'vfonts/Inter.css'
 import 'vfonts/FiraCode.css'
 import { emitter } from './emitter'
 import axios from './services/axios'
+import VueRewards from 'vue-rewards'
+
 declare module '@vue/runtime-core' {
 	export interface ComponentCustomProperties {
 		emitter: typeof emitter
@@ -44,6 +46,7 @@ pinia.use(piniaPluginPersistedState)
 app.use(pinia)
 app.use(router)
 app.use(axios)
+app.use(VueRewards)
 
 app.config.globalProperties.emitter = emitter
 app.mount('#app')

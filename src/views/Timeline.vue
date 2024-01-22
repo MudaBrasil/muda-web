@@ -82,7 +82,7 @@ const currentTask = ref({
 onMounted(async () => {
 	const { spaceId, listId }: any = route.params
 	hasSpaceList.value = spaceId && listId
-	requestEndpoint.value = hasSpaceList.value ? `/users/spaces/${spaceId}/lists/${listId}/tasks` : '/tasks'
+	requestEndpoint.value = hasSpaceList.value ? `/me/spaces/${spaceId}/lists/${listId}/tasks` : '/tasks'
 
 	getTasks()
 })
