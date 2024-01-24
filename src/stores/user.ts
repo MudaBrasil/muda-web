@@ -90,18 +90,11 @@ export const UserStore = defineStore(
 		const user = ref(new UserModel())
 		const tasks = ref<TaskModel[]>([])
 		const spaces = ref<SpaceModel[]>([])
+		const isOnRequest = ref(false)
 		const isLogoutRunning = ref(false)
 		const isNewUser = ref(false)
 
 		const reset = () => (user.value = new UserModel())
-		const resetAndLogout = () => {
-			reset()
-			if (route.name !== 'login' && !isLogoutRunning.value) {
-				router.push({ path: '/logout', query: { redirect: route.fullPath } })
-				return true
-			}
-			return false
-		}
 
 		auth?.onAuthStateChanged(sync, resetAndLogout)
 
@@ -112,7 +105,18 @@ export const UserStore = defineStore(
 
 			return firebaseErrors.find(e => e.code === code) || { id: 0, code, message }
 		}
+		function goToLogout() {
+			return router.push({ path: '/logout', query: { redirect: route.fullPath } })
+		}
 
+		function resetAndLogout() {
+			reset()
+			if (route.name !== 'login' && !isLogoutRunning.value) {
+				goToLogout()
+				return true
+			}
+			return false
+		}
 		function sync(newUserData) {
 			if (newUserData) {
 				user.value = {
@@ -203,8 +207,10 @@ export const UserStore = defineStore(
 			spaces,
 			tasks,
 			isNewUser,
+			isOnRequest,
 			register,
 			resetPassword,
+			goToLogout,
 			googleLogin,
 			googleLogout
 		}

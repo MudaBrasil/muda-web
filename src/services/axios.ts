@@ -9,7 +9,7 @@ const cookies = useCookies.withAttributes({
 	sameSite: 'strict',
 	secure: true
 })
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 const hasBearerToken = (auth: AxiosHeaderValue) => {
 	const [type, token] = String(auth).split(' ')
 	return type === 'Bearer' && token?.length > 10
