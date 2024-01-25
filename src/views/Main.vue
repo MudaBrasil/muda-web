@@ -27,7 +27,7 @@ onMounted(() => playRewards())
 watch(() => userStore.isNewUser, playRewards)
 
 watch(
-	() => userStore.user.isLogged,
+	() => userStore.auth.isLogged,
 	isLogged => {
 		!isLogged &&
 			setTimeout(() => {

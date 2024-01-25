@@ -1,8 +1,7 @@
 import { inject, App } from 'vue'
 import axios, { AxiosHeaderValue, AxiosRequestConfig, AxiosStatic } from 'axios'
 import useCookies from 'js-cookie'
-import { auth } from '@/services/firebase'
-import { User } from 'firebase/auth'
+import { auth as firebaseAuth } from '@/services/firebase'
 
 const cookies = useCookies.withAttributes({
 	// expires: 0.08,
@@ -10,8 +9,8 @@ const cookies = useCookies.withAttributes({
 	secure: true
 })
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-const hasBearerToken = (auth: AxiosHeaderValue) => {
-	const [type, token] = String(auth).split(' ')
+const hasBearerToken = (firebaseAuth: AxiosHeaderValue) => {
+	const [type, token] = String(firebaseAuth).split(' ')
 	return type === 'Bearer' && token?.length > 10
 }
 
@@ -32,7 +31,8 @@ const globalConfig: RetryConfig = {
 export const axiosInject = () => inject<customAxiosStatic>('axios')
 
 interface customAxiosStatic extends AxiosStatic {
-	googleLogin: (user: User) => Promise<any>
+	currentUser: () => Promise<any>
+	googleLogin: () => Promise<any>
 	googleLogout: () => Promise<any>
 }
 
@@ -41,7 +41,7 @@ export default {
 		const customAxios = axios.create(globalConfig) as customAxiosStatic
 
 		// TODO: Criar ID do dispositivo e salvar nos cookies
-		const saveToken = async (user = auth?.currentUser, forceRefresh = false) => {
+		const saveToken = async (user = firebaseAuth?.currentUser, forceRefresh = false) => {
 			if (!user) {
 				return (customAxios.defaults.headers.common['Authorization'] = 'Bearer')
 			}
@@ -86,13 +86,14 @@ export default {
 				return response
 			},
 			async function (error) {
-				if (!auth?.currentUser) return error
+				if (!firebaseAuth?.currentUser) return error
 
 				if (error.config.retry < 1)
 					return Promise.reject({
 						...error,
 						title: 'Falha na conexão',
-						description: 'Máximo de tentativas feitas.'
+						description:
+							'Não foi possível estabelecer uma conexão com o servidor. Verifique sua conexão com a internet ou tente novamente mais tarde.'
 					})
 
 				if (error.config.retry === 1) sleep(10000)
@@ -109,7 +110,7 @@ export default {
 						if (error.config.url === 'auth/login/google') return error
 
 						if (error.config.url === 'auth/logout/google') {
-							error.config.headers.Authorization = `Bearer ${await auth.currentUser?.getIdToken()}`
+							error.config.headers.Authorization = `Bearer ${await firebaseAuth.currentUser?.getIdToken()}`
 							return customAxios.request(error.config)
 						}
 					} else {
@@ -127,7 +128,7 @@ export default {
 					if (isAuthEndpoint) {
 						customAxios.defaults.headers.common['Authorization'] = 'Bearer'
 						cookies.remove('expirationTime')
-						await auth.signOut()
+						await firebaseAuth.signOut()
 
 						return Promise.reject(error)
 					} else {
@@ -141,8 +142,13 @@ export default {
 			}
 		)
 
-		customAxios.googleLogin = async (user: User) => {
-			await saveToken(user)
+		customAxios.currentUser = async () => {
+			console.log('Entrou no currentUser')
+			return customAxios.get('me')
+		}
+
+		customAxios.googleLogin = async () => {
+			await saveToken()
 			return customAxios.post('auth/login/google')
 		}
 

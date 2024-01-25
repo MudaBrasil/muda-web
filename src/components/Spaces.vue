@@ -70,18 +70,22 @@ const handleForm = (e: MouseEvent) => {
 	return formRef.value?.validate(errors => !errors)
 }
 
-const resolveCatch = ({ title, description }) => {
-	notification.error({ title, description })
+const resolveCatch = error => {
+	console.error(error)
 	loadingBar.error()
+
+	const { title, description } = error
+
+	notification.error({ title, description })
 }
 
 const openView = (type = 'space', index?, indexList?) => {
 	if (type === 'space') {
-		space.value.current = Object.assign({}, userStore.spaces[space.value.currentTab])
+		space.value.current = Object.assign({}, userStore.user.spaces[space.value.currentTab])
 		space.value.show.view = true
 	} else {
 		if (space.value.currentTab == index && list.value.currentTab == indexList) {
-			list.value.current = Object.assign({}, userStore.spaces[space.value.currentTab].lists[list.value.currentTab])
+			list.value.current = Object.assign({}, userStore.user.spaces[space.value.currentTab].lists[list.value.currentTab])
 			list.value.show.view = true
 		}
 	}
@@ -100,7 +104,7 @@ const cleanFields = (type = 'space') => {
 	}
 }
 
-const pushToTimeline = (currentSpace = userStore.spaces[space.value.currentTab]) => {
+const pushToTimeline = (currentSpace = userStore.user.spaces[space.value.currentTab]) => {
 	router.push({
 		name: 'timelineSpaceList',
 		params: {
@@ -119,8 +123,9 @@ const getSpaces = () => {
 		.get('/me/spaces')
 		.then(response => {
 			loadingBar.finish()
+
 			userStore.isOnRequest = false
-			return (userStore.spaces = response.data)
+			return (userStore.user.spaces = response.data)
 		})
 		.catch(resolveCatch)
 }
@@ -136,19 +141,20 @@ const addSpace = () => {
 			cleanFields()
 			await getSpaces()
 
-			return (space.value.currentTab = userStore.spaces.length - 1)
+			return (space.value.currentTab = userStore.user.spaces.length - 1)
 		})
 		.catch(resolveCatch)
 }
 
-const updateSpace = space => {
+const updateSpace = spaceItem => {
 	loadingBar.start()
 
 	return axios
-		.put(`/me/spaces/${space._id}`, { ...space, lists: undefined })
+		.put(`/me/spaces/${spaceItem._id}`, { ...spaceItem, lists: undefined })
 		.then(() => {
 			loadingBar.finish()
 			space.value.show.view = false
+
 			return getSpaces()
 		})
 		.catch(resolveCatch)
@@ -160,7 +166,7 @@ const deleteSpace = spaceId => {
 	axios
 		.delete(`/me/spaces/${spaceId}`)
 		.then(() => {
-			userStore.spaces = userStore.spaces.filter(space => space._id !== spaceId)
+			userStore.user.spaces = userStore.user.spaces.filter(space => space._id !== spaceId)
 			space.value.show.view = false
 			space.value.loading.delete = false
 
@@ -178,13 +184,13 @@ const addList = () => {
 	list.value.loading.new = true
 
 	return axios
-		.post(`/me/spaces/${userStore.spaces[space.value.currentTab]._id}/lists`, list.value.current)
+		.post(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists`, list.value.current)
 		.then(async () => {
 			loadingBar.finish()
 			cleanFields('list')
 
 			await getSpaces()
-			return (list.value.currentTab = userStore.spaces[space.value.currentTab]?.lists.length - 1)
+			return (list.value.currentTab = userStore.user.spaces[space.value.currentTab]?.lists.length - 1)
 		})
 		.catch(resolveCatch)
 }
@@ -193,7 +199,10 @@ const updateList = list => {
 	loadingBar.start()
 
 	return axios
-		.put(`/me/spaces/${userStore.spaces[space.value.currentTab]._id}/lists/${list._id}`, { ...list, tasks: undefined })
+		.put(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists/${list._id}`, {
+			...list,
+			tasks: undefined
+		})
 		.then(() => {
 			list.value.show.view = false
 			loadingBar.finish()
@@ -206,9 +215,9 @@ const deleteList = listId => {
 	list.value.loading.delete = true
 
 	axios
-		.delete(`/me/spaces/${userStore.spaces[space.value.currentTab]._id}/lists/${listId}`)
+		.delete(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists/${listId}`)
 		.then(() => {
-			userStore.spaces[space.value.currentTab].lists = userStore.spaces[space.value.currentTab].lists.filter(
+			userStore.user.spaces[space.value.currentTab].lists = userStore.user.spaces[space.value.currentTab].lists.filter(
 				list => list._id !== listId
 			)
 
@@ -241,7 +250,7 @@ const deleteList = listId => {
 					@update-value="list.currentTab = 0"
 					tab-style="padding: 0"
 				>
-					<n-tab-pane v-for="(spaceItem, index) in userStore.spaces" :key="index" :name="index">
+					<n-tab-pane v-for="(spaceItem, index) in userStore.user.spaces" :key="index" :name="index">
 						<template #tab>
 							<div class="p-10 d-flex ai-center" @click="space.currentTab == index && openView()">
 								<div class="mh-6">{{ spaceItem.name }}</div>

@@ -65,27 +65,29 @@ watch(error, newVal => {
 					{{ error }}
 				</n-tag>
 
-				<n-input
-					id="email"
-					type="text"
-					class="mb-10"
-					name="email"
-					required
-					:input-props="{ autocomplete: 'username' }"
-					placeholder="E-mail"
-					v-model:value="email"
-				/>
+				<form>
+					<n-input
+						id="email"
+						type="text"
+						class="mb-10"
+						name="email"
+						required
+						:input-props="{ autocomplete: 'username' }"
+						placeholder="E-mail"
+						v-model:value="email"
+					/>
 
-				<n-input
-					id="password"
-					type="password"
-					class="mb-10"
-					name="password"
-					required
-					placeholder="Senha"
-					:input-props="{ autocomplete: 'current-password' }"
-					v-model:value="password"
-				/>
+					<n-input
+						id="password"
+						type="password"
+						class="mb-10"
+						name="password"
+						required
+						placeholder="Senha"
+						:input-props="{ autocomplete: 'current-password' }"
+						v-model:value="password"
+					/>
+				</form>
 
 				<br />
 				<template #footer>

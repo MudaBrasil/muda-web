@@ -70,26 +70,30 @@ watch(error, newVal => {
 				<n-tag v-if="error" closable class="mb-10" type="error" @close="error = null">
 					{{ error }}
 				</n-tag>
-				<n-input id="name" type="text" placeholder="Nome" name="name" required class="mb-10" v-model:value="name" />
-				<n-input
-					id="email"
-					type="text"
-					placeholder="E-mail"
-					name="email"
-					:input-props="{ autocomplete: 'username' }"
-					required
-					class="mb-10"
-					v-model:value="email"
-				/>
-				<n-input
-					id="password"
-					type="password"
-					placeholder="Senha"
-					name="password"
-					:input-props="{ autocomplete: 'current-password' }"
-					required
-					v-model:value="password"
-				/>
+
+				<form>
+					<n-input id="name" type="text" placeholder="Nome" name="name" required class="mb-10" v-model:value="name" />
+					<n-input
+						id="email"
+						type="text"
+						placeholder="E-mail"
+						name="email"
+						:input-props="{ autocomplete: 'username' }"
+						required
+						class="mb-10"
+						v-model:value="email"
+					/>
+					<n-input
+						id="password"
+						type="password"
+						placeholder="Senha"
+						name="password"
+						:input-props="{ autocomplete: 'current-password' }"
+						required
+						v-model:value="password"
+					/>
+				</form>
+
 				<template #footer>
 					<div>
 						Ja possui uma conta?

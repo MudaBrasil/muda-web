@@ -18,7 +18,7 @@ import {
 	FormRules,
 	FormInst
 } from 'naive-ui'
-import { ref, defineProps, defineEmits, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { AddCircleOutline } from '@vicons/ionicons5'
 
 const formRef = ref<FormInst | null>(null)
@@ -70,8 +70,8 @@ const resolveCatch = ({ title, description }) => {
 	notification.error({ title, description })
 }
 
-const openView = index => {
-	taskState.value.current = Object.assign({}, tasks[index])
+const openView = task => {
+	taskState.value.current = Object.assign({}, task)
 	taskState.value.show.view = true
 }
 
@@ -116,7 +116,7 @@ const deleteTask = (task = taskState.value.current) => {
 
 <template>
 	<div class="d-flex" style="gap: 8px">
-		<n-card v-for="(task, index) in tasks" :key="index" style="width: 200px; cursor: pointer" @click="openView(index)">
+		<n-card v-for="(task, index) in tasks" :key="index" style="width: 200px; cursor: pointer" @click="openView(task)">
 			<h4 style="color: rgb(104, 104, 104)">{{ task.name }}</h4>
 			<br />
 

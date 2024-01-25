@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { auth } from '@/services/firebase'
+import { auth as firebaseAuth } from '@/services/firebase'
 import { saveUser } from '../services/firestore/users'
 import {
 	createUserWithEmailAndPassword,
@@ -19,7 +19,7 @@ import { axiosInject } from '@/services/axios'
 import { useRouter, useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 
-export class UserModel {
+export class AuthModel {
 	uid = ''
 	email = ''
 	isLogged = false
@@ -47,6 +47,47 @@ class Cell {
 	deleted: boolean
 }
 
+export class UserModel extends Cell {
+	// authId: string
+	authSources: string[]
+	devicesLoggedIn: string[]
+	devicesLoggedOut: string[]
+	lastVisited: Date
+	public: boolean
+	username: string
+	alias: string
+	birthDate: Date
+	email: string
+	telephone: string
+	profilePhoto: string
+	website: string
+	gender: string
+	nationality: string
+	jobTitle: string
+	worksFor: string
+	ideals: string
+	knowsAbout: string
+	knowsLanguage: string[]
+	following: string[]
+	followers: string[]
+	allies: string[]
+	funding: string[]
+	sponsors: string[]
+	awards: string[]
+	mentor: string
+	mentees: string[]
+	helping: string[]
+	helpedBy: string[]
+	inviteCode: string
+	invitingUser: string
+	invitedUsers: string[]
+	loves: string[]
+	loved: string[]
+	liked: string[]
+	roles: string[]
+	spaces: SpaceModel[]
+}
+
 export class SpaceModel extends Cell {
 	avatar: string
 	color: string
@@ -54,7 +95,7 @@ export class SpaceModel extends Cell {
 	rules: string[]
 	private: boolean
 	members: object[]
-	lists: ListModel[] | Nullable<[]>
+	lists: ListModel[]
 }
 
 export class ListModel extends Cell {
@@ -63,7 +104,7 @@ export class ListModel extends Cell {
 	taskCount: number
 	private: boolean
 	grantedPermissions: object[]
-	tasks: TaskModel[] | Nullable<[]>
+	tasks: TaskModel[]
 }
 
 export class TaskModel extends Cell {
@@ -88,15 +129,15 @@ export const UserStore = defineStore(
 		const route = useRoute()
 		const router = useRouter()
 		const user = ref(new UserModel())
+		const auth = ref(new AuthModel())
 		const tasks = ref<TaskModel[]>([])
-		const spaces = ref<SpaceModel[]>([])
 		const isOnRequest = ref(false)
 		const isLogoutRunning = ref(false)
 		const isNewUser = ref(false)
 
-		const reset = () => (user.value = new UserModel())
+		const reset = () => (auth.value = new AuthModel())
 
-		auth?.onAuthStateChanged(sync, resetAndLogout)
+		firebaseAuth?.onAuthStateChanged(sync, resetAndLogout)
 
 		// TODO: Talvez criar um store para os erros
 		function getError(error) {
@@ -117,23 +158,29 @@ export const UserStore = defineStore(
 			}
 			return false
 		}
-		function sync(newUserData) {
-			if (newUserData) {
-				user.value = {
-					uid: newUserData.uid,
-					email: newUserData.email,
+		function sync(authData) {
+			console.log('sync: Entrando')
+			if (authData) {
+				console.log('sync: tem dados no AuthData')
+
+				verifyUserData()
+				auth.value = {
+					uid: authData.uid,
+					email: authData.email,
 					isLogged: true,
-					displayName: newUserData.displayName,
-					phoneNumber: newUserData.phoneNumber,
-					photoURL: newUserData.photoURL,
-					userAlreadyRedirected: user.value.userAlreadyRedirected,
-					createdAt: new Date(parseInt(newUserData.metadata?.createdAt ?? null)),
-					lastLogin: new Date(parseInt(newUserData.metadata?.lastLoginAt ?? null))
+					displayName: authData.displayName,
+					phoneNumber: authData.phoneNumber,
+					photoURL: authData.photoURL,
+					userAlreadyRedirected: auth.value.userAlreadyRedirected,
+					createdAt: new Date(parseInt(authData.metadata?.createdAt ?? null)),
+					lastLogin: new Date(parseInt(authData.metadata?.lastLoginAt ?? null))
 				}
-				const createdAt = Timestamp.fromMillis(user.value.createdAt?.getTime() ?? 0)
-				saveUser({ ...user.value, createdAt })
-				if (!user.value.userAlreadyRedirected) {
-					user.value.userAlreadyRedirected = true
+				const createdAt = Timestamp.fromMillis(auth.value.createdAt?.getTime() ?? 0)
+				const lastLogin = Timestamp.fromMillis(auth.value.lastLogin?.getTime() ?? 0) // TODO: Verificar se isso aqui é necessário
+				saveUser({ ...auth.value, createdAt, lastLogin }) // TODO: Ver de salvar mais dados aqui no firebase
+
+				if (!auth.value.userAlreadyRedirected) {
+					auth.value.userAlreadyRedirected = true
 
 					const redirectPath: any = route.query.redirect || '/'
 					router.push(redirectPath)
@@ -141,14 +188,15 @@ export const UserStore = defineStore(
 			} else {
 				resetAndLogout()
 			}
+			console.log('sync: Saindo')
 		}
 
 		function register(newUser) {
-			sync(auth.currentUser)
-			return createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
+			sync(firebaseAuth.currentUser)
+			return createUserWithEmailAndPassword(firebaseAuth, newUser.email, newUser.password)
 				.then(() => {
-					if (auth.currentUser) {
-						updateProfile(auth.currentUser, { displayName: newUser.name }).then(() => {})
+					if (firebaseAuth.currentUser) {
+						updateProfile(firebaseAuth.currentUser, { displayName: newUser.name }).then(() => {})
 					} else {
 						throw new Error('Erro ao criar o usuário')
 					}
@@ -160,9 +208,31 @@ export const UserStore = defineStore(
 		}
 
 		function resetPassword(email) {
-			return sendPasswordResetEmail(auth, email).catch(error => {
+			return sendPasswordResetEmail(firebaseAuth, email).catch(error => {
 				throw new Error(getError(error).message)
 			})
+		}
+
+		async function verifyUserData() {
+			console.log('verifyUserData: Entrando')
+			if (user.value) return user.value
+
+			const { data } = await axios.currentUser()
+			if (!data) return console.error('Dados do usuário não encontrado')
+
+			return saveUserData(data)
+		}
+
+		function saveUserData(userData) {
+			console.log('saveUserData: Entrando', userData)
+			isNewUser.value = userData._newUser
+
+			delete userData._newUser
+			delete userData.authId
+
+			user.value = userData as UserModel
+
+			return user.value
 		}
 
 		function googleLogin() {
@@ -171,13 +241,11 @@ export const UserStore = defineStore(
 			provider.addScope('email')
 			provider.addScope('openid')
 
-			return signInWithPopup(auth, provider)
+			return signInWithPopup(firebaseAuth, provider)
 				.then(async response => {
 					if (!response.user) throw new Error('Erro ao logar com o Google - Usuário não encontrado')
-					const user = await axios.googleLogin(response.user)
-					isNewUser.value = user.data._newUser
-					spaces.value = user.data.spaces
-					return user
+					const { data } = await axios.googleLogin()
+					return saveUserData(data)
 				})
 				.catch(error => {
 					reset()
@@ -194,7 +262,7 @@ export const UserStore = defineStore(
 				NotificationStore().error({ title, description })
 			})
 
-			signOut(auth)
+			signOut(firebaseAuth)
 			isLogoutRunning.value = false
 			resetAndLogout()
 
@@ -203,8 +271,8 @@ export const UserStore = defineStore(
 
 		return {
 			sync,
+			auth,
 			user,
-			spaces,
 			tasks,
 			isNewUser,
 			isOnRequest,
@@ -218,7 +286,7 @@ export const UserStore = defineStore(
 	{
 		persist: true,
 		share: {
-			omit: ['user'],
+			// omit: ['auth'], TODO: Porque eu tinha colocado isso? Verificar se é necessário, senao deixa comentado
 			enable: true,
 			initialize: true
 		}

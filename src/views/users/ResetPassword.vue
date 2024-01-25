@@ -49,17 +49,19 @@ watch(error, newVal => {
 					{{ error }}
 				</n-tag>
 				<div>Informe o email de cadastro</div>
-				<n-input
-					id="email"
-					type="text"
-					class="mb-10"
-					name="email"
-					placeholder="E-mail"
-					required
-					:input-props="{ autocomplete: 'username' }"
-					autofocus
-					v-model:value="email"
-				/>
+				<form>
+					<n-input
+						id="email"
+						type="text"
+						class="mb-10"
+						name="email"
+						placeholder="E-mail"
+						required
+						:input-props="{ autocomplete: 'username' }"
+						autofocus
+						v-model:value="email"
+					/>
+				</form>
 				<br />
 				<template #footer>
 					<div>

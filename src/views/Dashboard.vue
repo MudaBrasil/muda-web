@@ -18,28 +18,28 @@ const userStore = UserStore()
 				<h2>O Muda vai virar todo esse jogo, o Muda é pra tudo, o Muda é pra todos!</h2>
 
 				<br />
-				<n-avatar round :size="100" :src="userStore.user.photoURL"></n-avatar>
+				<n-avatar round :size="100" :src="userStore.auth.photoURL"></n-avatar>
 				<br />
 				<br />
 				<div>
-					UID: <strong>{{ userStore.user.uid }}</strong>
+					UID: <strong>{{ userStore.auth.uid }}</strong>
 				</div>
 				<div>
-					isLogged: <strong>{{ userStore.user.isLogged }}</strong>
+					isLogged: <strong>{{ userStore.auth.isLogged }}</strong>
 				</div>
 				<div>
-					displayName: <strong>{{ userStore.user.displayName }}</strong>
+					displayName: <strong>{{ userStore.auth.displayName }}</strong>
 				</div>
 				<div>
-					email: <strong>{{ userStore.user.email }}</strong>
+					email: <strong>{{ userStore.auth.email }}</strong>
 				</div>
 				<br />
 
 				<br />
 				<br />
 				<div>
-					<div class="" v-if="userStore.user.isLogged">
-						<div class="card-header">Welcome, {{ userStore.user.displayName }}</div>
+					<div class="" v-if="userStore.auth.isLogged">
+						<div class="card-header">Welcome, {{ userStore.auth.displayName }}</div>
 
 						<br />
 

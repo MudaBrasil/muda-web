@@ -78,23 +78,23 @@ const verifyRedirect = to => (noRedirectPaths.includes(to) ? undefined : to)
 
 router.beforeEach(to => {
 	const userStore = UserStore()
-	if (to.path === '/logout' && userStore.user.isLogged) {
+	if (to.path === '/logout' && userStore.auth.isLogged) {
 		return userStore.googleLogout().then(() => {
 			return { path: '/login', query: { redirect: verifyRedirect(to.query.redirect) } }
 		})
 	}
-	if (to.meta.requiresAuth && !userStore.user.isLogged) {
+	if (to.meta.requiresAuth && !userStore.auth.isLogged) {
 		return { path: '/login', query: { redirect: verifyRedirect(to.fullPath) } }
 	}
 
-	if (to.meta.exceptAuth && userStore.user.isLogged) {
+	if (to.meta.exceptAuth && userStore.auth.isLogged) {
 		return { path: '/dashboard' }
 	}
 })
 
 // router.beforeResolve(async (to) => {
 // const userStore = UserStore()
-// if (to.meta.exceptAuth && !userStore.user.isLogged) {
+// if (to.meta.exceptAuth && !userStore.auth.isLogged) {
 // }
 //   if (to.meta.requiresCamera) {
 //     try {
