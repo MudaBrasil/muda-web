@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { UserStore, UserModel } from '@/stores/user'
-import { NAvatar, NFlex, NIcon, NButton, NDrawer, NDrawerContent, NMenu, NInput, NTag, NDynamicTags } from 'naive-ui'
+import { NAvatar, NFlex, NIcon, NButton, NDrawer, NDrawerContent, NMenu, NDynamicTags } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import EditProfileItem from '@/components/EditProfileItem.vue'
+import { axiosInject } from '@/services/axios'
 
+const router = useRouter()
+
+const axios = axiosInject()
 const userStore = UserStore()
+const hasChanges = ref(false)
 const mainMenu = ref({ active: false })
 const userMenu = ref({ active: false })
 const editUser = ref({ active: false })
@@ -12,7 +19,7 @@ const editUser = ref({ active: false })
 
 const userEditing = ref(new UserModel())
 
-onMounted(() => (userEditing.value = userStore.user))
+onMounted(() => resetEditingData())
 
 const isEditing = ref({
 	// allies: ['rennan96', 'carol95'],
@@ -34,7 +41,7 @@ const isEditing = ref({
 	// mentor: '654172253b44c11359e9ee1b',
 	alias: false,
 	birthDate: false,
-	description: false, //'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
+	description: true, //'Eu me chamo Lucrécio e sou professor de filosofia. Gosto de Tai-Chi e de cultivar plantas.',
 	gender: false,
 	ideals: false, // 'Respeito, Altruísmo e Amor. Eu acredito que a educação é a chave para a transformação do mundo.',
 	inviteCode: false, // 'MUDA96',
@@ -55,28 +62,107 @@ const isEditing = ref({
 	website: false, // 'http://lucrecio.com.br',
 	worksFor: false // Muda
 })
+
+const goTo = (name: string) => {
+	mainMenu.value.active = false
+	router.push({ name })
+}
+
+const resetEditingData = () => {
+	userEditing.value = { ...userStore.user }
+
+	Object.keys(isEditing.value).forEach(key => (isEditing.value[key] = false))
+}
+
+const openEditUser = () => {
+	resetEditingData()
+
+	userMenu.value.active = false
+	editUser.value.active = true
+}
+const verifyChanges = () => {
+	if (Object.values(isEditing.value).some(Boolean)) {
+		return Object.keys(isEditing.value).some(i => {
+			const changed = userEditing.value[i] || ''
+			const original = userStore.user[i] || ''
+			if (isEditing.value[i] && changed !== original) {
+				return true
+			}
+		})
+	}
+
+	return false
+}
+watch(
+	() => isEditing.value,
+	() => (hasChanges.value = verifyChanges()),
+	{ deep: true }
+)
+
+watch(
+	() => userEditing.value,
+	() => (hasChanges.value = verifyChanges()),
+	{ deep: true }
+)
+
+// const goBack = () => {
+// 	if (!window.history.state.back || window.history.length < 2) return router.push('/')
+
+// 	return router.go(-1)
+// }
+
+const saveUser = () => {
+	if (userStore.isOnRequest) return
+
+	userStore.isOnRequest = true
+
+	const changes = Object.keys(isEditing.value).reduce((acc, key) => {
+		if (isEditing.value[key]) {
+			acc[key] = userEditing.value[key]
+		}
+
+		return acc
+	}, {})
+
+	return axios
+		.put('me', changes)
+		.then(({ data }) => {
+			userStore.user = data
+			resetEditingData()
+		})
+		.catch(console.error)
+		.finally(() => (userStore.isOnRequest = false))
+}
 </script>
 
 <template>
 	<div class="top-bar">
-		<n-flex class="nav-header m-10 p-10" :justify="'space-between'" align="center">
+		<n-flex class="nav-header m-10 p-6" :justify="'space-between'" align="center">
 			<n-button quaternary circle class="ml-4" @click="mainMenu.active = true">
 				<n-icon size="32" color="#1a9561"><Menu /></n-icon>
 			</n-button>
 			<h3 class="muda-logo" @click="console.log('TODO: Abrir noticias do Muda')">Muda</h3>
 			<n-avatar
+				class="user-photo mr-2"
 				round
 				:fallback-src="userStore.auth.photoURL"
 				:src="userStore.auth.photoURL"
-				class="user-photo mr-2"
 				@click="userMenu.active = true"
 			></n-avatar>
 		</n-flex>
 
+		<!-- // TODO: AO INVÉS DE USAR DRAWER, CRIAR MODAL CENTRALIZADO IGUAL DO GOOGLE PLAY STORE -->
+
 		<n-drawer v-model:show="mainMenu.active" placement="left" width="70%">
 			<n-drawer-content body-content-style="padding: 0px">
 				<template #header>
-					<h3 class="muda-logo" @click="console.log('TODO: Abrir noticias do Muda')">Muda</h3>
+					<h3
+						class="muda-logo mv-7"
+						style="color: rgb(96, 96, 96)"
+						@click="console.log('TODO: Abrir noticias do Muda')"
+					>
+						Muda
+					</h3>
 				</template>
 				<!-- v-model:value="activeKey" -->
 				<n-menu
@@ -86,22 +172,22 @@ const isEditing = ref({
 						{
 							label: 'Início',
 							key: 'home',
-							disabled: true
+							onClick: () => goTo('home')
 						},
 						{
 							label: 'Dashboard',
 							key: 'dashboard',
-							disabled: true
+							onClick: () => goTo('dashboard')
 						},
 						{
 							label: 'Cronograma',
 							key: 'timeline',
-							disabled: true
+							onClick: () => goTo('timeline')
 						},
 						{
 							label: 'Atlas',
 							key: 'atlas',
-							disabled: true
+							disabled: true // TODO: Criar pagina do atlas
 						},
 						{
 							label: 'Currículo',
@@ -116,13 +202,13 @@ const isEditing = ref({
 		<n-drawer v-model:show="userMenu.active" placement="right" width="70%">
 			<n-drawer-content closable body-content-style="padding: 0px">
 				<template #header>
-					<div>
-						{{ userStore.auth.displayName }}
-						<div v-if="userStore.auth.email">
-							<span style="font-size: 12px">{{ userStore.auth.email }}</span>
+					<div class="mv-1">
+						{{ userStore.user.name }}
+						<div v-if="userStore.user.email">
+							<span style="font-size: 12px">{{ userStore.user.email }}</span>
 						</div>
-						<div v-else-if="userStore.auth.phoneNumber">
-							<span>{{ userStore.auth.phoneNumber }}</span>
+						<div v-else-if="userStore.user.telephone">
+							<span>{{ userStore.user.telephone }}</span>
 						</div>
 					</div>
 				</template>
@@ -134,7 +220,7 @@ const isEditing = ref({
 						{
 							label: 'Editar perfil', // TODO: Abrir Drawer vindo de baixo e se conectar com API
 							key: 'edit-profile',
-							onClick: () => (editUser.active = !(userMenu.active = false))
+							onClick: openEditUser
 						},
 						{
 							label: 'Encontrar amigos',
@@ -164,49 +250,64 @@ const isEditing = ref({
 			v-model:show="editUser.active"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
 		>
 			<n-drawer-content closable title="Editar perfil">
-				<small>Nome</small>
-
-				<n-input v-if="isEditing.name" v-model:value="userEditing.name" type="text" placeholder="Titulo da tarefa" />
-				<div v-else>
-					{{ userEditing.name }}
-				</div>
-				<small>Descrição</small>
-				<n-input
-					v-if="isEditing.description"
-					v-model:value="userEditing.description"
-					type="textarea"
-					placeholder="Descrição da tarefa"
-					class="mb-10"
+				<EditProfileItem
+					title="Nome"
+					placeholder="Informe seu nome completo"
+					:originalValue="userStore.user.name"
+					v-model:editingValue="userEditing.name"
+					v-model:isEditing="isEditing.name"
 				/>
-				<div v-else style="white-task: pre-wrap">{{ userEditing.description }}</div>
-				<br />
+
+				<EditProfileItem
+					title="Apelido"
+					placeholder="Informe um apelido que voce quer que as pessoas vejam"
+					:originalValue="userStore.user.alias"
+					v-model:editingValue="userEditing.alias"
+					v-model:isEditing="isEditing.alias"
+				/>
+
+				<EditProfileItem
+					title="Descrição"
+					placeholder="Descreva sobre você"
+					:originalValue="userStore.user.description"
+					v-model:editingValue="userEditing.description"
+					v-model:isEditing="isEditing.description"
+				/>
+
+				<EditProfileItem
+					title="Profissão"
+					placeholder="Informe sua profissão"
+					:originalValue="userStore.user.jobTitle"
+					v-model:editingValue="userEditing.jobTitle"
+					v-model:isEditing="isEditing.jobTitle"
+				/>
 				<small>Tags</small>
+				<n-dynamic-tags v-model:value="userEditing.tags" />
 				<div>
-					<n-dynamic-tags v-if="isEditing.description" v-model:value="userEditing.tags" />
-					<n-tag v-else v-for="(tag, index) in userEditing.tags" :key="index" style="margin-right: 8px">{{
+					<!-- <n-tag v-else v-for="(tag, index) in userEditing.tags" :key="index" style="margin-right: 8px">{{
 						tag
-					}}</n-tag>
+					}}</n-tag> -->
 				</div>
 
 				<template #footer>
 					<div class="d-flex jc-end">
-						<!-- <n-button
-							@click="taskState.loading.delete = isDeleting = true"
-							:loading="taskState.loading.delete"
-							type="error"
-							class="mr-10"
+						<n-button round @click="editUser.active = false">Cancelar</n-button>
+						<n-button
+							v-if="hasChanges"
+							class="ml-10"
+							type="success"
 							round
+							:loading="userStore.isOnRequest"
+							:disabled="userStore.isOnRequest"
+							@click="saveUser()"
+							>Salvar</n-button
 						>
-							Excluir
-						</n-button> -->
-						<n-button type="success" round @click="">Salvar</n-button>
-						<!-- <n-button type="warning" round>Editar</n-button> -->
 					</div>
 				</template>
 			</n-drawer-content>

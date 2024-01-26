@@ -2,12 +2,10 @@
 import { onMounted, ref } from 'vue'
 import { axiosInject } from '@/services/axios'
 import {
-	NSpace,
 	NTimeline,
 	NTimelineItem,
 	NCard,
 	NButton,
-	NIcon,
 	NInput,
 	NTime,
 	NForm,
@@ -20,13 +18,11 @@ import {
 	FormRules,
 	useLoadingBar
 } from 'naive-ui'
-import { AddSharp } from '@vicons/ionicons5'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 import { UserStore } from '@/stores/user'
 
 const formRef = ref<FormInst | null>(null)
-const router = useRouter()
 const route = useRoute()
 const axios = axiosInject()
 const loadingBar = useLoadingBar()
@@ -165,11 +161,6 @@ const showModalViewTask = task => {
 	currentTask.value.startDate = new Date(task.startDate)
 	showModal.value.viewTask = true
 }
-const goBack = () => {
-	if (!window.history.state.back || window.history.length < 2) return router.push('/')
-
-	return router.go(-1)
-}
 const handleAddTask = (e: MouseEvent) => {
 	e.preventDefault()
 
@@ -187,17 +178,13 @@ const handleAddTask = (e: MouseEvent) => {
 
 <template>
 	<div>
-		<n-space class="timeline-header" justify="space-between">
-			<!-- <n-button type="error" round class="m-20" @click.prevent="signOut">Logout</n-button> -->
-			<n-button round class="m-20" @click="goBack()">Voltar</n-button>
-			<n-button type="info" round class="m-20" @click="showModal.newTask = true">
+		<!-- <n-button type="info" round class="m-20" @click="showModal.newTask = true">
 				<template #icon>
 					<n-icon><AddSharp /></n-icon>
 				</template>
 				Tarefa
-			</n-button>
-		</n-space>
-		<div class="pt-100 ph-30 mb-100">
+			</n-button> -->
+		<div class="pt-10 mb-100 mh-30">
 			<n-timeline v-if="userStore.tasks?.length">
 				<n-timeline-item v-for="task in userStore.tasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">

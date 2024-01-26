@@ -143,7 +143,6 @@ export default {
 		)
 
 		customAxios.currentUser = async () => {
-			console.log('Entrou no currentUser')
 			return customAxios.get('me')
 		}
 

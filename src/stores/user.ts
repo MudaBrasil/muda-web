@@ -159,10 +159,9 @@ export const UserStore = defineStore(
 			return false
 		}
 		function sync(authData) {
-			console.log('sync: Entrando')
-			if (authData) {
-				console.log('sync: tem dados no AuthData')
+			isOnRequest.value = false
 
+			if (authData) {
 				verifyUserData()
 				auth.value = {
 					uid: authData.uid,
@@ -188,7 +187,6 @@ export const UserStore = defineStore(
 			} else {
 				resetAndLogout()
 			}
-			console.log('sync: Saindo')
 		}
 
 		function register(newUser) {
@@ -214,24 +212,26 @@ export const UserStore = defineStore(
 		}
 
 		async function verifyUserData() {
-			console.log('verifyUserData: Entrando')
-			if (user.value) return user.value
+			if (user.value._id) return user.value
+
+			isOnRequest.value = true
 
 			const { data } = await axios.currentUser()
+
+			isOnRequest.value = false
+
 			if (!data) return console.error('Dados do usuário não encontrado')
 
 			return saveUserData(data)
 		}
 
 		function saveUserData(userData) {
-			console.log('saveUserData: Entrando', userData)
 			isNewUser.value = userData._newUser
 
 			delete userData._newUser
 			delete userData.authId
 
 			user.value = userData as UserModel
-
 			return user.value
 		}
 
@@ -241,6 +241,7 @@ export const UserStore = defineStore(
 			provider.addScope('email')
 			provider.addScope('openid')
 
+			isOnRequest.value = true
 			return signInWithPopup(firebaseAuth, provider)
 				.then(async response => {
 					if (!response.user) throw new Error('Erro ao logar com o Google - Usuário não encontrado')
@@ -251,21 +252,21 @@ export const UserStore = defineStore(
 					reset()
 					throw new Error(getError(error).message)
 				})
+				.finally(() => (isOnRequest.value = false))
 		}
 
 		async function googleLogout() {
 			if (isLogoutRunning.value) return
 
-			isLogoutRunning.value = true
+			isLogoutRunning.value = isOnRequest.value = true
 
 			await axios.googleLogout().catch(({ title, description }) => {
 				NotificationStore().error({ title, description })
 			})
 
-			signOut(firebaseAuth)
 			isLogoutRunning.value = false
+			signOut(firebaseAuth).finally(() => (isOnRequest.value = false))
 			resetAndLogout()
-
 			return true
 		}
 
@@ -284,9 +285,12 @@ export const UserStore = defineStore(
 		}
 	},
 	{
-		persist: true,
+		persist: {
+			paths: ['auth', 'user', 'tasks']
+		},
 		share: {
-			// omit: ['auth'], TODO: Porque eu tinha colocado isso? Verificar se é necessário, senao deixa comentado
+			// omit: ['auth'], TODO: Porque eu tinha colocado pra omitir o auth de compartilhar entre navegadores e guias. Verificar se é necessário, senao deixa comentado
+			omit: ['isOnRequest'],
 			enable: true,
 			initialize: true
 		}

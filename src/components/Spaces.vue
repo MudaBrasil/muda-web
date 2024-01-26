@@ -26,7 +26,7 @@ import {
 } from 'naive-ui'
 import Tasks from '@/components/Tasks.vue'
 import { useRouter } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { EllipsisVertical } from '@vicons/ionicons5'
 
 const formRef = ref<FormInst | null>(null)
@@ -37,14 +37,12 @@ const notification = NotificationStore()
 const router = useRouter()
 const isEditing = ref(false)
 const isDeleting = ref(false)
+const deleteCurrentSpace = ref(false)
+const deleteCurrentList = ref(false)
 
 const initialState = <Type,>() => ({
 	current: {} as Type, // TODO: Talvez transformar em uma variavel fora daqui e unica pra espaco e lista
 	currentTab: 0,
-	loading: {
-		new: false,
-		delete: false
-	},
 	show: {
 		new: false,
 		view: false
@@ -59,10 +57,20 @@ const initialState = <Type,>() => ({
 	} as FormRules
 })
 
-const space = ref(initialState<SpaceModel>())
-const list = ref(initialState<ListModel>())
+const spaceState = ref(initialState<SpaceModel>())
+const listState = ref(initialState<ListModel>())
 
 onMounted(() => getSpaces())
+
+const openDeleteConfirmation = computed({
+	get: () => deleteCurrentSpace.value || deleteCurrentList.value,
+	set: val => (deleteCurrentSpace.value = deleteCurrentList.value = val)
+})
+
+watch(
+	() => userStore.isOnRequest,
+	newVal => (newVal ? loadingBar.start() : loadingBar.finish())
+)
 
 const handleForm = (e: MouseEvent) => {
 	e.preventDefault()
@@ -72,58 +80,55 @@ const handleForm = (e: MouseEvent) => {
 
 const resolveCatch = error => {
 	console.error(error)
-	loadingBar.error()
-
 	const { title, description } = error
 
 	notification.error({ title, description })
+	loadingBar.error()
+	userStore.isOnRequest = isDeleting.value = false
 }
 
-const openView = (type = 'space', index?, indexList?) => {
-	if (type === 'space') {
-		space.value.current = Object.assign({}, userStore.user.spaces[space.value.currentTab])
-		space.value.show.view = true
-	} else {
-		if (space.value.currentTab == index && list.value.currentTab == indexList) {
-			list.value.current = Object.assign({}, userStore.user.spaces[space.value.currentTab].lists[list.value.currentTab])
-			list.value.show.view = true
-		}
+const openViewList = list => {
+	if (!spaceState.value.current._id) {
+		spaceState.value.current = { ...userStore.user.spaces[spaceState.value.currentTab] }
 	}
+
+	listState.value.current = { ...list }
+	listState.value.show.view = true
+}
+
+const openViewSpace = space => {
+	spaceState.value.current = { ...space }
+	spaceState.value.show.view = true
 }
 
 const cleanFields = (type = 'space') => {
-	isEditing.value = false
 	if (type === 'space') {
-		space.value.current = {} as SpaceModel
-		space.value.show.new = false
-		space.value.loading.new = false
+		spaceState.value.current = {} as SpaceModel
+		spaceState.value.show.new = false
 	} else {
-		list.value.current = {} as ListModel
-		list.value.show.new = false
-		list.value.loading.new = false
+		listState.value.current = {} as ListModel
+		listState.value.show.new = false
 	}
+	setTimeout(() => (isEditing.value = false), 500)
 }
 
-const pushToTimeline = (currentSpace = userStore.user.spaces[space.value.currentTab]) => {
-	router.push({
-		name: 'timelineSpaceList',
-		params: {
-			spaceId: currentSpace._id,
-			listId: currentSpace.lists[list.value.currentTab]._id
-		}
-	})
+const pushToTimeline = (spaceId = spaceState.value.current._id, listId = listState.value.current._id) => {
+	router.push({ name: 'timelineSpaceList', params: { spaceId, listId } })
+}
+
+const updateTasks = () => {
+	userStore.isOnRequest = false
+	return getSpaces()
 }
 
 //#region Space Functions
 const getSpaces = () => {
-	loadingBar.start()
+	if (userStore.isOnRequest) return
 	userStore.isOnRequest = true
 
 	return axios
 		.get('/me/spaces')
 		.then(response => {
-			loadingBar.finish()
-
 			userStore.isOnRequest = false
 			return (userStore.user.spaces = response.data)
 		})
@@ -131,29 +136,29 @@ const getSpaces = () => {
 }
 
 const addSpace = () => {
-	loadingBar.start()
-	space.value.loading.new = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
 
 	return axios
-		.post('/me/spaces', space.value.current)
+		.post('/me/spaces', spaceState.value.current)
 		.then(async () => {
-			loadingBar.finish()
 			cleanFields()
+			userStore.isOnRequest = false
 			await getSpaces()
 
-			return (space.value.currentTab = userStore.user.spaces.length - 1)
+			return (spaceState.value.currentTab = userStore.user.spaces.length - 1)
 		})
 		.catch(resolveCatch)
 }
 
 const updateSpace = spaceItem => {
-	loadingBar.start()
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
 
 	return axios
 		.put(`/me/spaces/${spaceItem._id}`, { ...spaceItem, lists: undefined })
 		.then(() => {
-			loadingBar.finish()
-			space.value.show.view = false
+			userStore.isOnRequest = spaceState.value.show.view = false
 
 			return getSpaces()
 		})
@@ -161,17 +166,15 @@ const updateSpace = spaceItem => {
 }
 
 const deleteSpace = spaceId => {
-	space.value.loading.delete = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = isDeleting.value = true
 
 	axios
 		.delete(`/me/spaces/${spaceId}`)
 		.then(() => {
-			userStore.user.spaces = userStore.user.spaces.filter(space => space._id !== spaceId)
-			space.value.show.view = false
-			space.value.loading.delete = false
-
-			space.value.currentTab = space.value.currentTab > 0 ? space.value.currentTab - 1 : 0
-
+			// userStore.user.spaces = userStore.user.spaces.filter(space => space._id !== spaceId) // TODO: Pensar se faço apenas essa delecao local ou se faço uma chamada no getSpaces()
+			spaceState.value.currentTab = spaceState.value.currentTab > 0 ? spaceState.value.currentTab - 1 : 0
+			userStore.isOnRequest = isDeleting.value = spaceState.value.show.view = false
 			return getSpaces()
 		})
 		.catch(resolveCatch)
@@ -180,51 +183,48 @@ const deleteSpace = spaceId => {
 
 //#region List Functions
 const addList = () => {
-	loadingBar.start()
-	list.value.loading.new = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
 
 	return axios
-		.post(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists`, list.value.current)
+		.post(`/me/spaces/${userStore.user.spaces[spaceState.value.currentTab]._id}/lists`, listState.value.current)
 		.then(async () => {
-			loadingBar.finish()
 			cleanFields('list')
+			userStore.isOnRequest = false
 
 			await getSpaces()
-			return (list.value.currentTab = userStore.user.spaces[space.value.currentTab]?.lists.length - 1)
+			return (listState.value.currentTab = userStore.user.spaces[spaceState.value.currentTab]?.lists.length - 1)
 		})
 		.catch(resolveCatch)
 }
 
-const updateList = list => {
-	loadingBar.start()
+const updateList = listItem => {
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
+	delete listItem.tasks
 
 	return axios
-		.put(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists/${list._id}`, {
-			...list,
-			tasks: undefined
-		})
+		.put(`/me/spaces/${userStore.user.spaces[spaceState.value.currentTab]._id}/lists/${listItem._id}`, listItem)
 		.then(() => {
-			list.value.show.view = false
-			loadingBar.finish()
+			userStore.isOnRequest = listState.value.show.view = false
 			return getSpaces()
 		})
 		.catch(resolveCatch)
 }
 
 const deleteList = listId => {
-	list.value.loading.delete = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = isDeleting.value = true
 
 	axios
-		.delete(`/me/spaces/${userStore.user.spaces[space.value.currentTab]._id}/lists/${listId}`)
+		.delete(`/me/spaces/${userStore.user.spaces[spaceState.value.currentTab]._id}/lists/${listId}`)
 		.then(() => {
-			userStore.user.spaces[space.value.currentTab].lists = userStore.user.spaces[space.value.currentTab].lists.filter(
-				list => list._id !== listId
-			)
+			// userStore.user.spaces[space.value.currentTab].lists = userStore.user.spaces[space.value.currentTab].lists.filter(
+			// 	list => list._id !== listId
+			// )// TODO: Pensar se faço apenas essa delecao local ou se faço uma chamada no getSpaces()
 
-			list.value.show.view = false
-			list.value.loading.delete = false
-
-			list.value.currentTab = list.value.currentTab > 0 ? list.value.currentTab - 1 : 0
+			listState.value.currentTab = listState.value.currentTab > 0 ? listState.value.currentTab - 1 : 0
+			userStore.isOnRequest = isDeleting.value = listState.value.show.view = false
 			return getSpaces()
 		})
 		.catch(resolveCatch)
@@ -244,18 +244,18 @@ const deleteList = listId => {
 					type="card"
 					size="large"
 					:default-value="1"
-					v-model:value="space.currentTab"
+					v-model:value="spaceState.currentTab"
 					addable
-					@add="space.show.new = true"
-					@update-value="list.currentTab = 0"
+					@add="spaceState.show.new = true"
+					@update-value="listState.currentTab = 0"
 					tab-style="padding: 0"
 				>
 					<n-tab-pane v-for="(spaceItem, index) in userStore.user.spaces" :key="index" :name="index">
 						<template #tab>
-							<div class="p-10 d-flex ai-center" @click="space.currentTab == index && openView()">
+							<div class="p-10 d-flex ai-center" @click="spaceState.currentTab == index && openViewSpace(spaceItem)">
 								<div class="mh-6">{{ spaceItem.name }}</div>
 
-								<n-button v-if="space.currentTab == index" circle quaternary size="small">
+								<n-button v-if="spaceState.currentTab == index" circle quaternary size="small">
 									<n-icon size="16" color="#1a9561"><EllipsisVertical /></n-icon>
 								</n-button>
 							</div>
@@ -281,18 +281,18 @@ const deleteList = listId => {
 								type="card"
 								size="small"
 								:default-value="1"
-								v-model:value="list.currentTab"
+								v-model:value="listState.currentTab"
 								addable
-								@add="list.show.new = true"
+								@add="listState.show.new = true"
 								tab-style="padding: 0"
 							>
 								<n-tab-pane v-for="(listItem, indexList) in spaceItem.lists" :key="indexList" :name="indexList">
 									<template #tab>
-										<div class="p-4 d-flex ai-center" @click="openView('list', index, indexList)">
+										<div class="p-4 d-flex ai-center" @click="openViewList(listItem)">
 											<div class="ml-8 mr-2">{{ listItem.name }}</div>
 
 											<n-button
-												v-if="space.currentTab == index && list.currentTab == indexList"
+												v-if="spaceState.currentTab == index && listState.currentTab == indexList"
 												circle
 												quaternary
 												size="small"
@@ -317,10 +317,10 @@ const deleteList = listId => {
 										<!-- class="cards-scrollbar" TODO: Entender pq sombra na lista dos cards nao aparecem quando esta dentro de outro card -->
 										<n-scrollbar x-scrollable trigger="hover">
 											<Tasks
-												:tasks="listItem.tasks"
 												:spaceId="spaceItem._id"
 												:listId="listItem._id"
-												@update="getSpaces"
+												:tasks="listItem.tasks"
+												@update="updateTasks()"
 											/>
 										</n-scrollbar>
 									</div>
@@ -333,7 +333,7 @@ const deleteList = listId => {
 		</div>
 
 		<n-drawer
-			v-model:show="space.show.view"
+			v-model:show="spaceState.show.view"
 			class="drawer-task"
 			placement="bottom"
 			default-height="500"
@@ -344,25 +344,30 @@ const deleteList = listId => {
 		>
 			<n-drawer-content closable>
 				<template #header>
-					<n-input v-if="isEditing" v-model:value="space.current.name" type="text" placeholder="Titulo do espaço" />
+					<n-input
+						v-if="isEditing"
+						v-model:value="spaceState.current.name"
+						type="text"
+						placeholder="Titulo do espaço"
+					/>
 					<div v-else>
-						{{ space.current.name }}
+						{{ spaceState.current.name }}
 					</div>
 				</template>
 				<small>Descrição</small>
 				<n-input
 					v-if="isEditing"
-					v-model:value="space.current.description"
+					v-model:value="spaceState.current.description"
 					type="textarea"
 					placeholder="Descrição do espaço"
 					class="mb-10"
 				/>
-				<div v-else style="white-space: pre-wrap">{{ space.current.description }}</div>
+				<div v-else style="white-space: pre-wrap">{{ spaceState.current.description }}</div>
 				<br />
 				<small>Tags</small>
 				<div>
-					<n-dynamic-tags v-if="isEditing" v-model:value="space.current.tags" />
-					<n-tag v-else v-for="(tag, index) in space.current.tags" :key="index" style="margin-right: 8px">{{
+					<n-dynamic-tags v-if="isEditing" v-model:value="spaceState.current.tags" />
+					<n-tag v-else v-for="(tag, index) in spaceState.current.tags" :key="index" style="margin-right: 8px">{{
 						tag
 					}}</n-tag>
 				</div>
@@ -370,15 +375,24 @@ const deleteList = listId => {
 				<template #footer>
 					<div class="d-flex jc-end">
 						<n-button
-							@click="space.loading.delete = isDeleting = true"
-							:loading="space.loading.delete"
+							round
 							type="error"
 							class="mr-10"
-							round
+							:loading="isDeleting"
+							:disabled="isDeleting"
+							@click="deleteCurrentSpace = true"
 						>
 							Excluir
 						</n-button>
-						<n-button v-if="isEditing" type="success" round @click="updateSpace(space.current)">Salvar</n-button>
+						<n-button
+							v-if="isEditing"
+							round
+							type="success"
+							:disabled="userStore.isOnRequest"
+							:loading="userStore.isOnRequest"
+							@click="updateSpace(spaceState.current)"
+							>Salvar</n-button
+						>
 						<n-button v-else type="warning" round @click="isEditing = true">Editar</n-button>
 					</div>
 				</template>
@@ -386,7 +400,7 @@ const deleteList = listId => {
 		</n-drawer>
 
 		<n-drawer
-			v-model:show="space.show.new"
+			v-model:show="spaceState.show.new"
 			class="drawer-task"
 			placement="bottom"
 			default-height="500"
@@ -396,25 +410,31 @@ const deleteList = listId => {
 		>
 			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
 			<n-drawer-content title="Criar novo espaço" closable>
-				<n-form ref="formRef" :model="space.current" :rules="space.validationRules">
+				<n-form ref="formRef" :model="spaceState.current" :rules="spaceState.validationRules">
 					<n-form-item label="Titulo" path="name">
-						<n-input v-model:value="space.current.name" placeholder="Informe o titulo do espaço" />
+						<n-input v-model:value="spaceState.current.name" placeholder="Informe o titulo do espaço" />
 					</n-form-item>
 					<n-form-item label="Descrição" path="description">
 						<n-input
-							v-model:value="space.current.description"
+							v-model:value="spaceState.current.description"
 							placeholder="Informe a descrição do espaço"
 							type="textarea"
 							:autosize="{ minRows: 4 }"
 						/>
 					</n-form-item>
 					<n-form-item path="tags" label="Tags">
-						<n-dynamic-tags v-model:value="space.current.tags" />
+						<n-dynamic-tags v-model:value="spaceState.current.tags" />
 					</n-form-item>
 				</n-form>
 				<template #footer>
 					<div class="d-flex jc-end">
-						<n-button type="info" round @click="handleForm && addSpace()" :loading="space.loading.new">
+						<n-button
+							type="info"
+							round
+							:disabled="userStore.isOnRequest"
+							:loading="userStore.isOnRequest"
+							@click="handleForm && addSpace()"
+						>
 							Criar espaço
 						</n-button>
 					</div>
@@ -423,7 +443,7 @@ const deleteList = listId => {
 		</n-drawer>
 
 		<n-drawer
-			v-model:show="list.show.view"
+			v-model:show="listState.show.view"
 			class="drawer-task"
 			placement="bottom"
 			default-height="500"
@@ -434,25 +454,25 @@ const deleteList = listId => {
 		>
 			<n-drawer-content closable>
 				<template #header>
-					<n-input v-if="isEditing" v-model:value="list.current.name" type="text" placeholder="Titulo da lista" />
+					<n-input v-if="isEditing" v-model:value="listState.current.name" type="text" placeholder="Titulo da lista" />
 					<div v-else>
-						{{ list.current.name }}
+						{{ listState.current.name }}
 					</div>
 				</template>
 				<small>Descrição</small>
 				<n-input
 					v-if="isEditing"
-					v-model:value="list.current.description"
+					v-model:value="listState.current.description"
 					type="textarea"
 					placeholder="Descrição da lista"
 					class="mb-10"
 				/>
-				<div v-else style="white-list: pre-wrap">{{ list.current.description }}</div>
+				<div v-else style="white-list: pre-wrap">{{ listState.current.description }}</div>
 				<br />
 				<small>Tags</small>
 				<div>
-					<n-dynamic-tags v-if="isEditing" v-model:value="list.current.tags" />
-					<n-tag v-else v-for="(tag, index) in list.current.tags" :key="index" style="margin-right: 8px">{{
+					<n-dynamic-tags v-if="isEditing" v-model:value="listState.current.tags" />
+					<n-tag v-else v-for="(tag, index) in listState.current.tags" :key="index" style="margin-right: 8px">{{
 						tag
 					}}</n-tag>
 				</div>
@@ -462,16 +482,25 @@ const deleteList = listId => {
 						<n-button class="mr-10" type="info" round @click="pushToTimeline()"> Tarefas </n-button>
 
 						<n-button
-							@click="list.loading.delete = isDeleting = true"
-							:loading="list.loading.delete"
+							round
 							type="error"
 							class="mr-10"
-							round
+							:loading="isDeleting"
+							:disabled="isDeleting"
+							@click="deleteCurrentList = true"
 						>
 							Excluir
 						</n-button>
 
-						<n-button v-if="isEditing" type="success" round @click="updateList(list.current)">Salvar</n-button>
+						<n-button
+							v-if="isEditing"
+							type="success"
+							round
+							:disabled="userStore.isOnRequest"
+							:loading="userStore.isOnRequest"
+							@click="updateList(listState.current)"
+							>Salvar</n-button
+						>
 						<n-button v-else type="warning" round @click="isEditing = true">Editar</n-button>
 					</div>
 				</template>
@@ -479,7 +508,7 @@ const deleteList = listId => {
 		</n-drawer>
 
 		<n-drawer
-			v-model:show="list.show.new"
+			v-model:show="listState.show.new"
 			class="drawer-task"
 			placement="bottom"
 			default-height="500"
@@ -489,25 +518,31 @@ const deleteList = listId => {
 		>
 			<!-- // TODO: Calcular o tamanho da tela e setar o max-height -->
 			<n-drawer-content title="Criar nova lista" closable>
-				<n-form ref="formRef" :model="list.current" :rules="list.validationRules">
+				<n-form ref="formRef" :model="listState.current" :rules="listState.validationRules">
 					<n-form-item label="Titulo" path="name">
-						<n-input v-model:value="list.current.name" placeholder="Informe o titulo da lista" />
+						<n-input v-model:value="listState.current.name" placeholder="Informe o titulo da lista" />
 					</n-form-item>
 					<n-form-item label="Descrição" path="description">
 						<n-input
-							v-model:value="list.current.description"
+							v-model:value="listState.current.description"
 							placeholder="Informe a descrição da lista"
 							type="textarea"
 							:autosize="{ minRows: 4 }"
 						/>
 					</n-form-item>
 					<n-form-item path="tags" label="Tags">
-						<n-dynamic-tags v-model:value="list.current.tags" />
+						<n-dynamic-tags v-model:value="listState.current.tags" />
 					</n-form-item>
 				</n-form>
 				<template #footer>
 					<div class="d-flex jc-end">
-						<n-button type="info" round @click="handleForm && addList()" :loading="list.loading.new">
+						<n-button
+							type="info"
+							round
+							@click="handleForm && addList()"
+							:loading="userStore.isOnRequest"
+							:disabled="userStore.isOnRequest"
+						>
 							Criar lista
 						</n-button>
 					</div>
@@ -516,18 +551,24 @@ const deleteList = listId => {
 		</n-drawer>
 
 		<n-modal
-			v-model:show="isDeleting"
+			v-model:show="openDeleteConfirmation"
 			type="error"
 			title="Deseja realmente remover?"
-			content="Caso você opte por excluir não será possivel recuperar esses dados. Tem certeza de que deseja excluir?"
+			content="Caso você opte por excluir não será possível recuperar esses dados. Tem certeza de que deseja excluir?"
 			preset="confirm"
 			positive-text="Excluir"
 			negative-text="Cancelar"
 			:positive-button-props="{ round: true }"
 			:negative-button-props="{ round: true }"
-			@positive-click="list.loading.delete ? deleteList(list.current._id) : deleteSpace(space.current._id)"
-			@negative-click="list.loading.delete = space.loading.delete = isDeleting = false"
-			@after-leave="list.loading.delete = space.loading.delete = isDeleting = false"
+			@positive-click="
+				() => {
+					if (openDeleteConfirmation) {
+						deleteCurrentList ? deleteList(listState.current._id) : deleteSpace(spaceState.current._id)
+					}
+				}
+			"
+			@negative-click="deleteCurrentList = deleteCurrentSpace = false"
+			@after-leave="deleteCurrentList = deleteCurrentSpace = false"
 		/>
 	</div>
 </template>

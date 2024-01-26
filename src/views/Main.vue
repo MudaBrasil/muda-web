@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
+import TopBar from '@/components/TopBar.vue'
 import { RouterView } from 'vue-router'
 import { useMenuFlexStore } from '@/stores/menuFlex'
 import MenuBar from '@/components/MenuBar.vue'
@@ -51,6 +52,7 @@ watch(
 <template>
 	<div>
 		<MenuBar />
+		<TopBar />
 
 		<RouterView v-slot="{ Component }">
 			<Transition>

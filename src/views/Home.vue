@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import HomeContext from '@/components/HomeContext.vue'
 import Spaces from '@/components/Spaces.vue'
-import TopBar from '@/components/TopBar.vue'
 import { NFlex, NCard, NScrollbar } from 'naive-ui'
 </script>
 
@@ -9,7 +8,6 @@ import { NFlex, NCard, NScrollbar } from 'naive-ui'
 	<main style="max-width: 100%">
 		<n-scrollbar trigger="hover" style="max-height: 100%">
 			<HomeContext v-if="false" />
-			<TopBar />
 			<Spaces />
 
 			<div class="cards-scrollbar">

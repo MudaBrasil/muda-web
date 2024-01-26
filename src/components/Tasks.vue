@@ -16,28 +16,26 @@ import {
 	NModal,
 	NIcon,
 	FormRules,
-	FormInst
+	FormInst,
+	useLoadingBar
 } from 'naive-ui'
 import { ref, watch } from 'vue'
 import { AddCircleOutline } from '@vicons/ionicons5'
 
 const formRef = ref<FormInst | null>(null)
 const axios = axiosInject()
+const loadingBar = useLoadingBar()
 const userStore = UserStore()
 const notification = NotificationStore()
 const isEditing = ref(false)
 const isDeleting = ref(false)
+const deleteCurrentTask = ref(false)
 
 const { tasks, spaceId, listId } = defineProps(['tasks', 'spaceId', 'listId'])
 const emit = defineEmits(['update'])
 
 const initialState = () => ({
 	current: {} as TaskModel,
-	loading: {
-		new: false,
-		update: false,
-		delete: false
-	},
 	show: {
 		new: false,
 		view: false
@@ -54,7 +52,10 @@ const initialState = () => ({
 
 watch(
 	() => userStore.isOnRequest,
-	(newValue, oldValue) => !newValue && oldValue && cleanFields(),
+	(newValue, oldValue) => {
+		!newValue && oldValue && cleanFields()
+		newValue ? loadingBar.start() : loadingBar.finish()
+	},
 	{ immediate: true }
 )
 
@@ -66,50 +67,57 @@ const handleForm = (e: MouseEvent) => {
 	return formRef.value?.validate(errors => !errors)
 }
 
-const resolveCatch = ({ title, description }) => {
+const resolveCatch = error => {
+	console.error(error)
+	const { title, description } = error
 	notification.error({ title, description })
+	loadingBar.finish()
 }
 
 const openView = task => {
-	taskState.value.current = Object.assign({}, task)
+	taskState.value.current = { ...task }
 	taskState.value.show.view = true
 }
 
 const cleanFields = () => {
-	isEditing.value = false
+	setTimeout(() => (isDeleting.value = isEditing.value = false), 500)
+	taskState.value.show.new = taskState.value.show.view = false
 	taskState.value.current = {} as TaskModel
-	taskState.value.show.new = false
-	taskState.value.show.view = false
-	taskState.value.loading.new = false
 }
 
 //#region Task Functions
 
 const addTask = (task = taskState.value.current) => {
-	taskState.value.loading.new = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
 
 	return axios
 		.post(`/me/spaces/${spaceId}/lists/${listId}/tasks`, task)
 		.then(() => emit('update'))
 		.catch(resolveCatch)
+		.finally(() => (userStore.isOnRequest = false))
 }
 
 const updateTask = (task = taskState.value.current) => {
-	taskState.value.loading.update = true
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = true
 
 	return axios
 		.put(`/me/spaces/${spaceId}/lists/${listId}/tasks/${task._id}`, task)
 		.then(() => emit('update'))
 		.catch(resolveCatch)
+		.finally(() => (userStore.isOnRequest = false))
 }
 
-const deleteTask = (task = taskState.value.current) => {
-	taskState.value.loading.delete = true
+const deleteTask = (taskId = taskState.value.current._id) => {
+	if (userStore.isOnRequest) return
+	userStore.isOnRequest = isDeleting.value = true
 
 	axios
-		.delete(`/me/spaces/${spaceId}/lists/${listId}/tasks/${task._id}`)
+		.delete(`/me/spaces/${spaceId}/lists/${listId}/tasks/${taskId}`)
 		.then(() => emit('update'))
 		.catch(resolveCatch)
+		.finally(() => (userStore.isOnRequest = isDeleting.value = false))
 }
 //#endregion
 </script>
@@ -141,7 +149,6 @@ const deleteTask = (task = taskState.value.current) => {
 			:max-height="700"
 			:min-height="300"
 			resizable
-			@after-leave="cleanFields()"
 		>
 			<n-drawer-content closable>
 				<template #header>
@@ -171,15 +178,25 @@ const deleteTask = (task = taskState.value.current) => {
 				<template #footer>
 					<div class="d-flex jc-end">
 						<n-button
-							@click="taskState.loading.delete = isDeleting = true"
-							:loading="taskState.loading.delete"
+							round
 							type="error"
 							class="mr-10"
-							round
+							:disabled="isDeleting"
+							:loading="isDeleting"
+							@click="deleteCurrentTask = true"
 						>
 							Excluir
 						</n-button>
-						<n-button v-if="isEditing" type="success" round @click="updateTask()">Salvar</n-button>
+						<n-button
+							v-if="isEditing"
+							type="success"
+							round
+							:loading="userStore.isOnRequest"
+							:disabled="userStore.isOnRequest"
+							@click="updateTask()"
+						>
+							Salvar
+						</n-button>
 						<n-button v-else type="warning" round @click="isEditing = true">Editar</n-button>
 					</div>
 				</template>
@@ -214,7 +231,13 @@ const deleteTask = (task = taskState.value.current) => {
 				</n-form>
 				<template #footer>
 					<div class="d-flex jc-end">
-						<n-button type="info" round @click="handleForm && addTask()" :loading="taskState.loading.new">
+						<n-button
+							type="info"
+							round
+							:loading="userStore.isOnRequest"
+							:disabled="userStore.isOnRequest"
+							@click="handleForm && addTask()"
+						>
 							Criar tarefa
 						</n-button>
 					</div>
@@ -223,7 +246,7 @@ const deleteTask = (task = taskState.value.current) => {
 		</n-drawer>
 
 		<n-modal
-			v-model:show="isDeleting"
+			v-model:show="deleteCurrentTask"
 			type="error"
 			title="Deseja realmente remover?"
 			content="Caso você opte por excluir não será possivel recuperar esses dados. Tem certeza de que deseja excluir?"
@@ -232,9 +255,9 @@ const deleteTask = (task = taskState.value.current) => {
 			negative-text="Cancelar"
 			:positive-button-props="{ round: true }"
 			:negative-button-props="{ round: true }"
-			@positive-click="deleteTask()"
-			@negative-click="taskState.loading.delete = isDeleting = false"
-			@after-leave="taskState.loading.delete = isDeleting = false"
+			@positive-click="deleteTask(taskState.current._id)"
+			@negative-click="deleteCurrentTask = false"
+			@after-leave="deleteCurrentTask = false"
 		/>
 	</div>
 </template>
