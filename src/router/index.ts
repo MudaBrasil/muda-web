@@ -52,6 +52,12 @@ const router = createRouter({
 					name: 'timeline',
 					component: Timeline
 				},
+
+				{
+					path: '/timeline/tasks',
+					name: 'timelineTasks',
+					component: Timeline
+				},
 				{
 					path: '/timeline/spaces/:spaceId/lists/:listId',
 					name: 'timelineSpaceList',

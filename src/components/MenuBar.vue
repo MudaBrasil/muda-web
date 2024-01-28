@@ -20,7 +20,6 @@ const menuOptions = ref([
 		title: 'Home',
 		alt: 'Ícone de casa',
 		path: '/',
-		class: '',
 		active: route.path === '/',
 		click: () => router.push({ path: '/' })
 	},
@@ -30,7 +29,6 @@ const menuOptions = ref([
 		title: 'Social',
 		alt: 'Ícone de socialização',
 		path: '/dashboard',
-		class: '',
 		active: route.path === '/dashboard',
 		click: () => router.push({ path: '/dashboard' })
 	},
@@ -39,8 +37,8 @@ const menuOptions = ref([
 		title: 'Menu de adição',
 		alt: 'Ícone de adição',
 		path: '',
-		class: 'center-btn img-close-menu',
 		active: store.active,
+		class: 'center-btn img-close-menu',
 		click: () => (store.active = true)
 	},
 	{
@@ -48,16 +46,14 @@ const menuOptions = ref([
 		title: 'Progresso',
 		alt: 'Ícone de progresso',
 		path: '/timeline',
-		class: '',
-		active: route.path === '/timeline',
-		click: () => router.push({ path: '/timeline' })
+		active: route.path.includes('timeline'),
+		click: () => router.push({ name: 'timeline' })
 	},
 	{
 		icon: studentBookIcon,
 		title: 'Livro de estudos',
 		alt: 'Ícone de livro de estudos',
 		path: '/rennan',
-		class: '',
 		active: route.path === '/rennan',
 		click: () => router.push({ path: '/rennan' })
 	}
@@ -67,7 +63,10 @@ watch(
 	() => route.path,
 	path => {
 		menuOptions.value.forEach(option => {
-			option.active = option.path === path
+			if (option.path === '' || !option.path) return
+			if (option.path === '/') return (option.active = path === option.path)
+
+			option.active = path.includes(option.path)
 		})
 	}
 )
@@ -95,7 +94,7 @@ watch(
 				<div
 					v-for="(option, index) in menuOptions"
 					:key="index"
-					:class="['floating-menu-options-btn', option.class, { active: option.active }]"
+					:class="['floating-menu-options-btn', option?.class, { active: option.active }]"
 					@click="option.click"
 				>
 					<img :src="option.icon" :alt="option.alt" />

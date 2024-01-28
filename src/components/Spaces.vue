@@ -288,7 +288,10 @@ const deleteList = listId => {
 							>
 								<n-tab-pane v-for="(listItem, indexList) in spaceItem.lists" :key="indexList" :name="indexList">
 									<template #tab>
-										<div class="p-4 d-flex ai-center" @click="openViewList(listItem)">
+										<div
+											class="p-4 d-flex ai-center"
+											@click="listState.currentTab == indexList && openViewList(listItem)"
+										>
 											<div class="ml-8 mr-2">{{ listItem.name }}</div>
 
 											<n-button

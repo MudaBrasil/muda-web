@@ -112,7 +112,7 @@ export class TaskModel extends Cell {
 	orderIndex: number
 	dateDone: Date
 	dateClosed: Date
-	startDate: Date
+	startDate: number
 	started: boolean
 	dueDate: Date
 	lated: boolean

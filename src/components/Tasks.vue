@@ -15,6 +15,7 @@ import {
 	NFormItem,
 	NModal,
 	NIcon,
+	NDatePicker,
 	FormRules,
 	FormInst,
 	useLoadingBar
@@ -75,7 +76,7 @@ const resolveCatch = error => {
 }
 
 const openView = task => {
-	taskState.value.current = { ...task }
+	taskState.value.current = { ...task, startDate: new Date(task.startDate).getTime() }
 	taskState.value.show.view = true
 }
 
@@ -101,6 +102,8 @@ const addTask = (task = taskState.value.current) => {
 const updateTask = (task = taskState.value.current) => {
 	if (userStore.isOnRequest) return
 	userStore.isOnRequest = true
+
+	console.log('task StartDate', task.startDate)
 
 	return axios
 		.put(`/me/spaces/${spaceId}/lists/${listId}/tasks/${task._id}`, task)
@@ -174,6 +177,18 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 						tag
 					}}</n-tag>
 				</div>
+				<br />
+				<small>Data de inicio</small>
+
+				<!-- <n-form-item label="Data de inicio" path="startDate"> -->
+				<n-date-picker
+					v-model:value="taskState.current.startDate"
+					type="datetime"
+					style="width: 100%"
+					format="dd/MM/yyyy HH:mm:ss"
+					clearable
+				/>
+				<!-- </n-form-item> -->
 
 				<template #footer>
 					<div class="d-flex jc-end">
@@ -227,6 +242,16 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 					</n-form-item>
 					<n-form-item path="tags" label="Tags">
 						<n-dynamic-tags v-model:value="taskState.current.tags" />
+					</n-form-item>
+
+					<n-form-item label="Data de inicio" path="startDate">
+						<n-date-picker
+							v-model:value="taskState.current.startDate"
+							type="datetime"
+							style="width: 100%"
+							format="dd/MM/yyyy HH:mm:ss"
+							clearable
+						/>
 					</n-form-item>
 				</n-form>
 				<template #footer>
