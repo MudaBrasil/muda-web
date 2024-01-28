@@ -227,12 +227,12 @@ const handleAddTask = (e: MouseEvent) => {
 					:type="daySelected == day ? 'primary' : 'default'"
 					@click.prevent="daySelected = day"
 					secondary
-					style="height: 42px; width: 50px"
-					class="mh-3"
+					style="height: 50px; width: 60px"
+					class="mh-5"
 				>
 					<div class="">
-						<div style="font-weight: bold">{{ day.substring(8, 10) }}</div>
-						<div style="font-size: 10px">{{ getShortWeekDay(new Date(day)) }}</div>
+						<div style="font-size: 16px; font-weight: bold">{{ day.substring(8, 10) }}</div>
+						<div style="font-size: 11px">{{ getShortWeekDay(new Date(day)) }}</div>
 					</div>
 				</n-button>
 			</div>
