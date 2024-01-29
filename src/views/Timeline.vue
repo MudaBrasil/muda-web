@@ -12,7 +12,7 @@ import {
 	NFormItem,
 	NDatePicker,
 	NDrawer,
-	// NScrollbar,
+	NScrollbar,
 	NDrawerContent,
 	NPerformantEllipsis,
 	FormInst,
@@ -76,7 +76,7 @@ const validationTaskRules: FormRules = {
 	}
 }
 
-const dateToString = (date: Date = new Date()) => date.toISOString().substring(0, 10)
+const dateToString = (date: Date = new Date()) => date.toLocaleString('sv').substring(0, 10)
 const weekDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
 const getShortWeekDay = (date: Date = new Date()) => weekDays[date.getDay()].substring(0, 3)
@@ -218,24 +218,26 @@ const handleAddTask = (e: MouseEvent) => {
 				Tarefa
 			</n-button> -->
 
-		<div class="w-100">
-			<!-- </n-scrollbar> trigger="hover" class="m-10"> -->
-			<div class="m-10 pb-6 pt-3" style="white-space: nowrap; overflow-y: auto">
-				<n-button
-					v-for="(day, index) in daysToSplit"
-					:key="index"
-					:type="daySelected == day ? 'primary' : 'default'"
-					@click.prevent="daySelected = day"
-					secondary
-					style="height: 50px; width: 60px"
-					class="mh-5"
-				>
-					<div class="">
-						<div style="font-size: 16px; font-weight: bold">{{ day.substring(8, 10) }}</div>
-						<div style="font-size: 11px">{{ getShortWeekDay(new Date(day)) }}</div>
-					</div>
-				</n-button>
-			</div>
+		<!-- </n-scrollbar> class="m-10"> -->
+		<div class="ph-20">
+			<n-scrollbar x-scrollable trigger="hover">
+				<div class="d-flex mb-10 pb-4 mt-3" style="white-space: nowrap; overflow-y: auto; gap: 10px">
+					<n-button
+						v-for="(day, index) in daysToSplit"
+						:key="index"
+						:type="daySelected == day ? 'primary' : 'default'"
+						@click.prevent="daySelected = day"
+						secondary
+						style="height: 50px; width: 56px"
+						class="mh-0"
+					>
+						<div class="">
+							<div style="font-size: 16px; font-weight: bold">{{ day.substring(8, 10) }}</div>
+							<div style="font-size: 11px">{{ getShortWeekDay(new Date(day)) }}</div>
+						</div>
+					</n-button>
+				</div>
+			</n-scrollbar>
 		</div>
 		<div class="pt-10 mb-100 mh-30">
 			<n-timeline v-if="!hasTasksSplitted && userStore.tasks?.length">
