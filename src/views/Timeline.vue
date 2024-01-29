@@ -34,17 +34,7 @@ const hasTasksSplitted = ref(false)
 const requestEndpoint = ref('/me/tasks')
 const tasksSplitted = ref([])
 const daySelected = ref('')
-const daysToSplit = ref([
-	'2024-01-26',
-	'2024-01-27',
-	'2024-01-28',
-	'2024-01-29',
-	'2024-01-30',
-	'2024-01-31',
-	'2024-02-01',
-	'2024-02-02',
-	'2024-02-03'
-])
+const days = ref([])
 
 const showModal = ref({
 	newTask: false,
@@ -76,11 +66,6 @@ const validationTaskRules: FormRules = {
 	}
 }
 
-const dateToString = (date: Date = new Date()) => date.toLocaleString('sv').substring(0, 10)
-const weekDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
-
-const getShortWeekDay = (date: Date = new Date()) => weekDays[date.getDay()].substring(0, 3)
-
 const newTaskInitial = () => ({
 	name: '',
 	description: '',
@@ -105,13 +90,38 @@ onMounted(async () => {
 	}
 
 	if (route.name === 'timeline') {
-		const queryParam = new URLSearchParams()
-		queryParam.append('daysToSplit', daysToSplit.value.toLocaleString())
-		const todayDateString = dateToString()
-		daySelected.value = daysToSplit.value.includes(todayDateString) ? todayDateString : daysToSplit.value[0]
+		const weekDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+		const dateToString = (date: Date = new Date()) => date.toLocaleString('sv').substring(0, 10)
+		const getWeekDay = (date: Date) => weekDays[date.getDay()].substring(0, 3)
 
+		const today = new Date()
+		const yesterday = new Date(today.getTime() - 86400000)
+		const before2days = new Date(yesterday.getTime() - 86400000)
+		const tomorrow = new Date(today.getTime() + 86400000)
+		const after2days = new Date(tomorrow.getTime() + 86400000)
+		const after3days = new Date(after2days.getTime() + 86400000)
+		const after4days = new Date(after3days.getTime() + 86400000)
+		const after5days = new Date(after4days.getTime() + 86400000)
+
+		days.value = [
+			{ fullDate: before2days, shortDate: dateToString(before2days), weekDay: getWeekDay(before2days) },
+			{ fullDate: yesterday, shortDate: dateToString(yesterday), weekDay: getWeekDay(yesterday) },
+			{ fullDate: today, shortDate: dateToString(today), weekDay: getWeekDay(today) },
+			{ fullDate: tomorrow, shortDate: dateToString(tomorrow), weekDay: getWeekDay(tomorrow) },
+			{ fullDate: after2days, shortDate: dateToString(after2days), weekDay: getWeekDay(after2days) },
+			{ fullDate: after3days, shortDate: dateToString(after3days), weekDay: getWeekDay(after3days) },
+			{ fullDate: after4days, shortDate: dateToString(after4days), weekDay: getWeekDay(after4days) },
+			{ fullDate: after5days, shortDate: dateToString(after5days), weekDay: getWeekDay(after5days) }
+		]
+
+		const queryParam = new URLSearchParams()
+		const daysToSplit = days.value.map(day => day.shortDate)
+		const todayShortString = daysToSplit[2]
+
+		queryParam.append('daysToSplit', daysToSplit.join(','))
+		requestEndpoint.value = `/me/timelines?${queryParam.toString()}`
 		hasTasksSplitted.value = true
-		requestEndpoint.value = '/me/timelines' + (queryParam ? '?' + queryParam.toString() : '')
+		daySelected.value = todayShortString
 	}
 
 	getTasks()
@@ -219,21 +229,21 @@ const handleAddTask = (e: MouseEvent) => {
 			</n-button> -->
 
 		<!-- </n-scrollbar> class="m-10"> -->
-		<div class="ph-20">
-			<n-scrollbar x-scrollable trigger="hover">
-				<div class="d-flex mb-10 pb-4 mt-3" style="white-space: nowrap; overflow-y: auto; gap: 10px">
+		<div class="cards-scrollbar ph-20">
+			<n-scrollbar x-scrollable trigger="hover" class="pb-14 pt-3">
+				<div class="d-flex" style="white-space: nowrap; overflow-y: auto; gap: 10px">
 					<n-button
-						v-for="(day, index) in daysToSplit"
+						v-for="(day, index) in days"
 						:key="index"
-						:type="daySelected == day ? 'primary' : 'default'"
-						@click.prevent="daySelected = day"
+						:type="daySelected == day.shortDate ? 'primary' : 'default'"
+						@click.prevent="daySelected = day.shortDate"
 						secondary
 						style="height: 50px; width: 56px"
 						class="mh-0"
 					>
 						<div class="">
-							<div style="font-size: 16px; font-weight: bold">{{ day.substring(8, 10) }}</div>
-							<div style="font-size: 11px">{{ getShortWeekDay(new Date(day)) }}</div>
+							<div style="font-size: 16px; font-weight: bold">{{ day.shortDate.substring(8, 10) }}</div>
+							<div style="font-size: 11px">{{ day.weekDay }}</div>
 						</div>
 					</n-button>
 				</div>
@@ -363,6 +373,9 @@ const handleAddTask = (e: MouseEvent) => {
 	height: 100%;
 	border-radius: 20px;
 	cursor: pointer;
+	box-shadow:
+		0 1px 2px -2px rgba(0, 0, 0, 0.08),
+		0 3px 6px 0 rgba(0, 0, 0, 0.06);
 
 	&:not(.n-button--disabled):active {
 		background-color: var(--n-color-pressed);
