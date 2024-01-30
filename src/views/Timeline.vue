@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { axiosInject } from '@/services/axios'
 import {
 	NTimeline,
@@ -11,6 +11,7 @@ import {
 	NTime,
 	NForm,
 	NFormItem,
+	NEmpty,
 	NDatePicker,
 	NDrawer,
 	NScrollbar,
@@ -23,7 +24,7 @@ import {
 import { useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 import { UserStore } from '@/stores/user'
-import { PlayCircleOutline } from '@vicons/ionicons5'
+import { AddSharp, PlayCircleOutline } from '@vicons/ionicons5'
 
 const formRef = ref<FormInst | null>(null)
 const route = useRoute()
@@ -35,7 +36,7 @@ const hasSpaceList = ref(false)
 const hasTasksSplitted = ref(false)
 const requestEndpoint = ref('/me/tasks')
 const tasksSplitted = ref([])
-const daySelected = ref('')
+const daySelected = ref<number | null>(null)
 const days = ref([])
 
 const showModal = ref({
@@ -92,9 +93,23 @@ onMounted(async () => {
 	}
 
 	if (route.name === 'timeline') {
-		const weekDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+		const weekDaysNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+		const monthsNames = [
+			'Janeiro',
+			'Fevereiro',
+			'Março',
+			'Abril',
+			'Maio',
+			'Junho',
+			'Julho',
+			'Agosto',
+			'Setembro',
+			'Outubro',
+			'Novembro',
+			'Dezembro'
+		]
 		const dateToString = (date: Date = new Date()) => date.toLocaleString('sv').substring(0, 10)
-		const getWeekDay = (date: Date) => weekDays[date.getDay()].substring(0, 3)
+		const getWeekDay = (date: Date) => weekDaysNames[date.getDay()]
 
 		const today = new Date()
 		const yesterday = new Date(today.getTime() - 86400000)
@@ -116,6 +131,10 @@ onMounted(async () => {
 			{ fullDate: after5days, shortDate: dateToString(after5days), weekDay: getWeekDay(after5days) }
 		]
 
+		days.value.map(
+			day => (day.description = `${day.weekDay}, ${day.fullDate.getDate()} de ${monthsNames[day.fullDate.getMonth()]}`)
+		)
+
 		const queryParam = new URLSearchParams()
 		const daysToSplit = days.value.map(day => day.shortDate)
 		const todayShortString = daysToSplit[2]
@@ -123,10 +142,18 @@ onMounted(async () => {
 		queryParam.append('daysToSplit', daysToSplit.join(','))
 		requestEndpoint.value = `/me/timelines?${queryParam.toString()}`
 		hasTasksSplitted.value = true
-		daySelected.value = todayShortString
+		daySelected.value = days.value.findIndex(day => day.shortDate === todayShortString)
 	}
 
 	getTasks()
+})
+
+const currentTasksSplitted = computed(() => {
+	if (hasTasksSplitted.value && daySelected.value !== null) {
+		const selectedShortString = days.value[daySelected.value].shortDate
+		return tasksSplitted.value[selectedShortString]
+	}
+	return []
 })
 
 const getTasks = () => {
@@ -223,38 +250,40 @@ const handleAddTask = (e: MouseEvent) => {
 
 <template>
 	<div>
-		<!-- <n-button type="info" round class="m-20" @click="showModal.newTask = true">
-				<template #icon>
-					<n-icon><AddSharp /></n-icon>
-				</template>
-				Tarefa
-			</n-button> -->
-
-		<!-- </n-scrollbar> class="m-10"> -->
 		<div class="cards-scrollbar ph-20">
 			<n-scrollbar x-scrollable trigger="hover" class="pb-14 pt-3">
 				<div class="d-flex" style="white-space: nowrap; overflow-y: auto; gap: 10px">
 					<n-button
 						v-for="(day, index) in days"
 						:key="index"
-						:type="daySelected == day.shortDate ? 'primary' : 'default'"
-						@click.prevent="daySelected = day.shortDate"
+						:type="daySelected == index ? 'primary' : 'default'"
+						@click.prevent="daySelected = index"
 						secondary
 						style="height: 50px; width: 56px"
 						class="mh-0"
 					>
 						<div class="">
 							<div style="font-size: 16px; font-weight: bold">{{ day.shortDate.substring(8, 10) }}</div>
-							<div style="font-size: 11px">{{ day.weekDay }}</div>
+							<div style="font-size: 11px">{{ day.weekDay.substring(0, 3) }}</div>
 						</div>
 					</n-button>
 				</div>
 			</n-scrollbar>
 		</div>
+
+		<div class="d-flex jc-between ai-center">
+			<h3 class="ml-20" style="color: #444">{{ days[daySelected]?.description }}</h3>
+			<n-button type="info" round class="m-20" @click="showModal.newTask = true">
+				<template #icon>
+					<n-icon><AddSharp /></n-icon>
+				</template>
+				Tarefa
+			</n-button>
+		</div>
 		<div class="pt-10 mb-100 mh-30">
 			<n-timeline>
 				<n-timeline-item
-					v-for="task in hasTasksSplitted ? tasksSplitted[daySelected] : userStore.tasks"
+					v-for="task in hasTasksSplitted ? currentTasksSplitted : userStore.tasks"
 					type="success"
 					:key="task._id"
 				>
@@ -277,27 +306,11 @@ const handleAddTask = (e: MouseEvent) => {
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
-			<!-- <div v-else>
-				<div>
-					<n-timeline>
-						<n-timeline-item v-for="task in " type="success" :key="task._id">
-							<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
-								<template #header> {{ task.name }}2 </template>
-								<template #header-extra>
-									<div class="card-header-title">
-										<n-time v-if="task?.startDate" :time="new Date(task?.startDate)" format="HH:mm" />
-									</div>
-								</template>
-								<div class="card-content-text">
-									<n-performant-ellipsis :line-clamp="2" :tooltip="{ disabled: true }">
-										{{ task.description }}
-									</n-performant-ellipsis>
-								</div>
-							</n-card>
-						</n-timeline-item>
-					</n-timeline>
-				</div>
-			</div>-->
+			<n-empty
+				class="mt-40"
+				description="Não foi encontrado nenhuma tarefa"
+				v-if="!(hasTasksSplitted ? currentTasksSplitted : userStore.tasks)?.length"
+			/>
 		</div>
 
 		<n-drawer
