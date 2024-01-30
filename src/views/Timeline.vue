@@ -7,6 +7,7 @@ import {
 	NCard,
 	NButton,
 	NInput,
+	NIcon,
 	NTime,
 	NForm,
 	NFormItem,
@@ -22,6 +23,7 @@ import {
 import { useRoute } from 'vue-router'
 import { NotificationStore } from '@/stores/notification'
 import { UserStore } from '@/stores/user'
+import { PlayCircleOutline } from '@vicons/ionicons5'
 
 const formRef = ref<FormInst | null>(null)
 const route = useRoute()
@@ -250,28 +252,37 @@ const handleAddTask = (e: MouseEvent) => {
 			</n-scrollbar>
 		</div>
 		<div class="pt-10 mb-100 mh-30">
-			<n-timeline v-if="!hasTasksSplitted && userStore.tasks?.length">
-				<n-timeline-item v-for="task in userStore.tasks" type="success" :key="task._id">
+			<n-timeline>
+				<n-timeline-item
+					v-for="task in hasTasksSplitted ? tasksSplitted[daySelected] : userStore.tasks"
+					type="success"
+					:key="task._id"
+				>
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
-							<div class="card-header-title">
+							<div class="card-header-date">
 								<n-time v-if="task?.startDate" :time="new Date(task?.startDate)" format="HH:mm" />
 							</div>
 						</template>
-						<div class="card-content-text">
-							<n-performant-ellipsis :line-clamp="2" :tooltip="{ disabled: true }">
-								{{ task.description }}
-							</n-performant-ellipsis>
+						<div class="d-flex jc-between">
+							<div class="card-content-text">
+								<n-performant-ellipsis :line-clamp="1" :tooltip="{ disabled: true }">
+									{{ task.description }}
+								</n-performant-ellipsis>
+							</div>
+							<div class="d-flex ai-center mh-4">
+								<n-icon size="30" color="#555"><PlayCircleOutline /></n-icon>
+							</div>
 						</div>
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
-			<div v-else>
+			<!-- <div v-else>
 				<div>
 					<n-timeline>
-						<!-- v-for="(dayTasks, index) in tasksSplitted" :key="index"> -->
-						<n-timeline-item v-for="task in tasksSplitted[daySelected]" type="success" :key="task._id">
+						<n-timeline-item v-for="task in " type="success" :key="task._id">
 							<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
+								<template #header> {{ task.name }}2 </template>
 								<template #header-extra>
 									<div class="card-header-title">
 										<n-time v-if="task?.startDate" :time="new Date(task?.startDate)" format="HH:mm" />
@@ -286,7 +297,7 @@ const handleAddTask = (e: MouseEvent) => {
 						</n-timeline-item>
 					</n-timeline>
 				</div>
-			</div>
+			</div>-->
 		</div>
 
 		<n-drawer
@@ -406,11 +417,16 @@ const handleAddTask = (e: MouseEvent) => {
 
 :deep(.n-card-header) {
 	padding-bottom: 4px;
+	// padding-top: 4px;
+}
+.card-header-date {
+	font-weight: 500;
+	// font-size: 11px;
+	color: #000;
 }
 
-.card-header-title {
-	font-weight: 500;
-	color: #000;
+.card-content-text {
+	margin-top: 4px;
 }
 
 .timeline-header {
