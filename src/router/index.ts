@@ -86,6 +86,7 @@ router.beforeEach(to => {
 	const userStore = UserStore()
 	if (to.path === '/logout' && userStore.auth.isLogged) {
 		return userStore.googleLogout().then(() => {
+			userStore.isOnRequest = false
 			return { path: '/login', query: { redirect: verifyRedirect(to.query.redirect) } }
 		})
 	}

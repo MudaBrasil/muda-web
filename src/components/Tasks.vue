@@ -6,7 +6,8 @@ import {
 	NCard,
 	NPerformantEllipsis,
 	NInput,
-	NDynamicTags,
+	// NDynamicTags,
+	NSelect,
 	NTag,
 	NButton,
 	NDrawerContent,
@@ -22,6 +23,7 @@ import {
 } from 'naive-ui'
 import { ref, watch } from 'vue'
 import { AddCircleOutline } from '@vicons/ionicons5'
+import { SelectMixedOption } from 'naive-ui/es/select/src/interface'
 
 const formRef = ref<FormInst | null>(null)
 const axios = axiosInject()
@@ -31,6 +33,13 @@ const notification = NotificationStore()
 const isEditing = ref(false)
 const isDeleting = ref(false)
 const deleteCurrentTask = ref(false)
+const tagOptions = ref([] as SelectMixedOption[])
+
+tagOptions.value = [
+	{ label: 'tag1', value: 'tag1' },
+	{ label: 'tag2', value: 'tag2' },
+	{ label: 'tag3', value: 'tag3' }
+]
 
 const { tasks, spaceId, listId } = defineProps(['tasks', 'spaceId', 'listId'])
 const emit = defineEmits(['update'])
@@ -148,7 +157,7 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 			v-model:show="taskState.show.view"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -172,7 +181,16 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 				<br />
 				<small>Tags</small>
 				<div>
-					<n-dynamic-tags v-if="isEditing" v-model:value="taskState.current.tags" />
+					<n-select
+						v-if="isEditing"
+						v-model:value="taskState.current.tags"
+						:options="tagOptions"
+						filterable
+						multiple
+						tag
+						placeholder="Adicione tags para relacionar a outras tarefas"
+						:show-arrow="false"
+					/>
 					<n-tag v-else v-for="(tag, index) in taskState.current.tags" :key="index" style="margin-right: 8px">{{
 						tag
 					}}</n-tag>
@@ -222,7 +240,7 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 			v-model:show="taskState.show.new"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -241,7 +259,15 @@ const deleteTask = (taskId = taskState.value.current._id) => {
 						/>
 					</n-form-item>
 					<n-form-item path="tags" label="Tags">
-						<n-dynamic-tags v-model:value="taskState.current.tags" />
+						<n-select
+							v-model:value="taskState.current.tags"
+							:options="tagOptions"
+							filterable
+							multiple
+							tag
+							placeholder="Adicione tags para relacionar a outras tarefas"
+							:show-arrow="false"
+						/>
 					</n-form-item>
 
 					<n-form-item label="Data de inicio" path="startDate">

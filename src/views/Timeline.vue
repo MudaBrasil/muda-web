@@ -35,7 +35,6 @@ const userStore = UserStore()
 const hasSpaceList = ref(false)
 const hasTasksSplitted = ref(false)
 const requestEndpoint = ref('/me/tasks')
-const tasksSplitted = ref([])
 const daySelected = ref<number | null>(null)
 const days = ref([])
 
@@ -110,6 +109,7 @@ onMounted(async () => {
 		]
 		const dateToString = (date: Date = new Date()) => date.toLocaleString('sv').substring(0, 10)
 		const getWeekDay = (date: Date) => weekDaysNames[date.getDay()]
+		const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6
 
 		const today = new Date()
 		const yesterday = new Date(today.getTime() - 86400000)
@@ -131,9 +131,11 @@ onMounted(async () => {
 			{ fullDate: after5days, shortDate: dateToString(after5days), weekDay: getWeekDay(after5days) }
 		]
 
-		days.value.map(
-			day => (day.description = `${day.weekDay}, ${day.fullDate.getDate()} de ${monthsNames[day.fullDate.getMonth()]}`)
-		)
+		days.value.map(day => {
+			day.description = `${day.weekDay}, ${day.fullDate.getDate()} de ${monthsNames[day.fullDate.getMonth()]}`
+			day.isWeekend = isWeekend(day.fullDate)
+			return day
+		})
 
 		const queryParam = new URLSearchParams()
 		const daysToSplit = days.value.map(day => day.shortDate)
@@ -148,12 +150,16 @@ onMounted(async () => {
 	getTasks()
 })
 
-const currentTasksSplitted = computed(() => {
-	if (hasTasksSplitted.value && daySelected.value !== null) {
-		const selectedShortString = days.value[daySelected.value].shortDate
-		return tasksSplitted.value[selectedShortString]
+const currentTasks = computed(() => {
+	if (hasTasksSplitted.value) {
+		if (hasTasksSplitted.value && daySelected.value !== null) {
+			const selectedShortString = days.value[daySelected.value].shortDate
+			return userStore.tasksSplitted[selectedShortString]
+		}
+		return []
 	}
-	return []
+
+	return userStore.tasks
 })
 
 const getTasks = () => {
@@ -167,7 +173,7 @@ const getTasks = () => {
 		.then(response => {
 			loadingBar.finish()
 
-			if (hasTasksSplitted.value) return (tasksSplitted.value = response.data)
+			if (hasTasksSplitted.value) return (userStore.tasksSplitted = response.data)
 
 			return (userStore.tasks = response.data)
 		})
@@ -262,9 +268,9 @@ const handleAddTask = (e: MouseEvent) => {
 						style="height: 50px; width: 56px"
 						class="mh-0"
 					>
-						<div class="">
-							<div style="font-size: 16px; font-weight: bold">{{ day.shortDate.substring(8, 10) }}</div>
-							<div style="font-size: 11px">{{ day.weekDay.substring(0, 3) }}</div>
+						<div :class="['btn-day', { active: daySelected == index }]">
+							<div class="day-number">{{ day.shortDate.substring(8, 10) }}</div>
+							<div :class="{ weekend: day.isWeekend }">{{ day.weekDay.substring(0, 3) }}</div>
 						</div>
 					</n-button>
 				</div>
@@ -282,11 +288,7 @@ const handleAddTask = (e: MouseEvent) => {
 		</div>
 		<div class="pt-10 mb-100 mh-30">
 			<n-timeline>
-				<n-timeline-item
-					v-for="task in hasTasksSplitted ? currentTasksSplitted : userStore.tasks"
-					type="success"
-					:key="task._id"
-				>
+				<n-timeline-item v-for="task in currentTasks" type="success" :key="task._id">
 					<n-card hoverable embedded class="custom-card" :title="task.name" @click="showModalViewTask(task)">
 						<template #header-extra>
 							<div class="card-header-date">
@@ -306,18 +308,14 @@ const handleAddTask = (e: MouseEvent) => {
 					</n-card>
 				</n-timeline-item>
 			</n-timeline>
-			<n-empty
-				class="mt-40"
-				description="Não foi encontrado nenhuma tarefa"
-				v-if="!(hasTasksSplitted ? currentTasksSplitted : userStore.tasks)?.length"
-			/>
+			<n-empty class="mt-40" description="Não foi encontrado nenhuma tarefa" v-if="!currentTasks?.length" />
 		</div>
 
 		<n-drawer
 			v-model:show="showModal.newTask"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -358,7 +356,7 @@ const handleAddTask = (e: MouseEvent) => {
 			v-model:show="showModal.viewTask"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -426,6 +424,20 @@ const handleAddTask = (e: MouseEvent) => {
 	white-space: nowrap;
 	padding-right: 3px;
 	font-size: 16px;
+}
+
+.btn-day {
+	font-size: 11px;
+	.day-number {
+		font-size: 16px;
+		font-weight: bold;
+	}
+
+	&:not(.active) {
+		.weekend {
+			color: #813131;
+		}
+	}
 }
 
 :deep(.n-card-header) {

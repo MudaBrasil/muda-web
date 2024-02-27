@@ -131,6 +131,7 @@ export const UserStore = defineStore(
 		const user = ref(new UserModel())
 		const auth = ref(new AuthModel())
 		const tasks = ref<TaskModel[]>([])
+		const tasksSplitted = ref<TaskModel[][]>([])
 		const isOnRequest = ref(false)
 		const isLogoutRunning = ref(false)
 		const isNewUser = ref(false)
@@ -275,6 +276,7 @@ export const UserStore = defineStore(
 			auth,
 			user,
 			tasks,
+			tasksSplitted,
 			isNewUser,
 			isOnRequest,
 			register,
@@ -286,10 +288,10 @@ export const UserStore = defineStore(
 	},
 	{
 		persist: {
-			paths: ['auth', 'user', 'tasks']
+			paths: ['auth', 'user', 'tasks', 'tasksSplitted']
 		},
 		share: {
-			// omit: ['auth'], TODO: Porque eu tinha colocado pra omitir o auth de compartilhar entre navegadores e guias. Verificar se é necessário, senao deixa comentado
+			// omit: ['auth'], TODO: Entender o porque eu tinha colocado pra omitir o auth de compartilhar entre navegadores e guias. Verificar se é necessário, senao deixa comentado
 			omit: ['isOnRequest'],
 			enable: true,
 			initialize: true

@@ -339,7 +339,7 @@ const deleteList = listId => {
 			v-model:show="spaceState.show.view"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -406,7 +406,7 @@ const deleteList = listId => {
 			v-model:show="spaceState.show.new"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -449,7 +449,7 @@ const deleteList = listId => {
 			v-model:show="listState.show.view"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -514,7 +514,7 @@ const deleteList = listId => {
 			v-model:show="listState.show.new"
 			class="drawer-task"
 			placement="bottom"
-			default-height="500"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable

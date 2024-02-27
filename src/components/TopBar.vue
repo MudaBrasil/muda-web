@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UserStore, UserModel } from '@/stores/user'
-import { NAvatar, NFlex, NIcon, NButton, NDrawer, NDrawerContent, NMenu, NDynamicTags } from 'naive-ui'
+import { NAvatar, NFlex, NIcon, NButton, NDrawer, NDrawerContent, NMenu } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -235,6 +235,7 @@ const saveUser = () => {
 						{
 							label: 'Configurações',
 							key: 'settings',
+
 							disabled: true
 						}
 					]"
@@ -250,7 +251,7 @@ const saveUser = () => {
 			v-model:show="editUser.active"
 			class="drawer-task"
 			placement="bottom"
-			height="84%"
+			default-height="84%"
 			:max-height="700"
 			:min-height="300"
 			resizable
@@ -274,6 +275,8 @@ const saveUser = () => {
 
 				<EditProfileItem
 					title="Descrição"
+					inputType="textarea"
+					:autosize="{ minRows: 3, maxRows: 8 }"
 					placeholder="Descreva sobre você"
 					:originalValue="userStore.user.description"
 					v-model:editingValue="userEditing.description"
@@ -287,13 +290,21 @@ const saveUser = () => {
 					v-model:editingValue="userEditing.jobTitle"
 					v-model:isEditing="isEditing.jobTitle"
 				/>
-				<small>Tags</small>
-				<n-dynamic-tags v-model:value="userEditing.tags" />
-				<div>
-					<!-- <n-tag v-else v-for="(tag, index) in userEditing.tags" :key="index" style="margin-right: 8px">{{
-						tag
-					}}</n-tag> -->
-				</div>
+				<EditProfileItem
+					type="select"
+					title="Tags"
+					placeholder="Adicione tags para relacionar a outras tarefas"
+					:originalValues="userStore.user.tags"
+					v-model:editingValues="userEditing.tags"
+					v-model:isEditing="isEditing.tags"
+				/>
+				<!--
+				<EditProfileItem
+					title="Data de nascimento"
+					placeholder="Informe sua data de nascimento"
+					:originalValue="userStore.user.birthDate"
+					v-model:editingValue="userEditing.birthDate"
+					v-model:isEditing="isEditing.birthDate" -->
 
 				<template #footer>
 					<div class="d-flex jc-end">
